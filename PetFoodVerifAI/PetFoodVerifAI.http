@@ -1,0 +1,6 @@
+@PetFoodVerifAI_HostAddress = http://localhost:5135
+
+GET {{PetFoodVerifAI_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
