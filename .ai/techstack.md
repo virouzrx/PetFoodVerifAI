@@ -23,3 +23,14 @@ This document outlines the technology stack for the PetFoodVerifAI project.
 
 - **CSS Framework:** Tailwind CSS
 - **Reasoning:** A utility-first CSS framework for rapidly building custom user interfaces without leaving your HTML. It provides flexibility while maintaining a consistent design system.
+
+## Authentication
+
+- **Framework:** ASP.NET Identity
+- **Protocol:** OAuth2
+- **Reasoning:** ASP.NET Identity provides a robust and secure authentication system out-of-the-box, handling user registration, login, and management. OAuth2 will be integrated for future scalability, allowing for social logins and secure API access.
+
+## Deployment
+
+- **Platform:** Microsoft Azure
+- **Reasoning:** Azure offers a scalable and reliable cloud platform with excellent support for .NET applications. Services like Azure App Service and Azure Database for PostgreSQL will be utilized for seamless deployment and management.
