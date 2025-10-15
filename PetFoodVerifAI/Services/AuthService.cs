@@ -12,15 +12,38 @@ using System.Threading.Tasks;
 
 namespace PetFoodVerifAI.Services
 {
-    public class AuthService : IAuthService
+    public class AuthService(UserManager<IdentityUser> userManager, IConfiguration configuration, SignInManager<IdentityUser> signInManager) : IAuthService
     {
-        private readonly UserManager<IdentityUser> _userManager;
-        private readonly IConfiguration _configuration;
+        private readonly UserManager<IdentityUser> _userManager = userManager;
+        private readonly IConfiguration _configuration = configuration;
+        private readonly SignInManager<IdentityUser> _signInManager = signInManager;
 
-        public AuthService(UserManager<IdentityUser> userManager, IConfiguration configuration)
+        public async Task<AuthResultDto> LoginAsync(LoginRequestDto loginRequest)
         {
-            _userManager = userManager;
-            _configuration = configuration;
+            var user = await _userManager.FindByEmailAsync(loginRequest.Email);
+            if (user == null)
+            {
+                return new AuthResultDto { Succeeded = false, Errors = new[] { "Invalid credentials" } };
+            }
+
+            var result = await _signInManager.CheckPasswordSignInAsync(user, loginRequest.Password, lockoutOnFailure: true);
+
+            if (!result.Succeeded)
+            {
+                return new AuthResultDto { Succeeded = false, Errors = new[] { "Invalid credentials" } };
+            }
+
+            var token = GenerateJwtToken(user);
+
+            return new AuthResultDto
+            {
+                Succeeded = true,
+                Response = new AuthResponseDto
+                {
+                    UserId = user.Id,
+                    Token = token
+                }
+            };
         }
 
         public async Task<AuthResultDto> RegisterAsync(RegisterDto registerDto)

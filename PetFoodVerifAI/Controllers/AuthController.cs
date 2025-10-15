@@ -33,5 +33,23 @@ namespace PetFoodVerifAI.Controllers
 
             return CreatedAtAction(nameof(Register), new { userId = result.Response.UserId }, result.Response);
         }
+
+        [HttpPost("login")]
+        public async Task<IActionResult> Login([FromBody] LoginRequestDto loginRequest)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var result = await _authService.LoginAsync(loginRequest);
+
+            if (!result.Succeeded)
+            {
+                return Unauthorized(new { Errors = result.Errors });
+            }
+
+            return Ok(result.Response);
+        }
     }
 }
