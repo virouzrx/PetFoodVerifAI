@@ -48,6 +48,14 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddScoped<IAuthService, AuthService>();
 
+// Register application services
+builder.Services.AddScoped<IAnalysisService, AnalysisService>();
+
+// Register mock/placeholder services for external dependencies
+// TODO: Replace with actual implementations
+builder.Services.AddSingleton<IScrapingService, MockScrapingService>();
+builder.Services.AddSingleton<ILLMService, MockLLMService>();
+
 
 builder.Services.AddControllersWithViews();
 

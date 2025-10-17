@@ -1,0 +1,82 @@
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using PetFoodVerifAI.DTOs;
+using PetFoodVerifAI.Exceptions;
+using PetFoodVerifAI.Services;
+using System;
+using System.Security.Claims;
+using System.Threading.Tasks;
+
+namespace PetFoodVerifAI.Controllers
+{
+    [Authorize]
+    [ApiController]
+    [Route("api/[controller]")]
+    public class AnalysesController : ControllerBase
+    {
+        private readonly IAnalysisService _analysisService;
+
+        public AnalysesController(IAnalysisService analysisService)
+        {
+            _analysisService = analysisService;
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CreateAnalysis([FromBody] CreateAnalysisRequest request)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null)
+            {
+                return Unauthorized();
+            }
+
+            try
+            {
+                var result = await _analysisService.CreateAnalysisAsync(request, userId);
+                return CreatedAtAction(nameof(CreateAnalysis), new { id = result.AnalysisId }, result);
+            }
+            catch (ExternalServiceException ex)
+            {
+                // Log the exception ex
+                return StatusCode(503, new { message = "An external service is unavailable. Please try again later.", details = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                // Log the exception ex
+                return StatusCode(500, new { message = "An unexpected error occurred.", details = ex.Message });
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAnalyses([FromQuery] GetAnalysesQueryParameters query)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null)
+            {
+                return Unauthorized();
+            }
+
+            var result = await _analysisService.GetUserAnalysesAsync(userId, query);
+            return Ok(result);
+        }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetAnalysisById(Guid id)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null)
+            {
+                return Unauthorized(); 
+            }
+
+            var result = await _analysisService.GetAnalysisByIdAsync(id, userId);
+
+            if (result == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(result);
+        }
+    }
+}

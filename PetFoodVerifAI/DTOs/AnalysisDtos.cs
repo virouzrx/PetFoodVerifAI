@@ -83,3 +83,20 @@ public class AnalysisDetailDto
     public string? AdditionalInfo { get; set; }
     public DateTime CreatedAt { get; set; }
 }
+
+public class AnalysisDetailsDto
+{
+      public Guid AnalysisId { get; set; }
+      public Guid ProductId { get; set; }
+      public string ProductName { get; set; }
+      public string ProductUrl { get; set; }
+      public bool IsGeneral { get; set; }
+      public Recommendation Recommendation { get; set; }
+      public string Justification { get; set; }
+      public string IngredientsText { get; set; }
+      public Species Species { get; set; }
+      public string? Breed { get; set; }
+      public int? Age { get; set; }
+      public string? AdditionalInfo { get; set; }
+      public DateTime CreatedAt { get; set; }
+}
