@@ -51,16 +51,67 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 // Register application services
 builder.Services.AddScoped<IAnalysisService, AnalysisService>();
 
-// Register mock/placeholder services for external dependencies
-// TODO: Replace with actual implementations
-builder.Services.AddSingleton<IScrapingService, MockScrapingService>();
-builder.Services.AddSingleton<ILLMService, MockLLMService>();
+// Register external services
+builder.Services.AddHttpClient<IScrapingService, BasicScrapingService>(client =>
+{
+    // Add headers to make requests look like they're coming from a real browser
+    client.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36");
+    client.DefaultRequestHeaders.Add("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8");
+    client.DefaultRequestHeaders.Add("Accept-Language", "en-US,en;q=0.9");
+    // Don't manually add Accept-Encoding - let HttpClient handle compression automatically
+    client.DefaultRequestHeaders.Add("DNT", "1");
+    client.DefaultRequestHeaders.Add("Connection", "keep-alive");
+    client.DefaultRequestHeaders.Add("Upgrade-Insecure-Requests", "1");
+    client.Timeout = TimeSpan.FromSeconds(30);
+})
+.ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
+{
+    // Automatically decompress gzip and deflate responses
+    AutomaticDecompression = System.Net.DecompressionMethods.GZip | System.Net.DecompressionMethods.Deflate | System.Net.DecompressionMethods.Brotli
+});
+
+// LLM Service - Switch between Mock and Real LLM based on configuration
+var useMockLLM = builder.Configuration.GetValue<bool>("UseMockLLM", false);
+if (useMockLLM)
+{
+    builder.Services.AddSingleton<ILLMService, MockLLMService>();
+}
+else
+{
+    builder.Services.AddHttpClient<ILLMService, LLMService>();
+}
 
 
 builder.Services.AddControllersWithViews();
 
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(options =>
+{
+    options.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Type = Microsoft.OpenApi.Models.SecuritySchemeType.Http,
+        Scheme = "Bearer",
+        BearerFormat = "JWT",
+        In = Microsoft.OpenApi.Models.ParameterLocation.Header,
+        Description = "Enter your JWT token in the format: {your token here}"
+    });
+
+    options.AddSecurityRequirement(new Microsoft.OpenApi.Models.OpenApiSecurityRequirement
+    {
+        {
+            new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+            {
+                Reference = new Microsoft.OpenApi.Models.OpenApiReference
+                {
+                    Type = Microsoft.OpenApi.Models.ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            new string[] {}
+        }
+    });
+});
 
 var app = builder.Build();
 

@@ -56,7 +56,7 @@ namespace PetFoodVerifAI.Services
                 Product = product,
                 UserId = userId,
                 IsGeneral = false,
-                Recommendation = Enum.Parse<Recommendation>(llmResult.Recommendation),
+                Recommendation = llmResult.IsRecommended ? Recommendation.Recommended : Recommendation.NotRecommended,
                 Justification = llmResult.Justification,
                 IngredientsText = ingredients,
                 Species = request.Species,
@@ -75,6 +75,12 @@ namespace PetFoodVerifAI.Services
                 ProductId = product.ProductId,
                 Recommendation = analysis.Recommendation,
                 Justification = analysis.Justification,
+                Concerns = [.. llmResult.Concerns.Select(c => new IngredientConcernDto
+                {
+                    Type = c.Type,
+                    Ingredient = c.Ingredient,
+                    Reason = c.Reason
+                })],
                 CreatedAt = analysis.CreatedAt
             };
         }

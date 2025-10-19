@@ -38,7 +38,18 @@ public class AnalysisCreatedResponse
     public Guid ProductId { get; set; }
     public Recommendation Recommendation { get; set; }
     public string Justification { get; set; } = string.Empty;
+    public List<IngredientConcernDto> Concerns { get; set; } = new List<IngredientConcernDto>();
     public DateTime CreatedAt { get; set; }
+}
+
+/// <summary>
+/// DTO for ingredient concerns in the analysis response.
+/// </summary>
+public class IngredientConcernDto
+{
+    public string Type { get; set; } = string.Empty; // "questionable" or "unacceptable"
+    public string Ingredient { get; set; } = string.Empty;
+    public string Reason { get; set; } = string.Empty;
 }
 
 /// <summary>
