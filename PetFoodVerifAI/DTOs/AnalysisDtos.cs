@@ -104,7 +104,7 @@ public class AnalysisDetailsDto
       public bool IsGeneral { get; set; }
       public Recommendation Recommendation { get; set; }
       public string Justification { get; set; }
-      public string IngredientsText { get; set; }
+      public string? IngredientsText { get; set; }
       public Species Species { get; set; }
       public string? Breed { get; set; }
       public int? Age { get; set; }
