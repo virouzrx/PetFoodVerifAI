@@ -35,14 +35,13 @@ Stores unique product information. A product is uniquely identified by the combi
 ---
 
 #### `Analyses`
-The central table storing the results of all analyses. It distinguishes between private ("personal") and public ("general") analyses.
+The central table storing the results of all analyses.
 
 | Column Name       | Data Type             | Constraints                                       | Description                                                |
 |-------------------|-----------------------|---------------------------------------------------|------------------------------------------------------------|
 | `AnalysisId`      | `UUID`                | `PRIMARY KEY`, `DEFAULT gen_random_uuid()`        | Unique identifier for the analysis.                        |
 | `ProductId`       | `UUID`                | `NOT NULL`, `REFERENCES Products(ProductId)`      | Foreign key to the `Products` table.                       |
 | `UserId`          | `TEXT`                | `NOT NULL`, `REFERENCES AspNetUsers(Id)`          | Foreign key to the user who requested the analysis.        |
-| `IsGeneral`       | `BOOLEAN`             | `NOT NULL`, `DEFAULT FALSE`                       | `FALSE` for personal analysis, `TRUE` for general.         |
 | `Recommendation`  | `recommendation_enum` | `NOT NULL`                                        | The final verdict ("Recommended" or "Not Recommended").    |
 | `Justification`   | `TEXT`                | `NOT NULL`                                        | The LLM-generated reason for the recommendation.           |
 | `IngredientsText` | `TEXT`                | `NOT NULL`                                        | The raw ingredient list used for the analysis.             |
@@ -92,7 +91,7 @@ CREATE INDEX idx_feedback_user_id ON Feedback(UserId);
 
 ## 4. PostgreSQL Policies (Row-Level Security)
 
-To ensure users can only access their own data or public data, Row-Level Security (RLS) will be enabled on the `Analyses` table.
+To ensure users can only access their own data, Row-Level Security (RLS) will be enabled on the `Analyses` table.
 
 ```sql
 -- 1. Enable RLS on the Analyses table
@@ -102,8 +101,8 @@ ALTER TABLE Analyses ENABLE ROW LEVEL SECURITY;
 CREATE POLICY analyses_rls_policy ON Analyses
 FOR ALL
 USING (
-    -- Users can read their own personal analyses OR any general analysis
-    (UserId = current_user_id()) OR (IsGeneral = TRUE)
+    -- Users can only read their own personal analyses
+    (UserId = current_user_id())
 )
 WITH CHECK (
     -- Users can only write (INSERT, UPDATE) to their own records
@@ -116,5 +115,4 @@ _Note: `current_user_id()` is a placeholder for the function that will be implem
 
 - **Primary Keys**: `UUID` is used for all primary keys to avoid enumeration attacks and to simplify integration in distributed systems.
 - **Timestamps**: `TIMESTAMPTZ` is used for all date/time fields to ensure time zone correctness across the application.
-- **General vs. Personal Analyses**: The `IsGeneral` flag in the `Analyses` table is a key part of the design. User submissions will only create "personal" analyses (`IsGeneral = FALSE`). A separate, trusted administrative process will be responsible for creating and managing "general" analyses to ensure data quality and consistency.
 - **ASP.NET Identity Integration**: The `UserId` foreign key is of type `TEXT` to match the default `Id` column type in the `AspNetUsers` table from ASP.NET Identity.

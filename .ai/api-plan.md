@@ -17,14 +17,14 @@ The API is designed around the following main resources:
 
 Authentication will be handled by the built-in endpoints provided by ASP.NET Identity. The following are conceptual representations.
 
-- **POST `/register`**
+- **POST `/api/auth/register`**
   - **Description**: Registers a new user.
   - **Request Payload**: `{ "email": "user@example.com", "password": "Password123!" }`
   - **Response Payload**: `{ "userId": "...", "token": "..." }`
   - **Success Code**: 201 Created
   - **Error Codes**: 400 Bad Request (invalid email, weak password), 409 Conflict (email already exists)
 
-- **POST `/login`**
+- **POST `/api/auth/login`**
   - **Description**: Logs in an existing user.
   - **Request Payload**: `{ "email": "user@example.com", "password": "Password123!" }`
   - **Response Payload**: `{ "userId": "...", "token": "..." }`
@@ -94,7 +94,6 @@ Authentication will be handled by the built-in endpoints provided by ASP.NET Ide
       "productId": "uuid-goes-here",
       "productName": "Example Pet Food",
       "productUrl": "http://example.com/petfood",
-      "isGeneral": false,
       "recommendation": "Recommended",
       "justification": "This food contains high-quality protein sources...",
       "ingredientsText": "Chicken, rice, ...",
@@ -128,7 +127,7 @@ Authentication will be handled by the built-in endpoints provided by ASP.NET Ide
 - **Implementation**:
   - All endpoints under `/api/*` will require a valid authentication token in the `Authorization` header (e.g., `Authorization: Bearer <token>`).
   - Unauthenticated requests will receive a `401 Unauthorized` response.
-  - Authorization logic will be implemented to enforce the database's Row-Level Security policy: users can only access their own personal analyses or public (`IsGeneral = TRUE`) analyses. This ensures data privacy.
+  - Authorization logic will be implemented to enforce that users can only access their own analyses. This ensures data privacy.
 
 ## 4. Validation and Business Logic
 

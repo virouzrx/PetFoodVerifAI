@@ -51,10 +51,6 @@ public class ApplicationDbContext : IdentityDbContext<IdentityUser>
             entity.Property(a => a.CreatedAt)
                 .HasDefaultValueSql("NOW()");
 
-            // Default value for IsGeneral
-            entity.Property(a => a.IsGeneral)
-                .HasDefaultValue(false);
-
             // Configure relationship with Product
             entity.HasOne(a => a.Product)
                 .WithMany(p => p.Analyses)
@@ -64,8 +60,7 @@ public class ApplicationDbContext : IdentityDbContext<IdentityUser>
             // Configure relationship with User
             entity.HasOne(a => a.User)
                 .WithMany()
-                .HasForeignKey(a => a.UserId)
-                .OnDelete(DeleteBehavior.Restrict);
+                .HasForeignKey(a => a.UserId);
 
             // Index for ProductId for efficient version history queries
             entity.HasIndex(a => a.ProductId);

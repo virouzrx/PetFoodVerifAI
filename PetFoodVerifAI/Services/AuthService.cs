@@ -23,14 +23,14 @@ namespace PetFoodVerifAI.Services
             var user = await _userManager.FindByEmailAsync(loginRequest.Email);
             if (user == null)
             {
-                return new AuthResultDto { Succeeded = false, Errors = new[] { "Invalid credentials" } };
+                return new AuthResultDto { Succeeded = false, Errors = new[] { new IdentityError { Description = "Invalid credentials" } } };
             }
 
             var result = await _signInManager.CheckPasswordSignInAsync(user, loginRequest.Password, lockoutOnFailure: true);
 
             if (!result.Succeeded)
             {
-                return new AuthResultDto { Succeeded = false, Errors = new[] { "Invalid credentials" } };
+                return new AuthResultDto { Succeeded = false, Errors = new[] { new IdentityError { Description = "Invalid credentials" } } };
             }
 
             var token = GenerateJwtToken(user);
@@ -61,7 +61,7 @@ namespace PetFoodVerifAI.Services
                 return new AuthResultDto
                 {
                     Succeeded = false,
-                    Errors = result.Errors.Select(e => e.Description)
+                    Errors = result.Errors
                 };
             }
 

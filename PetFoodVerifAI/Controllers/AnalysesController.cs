@@ -6,6 +6,7 @@ using PetFoodVerifAI.Services;
 using System;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 
 namespace PetFoodVerifAI.Controllers
 {
@@ -77,6 +78,35 @@ namespace PetFoodVerifAI.Controllers
             }
 
             return Ok(result);
+        }
+
+        [HttpPost("{analysisId}/feedback")]
+        public async Task<IActionResult> CreateFeedback(Guid analysisId, [FromBody] CreateFeedbackRequest request)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null)
+            {
+                return Unauthorized();
+            }
+
+            try
+            {
+                await _analysisService.CreateFeedbackAsync(analysisId, userId, request);
+                return Created();
+            }
+            catch (KeyNotFoundException)
+            {
+                return NotFound();
+            }
+            catch (InvalidOperationException)
+            {
+                return Conflict();
+            }
+            catch (Exception ex)
+            {
+                // Log the exception ex
+                return StatusCode(500, new { message = "An unexpected error occurred.", details = ex.Message });
+            }
         }
     }
 }

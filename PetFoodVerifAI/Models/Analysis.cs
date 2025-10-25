@@ -22,9 +22,6 @@ public class Analysis
     public string UserId { get; set; } = string.Empty;
 
     [Required]
-    public bool IsGeneral { get; set; } = false;
-
-    [Required]
     public Recommendation Recommendation { get; set; }
 
     [Required]

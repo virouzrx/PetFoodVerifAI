@@ -11,7 +11,7 @@ The application is a secure, accessible SPA with a pre-auth landing experience, 
 - **Error handling**: Inline field validation (400), session expiry handling (401) with redirect and message, service unavailability (503) surfaced as retryable alerts, offline detection. Clear, actionable messages mapped from API codes.
 
 - **Key API endpoints** (compatibility summary):
-  - POST `/register`, POST `/login`
+  - POST `/api/auth/register`, POST `/api/auth/login`
   - POST `/api/analyses`
   - GET `/api/analyses` (paginated, optional `productId`)
   - GET `/api/analyses/{id}`
@@ -179,7 +179,7 @@ The application is a secure, accessible SPA with a pre-auth landing experience, 
 
 ### API compatibility details (by view)
 - Landing: none.
-- Register/Login: POST `/register` / POST `/login`; handle 400/401/409.
+- Register/Login: POST `/api/auth/register` / POST `/api/auth/login`; handle 400/401/409.
 - Analyze Product: POST `/api/analyses`; client triggers scraping or includes `ingredientsText` fallback; handle 400/503.
 - Results: GET `/api/analyses/{id}`; POST feedback `/api/analyses/{analysisId}/feedback` (201/409).
 - My Products: GET `/api/analyses` (paginated); filters by `productId` when opened in Version History drawer.

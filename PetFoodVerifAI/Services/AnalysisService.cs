@@ -41,10 +41,10 @@ namespace PetFoodVerifAI.Services
                 }
             }
             
-            LlmAnalysisResult llmResult;
+            LlmAnalysisResult llmResponse;
             try
             {
-                llmResult = await _llmService.AnalyzeIngredientsAsync(ingredients, request);
+                llmResponse = await _llmService.AnalyzeIngredientsAsync(ingredients, request);
             }
             catch (Exception ex)
             {
@@ -53,11 +53,10 @@ namespace PetFoodVerifAI.Services
             
             var analysis = new Analysis
             {
-                Product = product,
+                ProductId = product.ProductId,
                 UserId = userId,
-                IsGeneral = false,
-                Recommendation = llmResult.IsRecommended ? Recommendation.Recommended : Recommendation.NotRecommended,
-                Justification = llmResult.Justification,
+                Recommendation = llmResponse.IsRecommended ? Recommendation.Recommended : Recommendation.NotRecommended,
+                Justification = llmResponse.Justification,
                 IngredientsText = ingredients,
                 Species = request.Species,
                 Breed = request.Breed,
@@ -75,12 +74,12 @@ namespace PetFoodVerifAI.Services
                 ProductId = product.ProductId,
                 Recommendation = analysis.Recommendation,
                 Justification = analysis.Justification,
-                Concerns = [.. llmResult.Concerns.Select(c => new IngredientConcernDto
+                Concerns = llmResponse.Concerns.Select(c => new IngredientConcernDto
                 {
                     Type = c.Type,
                     Ingredient = c.Ingredient,
                     Reason = c.Reason
-                })],
+                }).ToList(),
                 CreatedAt = analysis.CreatedAt
             };
         }
@@ -105,6 +104,7 @@ namespace PetFoodVerifAI.Services
                 .Select(a => new AnalysisSummaryDto
                 {
                     AnalysisId = a.AnalysisId,
+                    ProductId = a.ProductId,
                     ProductName = a.Product.ProductName,
                     Recommendation = a.Recommendation,
                     CreatedAt = a.CreatedAt
@@ -131,7 +131,6 @@ namespace PetFoodVerifAI.Services
                     ProductId = a.ProductId,
                     ProductName = a.Product.ProductName,
                     ProductUrl = a.Product.ProductUrl,
-                    IsGeneral = a.IsGeneral,
                     Recommendation = a.Recommendation,
                     Justification = a.Justification,
                     IngredientsText = a.IngredientsText,
@@ -144,6 +143,35 @@ namespace PetFoodVerifAI.Services
                 .FirstOrDefaultAsync();
 
             return analysis;
+        }
+
+        public async Task CreateFeedbackAsync(Guid analysisId, string userId, CreateFeedbackRequest request)
+        {
+            var analysisExists = await _context.Analyses.AnyAsync(a => a.AnalysisId == analysisId);
+            if (!analysisExists)
+            {
+                throw new KeyNotFoundException("Analysis not found.");
+            }
+
+            var feedbackExists = await _context.Feedbacks
+                .AnyAsync(f => f.AnalysisId == analysisId && f.UserId == userId);
+
+            if (feedbackExists)
+            {
+                // Or update existing feedback, depending on requirements
+                throw new InvalidOperationException("Feedback already submitted for this analysis.");
+            }
+
+            var feedback = new Feedback
+            {
+                AnalysisId = analysisId,
+                UserId = userId,
+                IsPositive = request.IsPositive ?? false,
+                CreatedAt = DateTime.UtcNow
+            };
+
+            _context.Feedbacks.Add(feedback);
+            await _context.SaveChangesAsync();
         }
     }
 }

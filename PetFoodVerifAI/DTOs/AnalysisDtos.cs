@@ -70,6 +70,7 @@ public class PaginatedAnalysesResponse
 public class AnalysisSummaryDto
 {
     public Guid AnalysisId { get; set; }
+    public Guid ProductId { get; set; }
     public string ProductName { get; set; } = string.Empty;
     public Recommendation Recommendation { get; set; }
     public DateTime CreatedAt { get; set; }
@@ -84,7 +85,6 @@ public class AnalysisDetailDto
     public Guid ProductId { get; set; }
     public string ProductName { get; set; } = string.Empty;
     public string ProductUrl { get; set; } = string.Empty;
-    public bool IsGeneral { get; set; }
     public Recommendation Recommendation { get; set; }
     public string Justification { get; set; } = string.Empty;
     public string IngredientsText { get; set; } = string.Empty;
@@ -99,11 +99,10 @@ public class AnalysisDetailsDto
 {
       public Guid AnalysisId { get; set; }
       public Guid ProductId { get; set; }
-      public string ProductName { get; set; }
-      public string ProductUrl { get; set; }
-      public bool IsGeneral { get; set; }
+      public string ProductName { get; set; } = string.Empty;
+      public string ProductUrl { get; set; } = string.Empty;
       public Recommendation Recommendation { get; set; }
-      public string Justification { get; set; }
+      public string Justification { get; set; } = string.Empty;
       public string? IngredientsText { get; set; }
       public Species Species { get; set; }
       public string? Breed { get; set; }

@@ -4,7 +4,7 @@ This document outlines the technology stack for the PetFoodVerifAI project.
 
 ## Backend
 
-- **Framework:** .NET 10
+- **Framework:** .NET 8
 - **ORM:** Entity Framework Core
 - **Database Approach:** Code-First
 - **Reasoning:** Developer familiarity for rapid MVP development. It's a robust, scalable, and high-performance framework suitable for building the required REST API. Entity Framework Core with a Code-First approach will be used for data access, allowing the database schema to be defined and managed directly from the C# code.

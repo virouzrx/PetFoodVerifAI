@@ -82,7 +82,6 @@ Typy te są automatycznie tworzone przez EF Core dzięki metodzie `HasPostgresEn
 - `AnalysisId` (UUID, PK)
 - `ProductId` (UUID, FK -> Products)
 - `UserId` (TEXT, FK -> AspNetUsers)
-- `IsGeneral` (BOOLEAN, default: false)
 - `Recommendation` (recommendation_enum)
 - `Justification` (TEXT)
 - `IngredientsText` (TEXT)
