@@ -3,10 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using PetFoodVerifAI.DTOs;
 using PetFoodVerifAI.Exceptions;
 using PetFoodVerifAI.Services;
-using System;
 using System.Security.Claims;
-using System.Threading.Tasks;
-using System.Collections.Generic;
 
 namespace PetFoodVerifAI.Controllers
 {
