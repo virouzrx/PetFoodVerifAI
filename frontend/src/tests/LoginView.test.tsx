@@ -1,5 +1,5 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
-import { vi } from 'vitest'
+import { vi, type Mock } from 'vitest'
 import { MemoryRouter } from 'react-router-dom'
 import LoginView from '../views/login/LoginView'
 import useLogin from '../hooks/useLogin'
@@ -20,7 +20,7 @@ describe('LoginView', () => {
   beforeEach(() => {
     loginMock.mockReset()
     clearErrorMock.mockReset()
-    ;(useLogin as unknown as vi.Mock).mockReturnValue({
+    ;(useLogin as unknown as Mock).mockReturnValue({
       login: loginMock,
       isLoading: false,
       error: {},
@@ -39,7 +39,7 @@ describe('LoginView', () => {
   })
 
   it('submits valid credentials and redirects', async () => {
-    ;(useLogin as unknown as vi.Mock).mockReturnValue({
+    ;(useLogin as unknown as Mock).mockReturnValue({
       login: loginMock.mockResolvedValue(undefined),
       isLoading: false,
       error: {},
@@ -59,20 +59,18 @@ describe('LoginView', () => {
   })
 
   it('shows server form error in GlobalAlert', async () => {
-    ;(useLogin as unknown as vi.Mock).mockReturnValue({
+    ;(useLogin as unknown as Mock).mockReturnValue({
       login: loginMock,
       isLoading: false,
-      error: { form: 'We couldn’t sign you in. Check your credentials and try again.' },
+      error: { form: 'We couldn\'t sign you in. Check your credentials and try again.' },
       clearError: clearErrorMock,
     })
 
     renderWithRouter()
 
-    expect(
-      screen.getByRole('alert', {
-        name: /we couldn’t sign you in\. check your credentials and try again\./i,
-      }),
-    ).toBeInTheDocument()
+    expect(screen.getByRole('alert')).toHaveTextContent(
+      'We couldn\'t sign you in. Check your credentials and try again.',
+    )
   })
 })
 

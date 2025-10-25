@@ -1,47 +1,59 @@
 import { renderHook, act } from '@testing-library/react'
 import { vi } from 'vitest'
 import useLogin from '../hooks/useLogin'
-import { useAuth } from '../state/auth/AuthContext'
 import * as authService from '../services/authService'
 
-vi.mock('../state/auth/AuthContext', () => ({
-  useAuth: vi.fn(),
+const loginMock = vi.fn()
+
+vi.mock('../state/auth/AuthContext', () => {
+  return {
+    useAuth: () => {
+      const mockFn = vi.fn()
+      mockFn.mockImplementation((...args: unknown[]) => loginMock(...args))
+      return {
+        login: mockFn,
+      }
+    },
+  }
+})
+
+vi.mock('../services/authService', () => ({
+  loginUser: vi.fn(),
 }))
 
-vi.mock('../services/authService')
-
-const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
-
 describe('useLogin', () => {
-  const loginMock = vi.fn()
-
   beforeEach(() => {
     vi.useFakeTimers()
-    ;(useAuth as unknown as vi.Mock).mockReturnValue({ login: loginMock })
-    loginMock.mockReset()
-    vi.spyOn(authService, 'loginUser').mockReset()
+    loginMock.mockClear()
+    vi.mocked(authService.loginUser).mockReset()
   })
 
   afterEach(() => {
     vi.useRealTimers()
+    vi.clearAllMocks()
   })
 
+  const flushAsync = async () => {
+    await vi.advanceTimersByTimeAsync(600)
+  }
+
   it('logs in successfully and updates auth state', async () => {
-    vi.spyOn(authService, 'loginUser').mockResolvedValue({
+    vi.mocked(authService.loginUser).mockResolvedValue({
       token: 'token-123',
       userId: 'user-456',
     })
 
     const { result } = renderHook(() => useLogin())
 
+    let loginPromise: Promise<void>
+    
     await act(async () => {
-      const loginPromise = result.current.login({ email: 'USER@test.com', password: 'password1' })
-      await sleep(10)
-      vi.advanceTimersByTime(600)
+      loginPromise = result.current.login({ email: 'USER@test.com', password: 'password1' })
+      await flushAsync()
       await loginPromise
     })
 
-    expect(authService.loginUser).toHaveBeenCalledWith({
+    expect(vi.mocked(authService.loginUser)).toHaveBeenCalledWith({
       email: 'user@test.com',
       password: 'password1',
     })
@@ -51,37 +63,40 @@ describe('useLogin', () => {
   })
 
   it('handles credential errors with neutral messaging', async () => {
-    vi.spyOn(authService, 'loginUser').mockRejectedValue({ status: 401 })
+    vi.mocked(authService.loginUser).mockRejectedValue({ status: 401 })
 
     const { result } = renderHook(() => useLogin())
 
+    let loginPromise: Promise<void>
+
     await act(async () => {
-      const loginPromise = result.current.login({ email: 'user@test.com', password: 'wrongpass' })
-      await sleep(10)
-      vi.advanceTimersByTime(600)
+      loginPromise = result.current.login({ email: 'user@test.com', password: 'wrongpass' })
+      await flushAsync()
       await loginPromise
     })
 
     expect(result.current.error.form).toBe(
-      "We couldn’t sign you in. Check your credentials and try again.",
+      'We couldn\'t sign you in. Check your credentials and try again.',
     )
     expect(loginMock).not.toHaveBeenCalled()
     expect(result.current.isLoading).toBe(false)
   })
 
   it('handles rate limit errors', async () => {
-    vi.spyOn(authService, 'loginUser').mockRejectedValue({ status: 429 })
+    vi.mocked(authService.loginUser).mockRejectedValue({ status: 429 })
 
     const { result } = renderHook(() => useLogin())
 
+    let loginPromise: Promise<void>
+
     await act(async () => {
-      const loginPromise = result.current.login({ email: 'user@test.com', password: 'password1' })
-      await sleep(10)
-      vi.advanceTimersByTime(600)
+      loginPromise = result.current.login({ email: 'user@test.com', password: 'password1' })
+      await flushAsync()
       await loginPromise
     })
 
     expect(result.current.error.form).toBe('Too many attempts. Please wait and try again.')
+    expect(result.current.isLoading).toBe(false)
   })
 })
 

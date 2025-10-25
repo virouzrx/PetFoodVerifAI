@@ -5,7 +5,6 @@ import { useAuth } from '../state/auth/AuthContext'
 import type {
   FieldErrorMap,
   LoginRequestDto,
-  LoginResponseDto,
   ApiErrorResponse,
 } from '../types/auth'
 
@@ -54,7 +53,7 @@ const useLogin = (): UseLoginResult => {
         let fieldErrors: FieldErrorMap = {}
         const apiError = error as ApiErrorResponse
         if (apiError?.status === 400 || apiError?.status === 401) {
-          fieldErrors.form = "We couldn’t sign you in. Check your credentials and try again."
+          fieldErrors.form = 'We couldn\'t sign you in. Check your credentials and try again.'
         } else if (apiError?.status === 429) {
           fieldErrors.form = 'Too many attempts. Please wait and try again.'
         } else {
