@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../state/auth/AuthContext';
 import InlineHelp from './components/InlineHelp';
 import AnalyzeForm from './components/AnalyzeForm';
@@ -29,11 +29,28 @@ import { speciesStringToEnum } from '../../types/analyze';
  */
 const AnalyzePage = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { state: authState } = useAuth();
   const [submitStatus, setSubmitStatus] = useState<SubmitStatus>('idle');
   const [apiError, setApiError] = useState<ApiErrorShape | null>(null);
   const [statusMessage, setStatusMessage] = useState<string>('');
   const [scrapeState, setScrapeState] = useState<ScrapeState>('idle');
+
+  // Check if this is a reanalysis (from My Products view)
+  const navigationState = location.state as any;
+  const isReanalysis = navigationState?.fromReanalysis === true;
+  
+  // Prepare initial values and locked fields for reanalysis
+  const initialValues = isReanalysis ? {
+    productName: navigationState?.productName || '',
+    productUrl: navigationState?.productUrl || '',
+    species: navigationState?.species || '',
+    breed: navigationState?.breed || '',
+    age: navigationState?.age || '',
+    additionalInfo: navigationState?.additionalInfo || '',
+  } : undefined;
+  
+  const lockedFields: ('productName' | 'productUrl')[] = isReanalysis ? ['productName', 'productUrl'] : [];
 
   const handleSubmit = useCallback(
     async (formValues: AnalyzeFormValues) => {
@@ -130,12 +147,40 @@ const AnalyzePage = () => {
         {/* Page Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-white">
-            Analyze Pet Food Product
+            {isReanalysis ? 'Re-analyze Pet Food Product' : 'Analyze Pet Food Product'}
           </h1>
           <p className="mt-2 text-base text-white">
-            Enter product details to get a personalized recommendation for your pet
+            {isReanalysis 
+              ? 'Update your pet details or ingredient information for a fresh analysis'
+              : 'Enter product details to get a personalized recommendation for your pet'
+            }
           </p>
         </div>
+
+        {/* Reanalysis notice */}
+        {isReanalysis && (
+          <div className="mb-6 bg-brand-secondary/80 border-l-4 border-brand-accent rounded-lg p-4">
+            <div className="flex items-start gap-3">
+              <svg
+                className="h-5 w-5 text-brand-primary flex-shrink-0 mt-0.5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                aria-hidden="true"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+              <p className="text-sm text-brand-dark">
+                <strong>Re-analysis Mode:</strong> Product name and URL are locked to ensure you're analyzing the same product. You can update your pet's details or ingredient information below.
+              </p>
+            </div>
+          </div>
+        )}
 
         {/* Status announcements for screen readers */}
         <div className="sr-only" role="status" aria-live="polite" aria-atomic="true">
@@ -166,6 +211,8 @@ const AnalyzePage = () => {
             submissionStatus={submitStatus}
             scrapeStateFromParent={scrapeState}
             apiErrors={apiError?.errors}
+            initialValues={initialValues}
+            lockedFields={lockedFields}
           />
         </div>
       </main>

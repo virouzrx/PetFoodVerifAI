@@ -99,6 +99,7 @@ namespace PetFoodVerifAI.Services
         public async Task<PaginatedResult<AnalysisSummaryDto>> GetUserAnalysesAsync(string userId, GetAnalysesQueryParameters query)
         {
             var queryable = _context.Analyses
+                .Include(a => a.Product)
                 .Where(a => a.UserId == userId)
                 .OrderByDescending(a => a.CreatedAt)
                 .AsQueryable();
@@ -108,9 +109,47 @@ namespace PetFoodVerifAI.Services
                 queryable = queryable.Where(a => a.ProductId == query.ProductId.Value);
             }
 
-            var totalCount = await queryable.CountAsync();
+            // If grouping by product, get only the latest analysis per product
+            if (query.GroupByProduct && !query.ProductId.HasValue)
+            {
+                // Get all analyses for the user with Product included
+                var allAnalyses = await queryable.ToListAsync();
 
-            var items = await queryable
+                // Group by ProductId and get the latest analysis for each product (in memory)
+                var latestAnalyses = allAnalyses
+                    .GroupBy(a => a.ProductId)
+                    .Select(g => g.OrderByDescending(a => a.CreatedAt).First())
+                    .ToList();
+
+                var totalCount = latestAnalyses.Count;
+
+                // Apply pagination and project to DTO (in memory)
+                var items = latestAnalyses
+                    .Skip((query.Page - 1) * query.PageSize)
+                    .Take(query.PageSize)
+                    .Select(a => new AnalysisSummaryDto
+                    {
+                        AnalysisId = a.AnalysisId,
+                        ProductId = a.ProductId,
+                        ProductName = a.Product.ProductName,
+                        Recommendation = a.Recommendation,
+                        CreatedAt = a.CreatedAt
+                    })
+                    .ToList();
+
+                return new PaginatedResult<AnalysisSummaryDto>
+                {
+                    Page = query.Page,
+                    PageSize = query.PageSize,
+                    TotalCount = totalCount,
+                    Items = items
+                };
+            }
+
+            // Default behavior: return all analyses
+            var defaultTotalCount = await queryable.CountAsync();
+
+            var defaultItems = await queryable
                 .Skip((query.Page - 1) * query.PageSize)
                 .Take(query.PageSize)
                 .Select(a => new AnalysisSummaryDto
@@ -127,8 +166,8 @@ namespace PetFoodVerifAI.Services
             {
                 Page = query.Page,
                 PageSize = query.PageSize,
-                TotalCount = totalCount,
-                Items = items
+                TotalCount = defaultTotalCount,
+                Items = defaultItems
             };
         }
 

@@ -1,4 +1,4 @@
-import { useReducer, useCallback, useState } from 'react';
+import { useReducer, useCallback, useState, useEffect } from 'react';
 import type {
   AnalyzeFormValues,
   AnalyzeFormErrors,
@@ -12,7 +12,8 @@ type FormAction =
   | { type: 'SET_NO_INGREDIENTS'; value: boolean }
   | { type: 'ENABLE_MANUAL' }
   | { type: 'RESET_MANUAL' }
-  | { type: 'RESET_FORM' };
+  | { type: 'RESET_FORM' }
+  | { type: 'INIT_FORM'; values: Partial<AnalyzeFormValues> };
 
 const initialFormValues: AnalyzeFormValues = {
   productName: '',
@@ -45,6 +46,8 @@ const formReducer = (state: AnalyzeFormValues, action: FormAction): AnalyzeFormV
       };
     case 'RESET_FORM':
       return initialFormValues;
+    case 'INIT_FORM':
+      return { ...state, ...action.values };
     default:
       return state;
   }
@@ -56,11 +59,23 @@ const formReducer = (state: AnalyzeFormValues, action: FormAction): AnalyzeFormV
  * Purpose: Manage form state, validation, and manual ingredient fallback
  * Returns: Form values, errors, handlers, and manual ingredient state
  */
-export const useAnalyzeForm = () => {
+export const useAnalyzeForm = (initialValues?: Partial<AnalyzeFormValues>) => {
   const [formValues, dispatch] = useReducer(formReducer, initialFormValues);
   const [formErrors, setFormErrors] = useState<AnalyzeFormErrors>({});
   const [scrapeState, setScrapeState] = useState<ScrapeState>('idle');
   const [showValidationSummary, setShowValidationSummary] = useState(false);
+
+  // Initialize form with provided values
+  const initializeForm = useCallback((values: Partial<AnalyzeFormValues>) => {
+    dispatch({ type: 'INIT_FORM', values });
+  }, []);
+
+  // Initialize on mount if initial values provided
+  useEffect(() => {
+    if (initialValues) {
+      initializeForm(initialValues);
+    }
+  }, []); // Only run once on mount
 
   // Field update handler
   const updateField = useCallback((field: keyof AnalyzeFormValues, value: any) => {
@@ -273,6 +288,7 @@ export const useAnalyzeForm = () => {
     toggleNoIngredients,
     setScrapeState,
     setFormErrors,
+    initializeForm,
   };
 };
 

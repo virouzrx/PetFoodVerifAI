@@ -9,6 +9,7 @@ import NotFoundRoute from './views/not-found/NotFoundRoute'
 
 const AnalyzeView = lazy(() => import('./views/AnalyzeView'))
 const ResultsView = lazy(() => import('./views/ResultsView'))
+const MyProductsView = lazy(() => import('./views/MyProductsView'))
 
 const RedirectIfAuthenticated = ({ children }: { children: ReactNode }) => {
   const { isAuthenticated } = useAuth()
@@ -62,10 +63,7 @@ const App = () => {
             path="/products"
             element={
               <Suspense fallback={<div className="p-6">Loading...</div>}>
-                <div className="p-8">
-                  <h1 className="text-2xl font-bold">My Products</h1>
-                  <p className="mt-4 text-gray-600">Product listing coming soon...</p>
-                </div>
+                <MyProductsView />
               </Suspense>
             }
           />

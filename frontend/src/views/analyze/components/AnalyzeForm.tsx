@@ -19,6 +19,8 @@ type AnalyzeFormProps = {
   submissionStatus: SubmitStatus;
   scrapeStateFromParent?: ScrapeState;
   apiErrors?: Record<string, string[]>;
+  initialValues?: Partial<AnalyzeFormValues>;
+  lockedFields?: ('productName' | 'productUrl')[];
 };
 
 /**
@@ -33,7 +35,7 @@ type AnalyzeFormProps = {
  * - Scraping status display
  * - Grid layout for inputs
  */
-const AnalyzeForm = ({ onSubmit, submissionStatus, scrapeStateFromParent, apiErrors }: AnalyzeFormProps) => {
+const AnalyzeForm = ({ onSubmit, submissionStatus, scrapeStateFromParent, apiErrors, initialValues, lockedFields = [] }: AnalyzeFormProps) => {
   const {
     formValues,
     formErrors,
@@ -48,7 +50,7 @@ const AnalyzeForm = ({ onSubmit, submissionStatus, scrapeStateFromParent, apiErr
     updateManualIngredients,
     toggleNoIngredients,
     setScrapeState,
-  } = useAnalyzeForm();
+  } = useAnalyzeForm(initialValues);
 
   // Use parent scrape state if provided (for API-driven state changes)
   const scrapeState = scrapeStateFromParent || localScrapeState;
@@ -139,7 +141,7 @@ const AnalyzeForm = ({ onSubmit, submissionStatus, scrapeStateFromParent, apiErr
               error={mergedErrors.productName}
               onChange={(value) => updateField('productName', value)}
               onBlur={() => handleBlur('productName')}
-              disabled={isSubmitting}
+              disabled={isSubmitting || lockedFields.includes('productName')}
             />
           </div>
 
@@ -149,7 +151,7 @@ const AnalyzeForm = ({ onSubmit, submissionStatus, scrapeStateFromParent, apiErr
               error={mergedErrors.productUrl}
               onChange={(value) => updateField('productUrl', value)}
               onBlur={() => handleBlur('productUrl')}
-              disabled={isSubmitting}
+              disabled={isSubmitting || lockedFields.includes('productUrl')}
             />
           </div>
         </div>

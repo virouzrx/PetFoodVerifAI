@@ -101,10 +101,10 @@ const ResultStatusPanel = ({
             Analyze New Product
           </a>
           <a
-            href="/history"
-            className="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-brand-primary/30 focus:ring-offset-2"
+            href="/products"
+            className="rounded-md border border-brand-primary bg-white px-4 py-2 text-sm font-medium text-brand-primary hover:bg-brand-primary hover:text-white focus:outline-none focus:ring-2 focus:ring-brand-primary focus:ring-offset-2 transition-colors"
           >
-            View History
+            My Products
           </a>
         </div>
       </div>

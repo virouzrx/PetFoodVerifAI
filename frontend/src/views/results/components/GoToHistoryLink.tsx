@@ -7,12 +7,12 @@ type GoToHistoryLinkProps = {
 /**
  * GoToHistoryLink Component
  * 
- * Purpose: CTA button linking to the history view filtered by the current product
+ * Purpose: CTA button linking to the My Products view
  * 
  * Features:
  * - Styled as a button for visual prominence
  * - Uses React Router Link for client-side navigation
- * - Includes query parameter to filter history by product
+ * - Links to My Products page where user can view version history
  * - Icon for visual clarity
  * - Hidden/disabled if productId is missing
  */
@@ -24,8 +24,8 @@ const GoToHistoryLink = ({ productId }: GoToHistoryLinkProps) => {
 
   return (
     <Link
-      to={`/history?productId=${productId}`}
-      className="inline-flex items-center gap-2 rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
+      to="/products"
+      className="inline-flex items-center gap-2 rounded-md border border-brand-primary bg-white px-4 py-2 text-sm font-medium text-brand-primary hover:bg-brand-primary hover:text-white focus:outline-none focus:ring-2 focus:ring-brand-primary focus:ring-offset-2 transition-colors"
     >
       <svg
         className="h-5 w-5"
@@ -41,7 +41,7 @@ const GoToHistoryLink = ({ productId }: GoToHistoryLinkProps) => {
           d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
         />
       </svg>
-      <span>View History for this Product</span>
+      <span>Go to My Products</span>
     </Link>
   );
 };
