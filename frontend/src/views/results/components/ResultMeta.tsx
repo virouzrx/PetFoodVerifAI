@@ -33,22 +33,22 @@ const ResultMeta = ({ analysis }: ResultMetaProps) => {
   const hasValidUrl = isValidUrl(analysis.productUrl);
 
   return (
-    <div className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
-      <h2 className="text-lg font-semibold text-slate-900 mb-4">
+    <div className="rounded-lg border border-brand-secondary/40 bg-gradient-to-br from-white to-brand-secondary/10 p-6 shadow-md">
+      <h2 className="text-lg font-semibold text-brand-dark mb-4">
         Product & Pet Details
       </h2>
 
       <dl className="space-y-4">
         {/* Product Name */}
         <div>
-          <dt className="text-sm font-medium text-slate-500">Product Name</dt>
-          <dd className="mt-1 text-base text-slate-900">
+          <dt className="text-sm font-medium text-gray-600">Product Name</dt>
+          <dd className="mt-1 text-base text-brand-dark">
             {hasValidUrl ? (
               <a
                 href={analysis.productUrl!}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-blue-600 hover:text-blue-800 hover:underline"
+                className="text-brand-primary hover:text-brand-primary/80 hover:underline"
               >
                 {analysis.productName}
                 <svg
@@ -76,14 +76,14 @@ const ResultMeta = ({ analysis }: ResultMetaProps) => {
         {/* Product URL */}
         {analysis.productUrl && (
           <div>
-            <dt className="text-sm font-medium text-slate-500">Product URL</dt>
-            <dd className="mt-1 text-sm text-slate-600 break-all">
+            <dt className="text-sm font-medium text-gray-600">Product URL</dt>
+            <dd className="mt-1 text-sm text-gray-700 break-all">
               {hasValidUrl ? (
                 <a
                   href={analysis.productUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-blue-600 hover:text-blue-800 hover:underline"
+                  className="text-brand-primary hover:text-brand-primary/80 hover:underline"
                 >
                   {analysis.productUrl}
                 </a>
@@ -96,17 +96,17 @@ const ResultMeta = ({ analysis }: ResultMetaProps) => {
 
         {/* Pet Information */}
         <div>
-          <dt className="text-sm font-medium text-slate-500">Pet Information</dt>
-          <dd className="mt-1 text-base text-slate-900">{petSummary}</dd>
+          <dt className="text-sm font-medium text-gray-600">Pet Information</dt>
+          <dd className="mt-1 text-base text-brand-dark">{petSummary}</dd>
         </div>
 
         {/* Additional Info */}
         {analysis.additionalInfo && (
           <div>
-            <dt className="text-sm font-medium text-slate-500">
+            <dt className="text-sm font-medium text-gray-600">
               Additional Context
             </dt>
-            <dd className="mt-1 text-sm text-slate-700">
+            <dd className="mt-1 text-sm text-gray-800">
               {analysis.additionalInfo}
             </dd>
           </div>
@@ -115,15 +115,15 @@ const ResultMeta = ({ analysis }: ResultMetaProps) => {
         {/* Ingredients Preview */}
         {analysis.ingredientsText && (
           <div>
-            <dt className="text-sm font-medium text-slate-500">
+            <dt className="text-sm font-medium text-gray-600">
               Ingredients Analyzed
             </dt>
-            <dd className="mt-1 text-sm text-slate-700">
+            <dd className="mt-1 text-sm text-gray-800">
               <details className="cursor-pointer">
-                <summary className="text-blue-600 hover:text-blue-800">
+                <summary className="text-brand-primary hover:text-brand-primary/80">
                   View ingredients list
                 </summary>
-                <div className="mt-2 p-3 bg-slate-50 rounded border border-slate-200 text-xs font-mono whitespace-pre-wrap break-words">
+                <div className="mt-2 p-3 bg-brand-secondary/5 rounded border border-brand-secondary/30 text-xs font-mono whitespace-pre-wrap break-words">
                   {analysis.ingredientsText}
                 </div>
               </details>
@@ -133,18 +133,18 @@ const ResultMeta = ({ analysis }: ResultMetaProps) => {
 
         {/* Analysis Timestamp */}
         <div>
-          <dt className="text-sm font-medium text-slate-500">
+          <dt className="text-sm font-medium text-gray-600">
             Analysis Date
           </dt>
-          <dd className="mt-1 text-sm text-slate-600">
+          <dd className="mt-1 text-sm text-gray-700">
             <time dateTime={analysis.createdAt}>{formattedDate}</time>
           </dd>
         </div>
 
         {/* Analysis ID */}
         <div>
-          <dt className="text-sm font-medium text-slate-500">Analysis ID</dt>
-          <dd className="mt-1 text-xs text-slate-500 font-mono">
+          <dt className="text-sm font-medium text-gray-600">Analysis ID</dt>
+          <dd className="mt-1 text-xs text-gray-600 font-mono">
             {analysis.analysisId}
           </dd>
         </div>

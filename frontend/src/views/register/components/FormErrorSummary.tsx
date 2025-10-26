@@ -42,7 +42,7 @@ const FormErrorSummary = ({ errors, onFocusField }: FormErrorSummaryProps) => {
           <li key={item.field}>
             <button
               type="button"
-              className="underline decoration-dotted underline-offset-2 hover:text-indigo-600"
+              className="underline decoration-dotted underline-offset-2 hover:text-brand-primary"
               onClick={() => onFocusField?.(item.field)}
             >
               {item.message}

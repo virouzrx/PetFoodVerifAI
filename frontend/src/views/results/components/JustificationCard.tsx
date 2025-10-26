@@ -26,19 +26,19 @@ const JustificationCard = ({
 
   return (
     <section
-      className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm"
+      className="rounded-lg border border-brand-primary/40 bg-gradient-to-br from-white to-brand-primary/10 p-6 shadow-md"
       aria-labelledby="justification-heading"
     >
       <h2
         id="justification-heading"
-        className="text-lg font-semibold text-slate-900 mb-3"
+        className="text-lg font-semibold text-brand-dark mb-3"
       >
         Analysis Justification
       </h2>
 
       {/* Main Justification Text */}
       <div className="prose prose-slate max-w-none">
-        <p className="text-slate-700 leading-relaxed">
+        <p className="text-gray-800 leading-relaxed">
           {justification || 'No justification provided.'}
         </p>
       </div>
@@ -46,7 +46,7 @@ const JustificationCard = ({
       {/* Ingredient Concerns */}
       {hasConcerns && (
         <div className="mt-6">
-          <h3 className="text-base font-semibold text-slate-900 mb-3">
+          <h3 className="text-base font-semibold text-brand-dark mb-3">
             Ingredient Concerns
           </h3>
           <ul className="space-y-3" role="list">
@@ -59,7 +59,7 @@ const JustificationCard = ({
               return (
                 <li
                   key={index}
-                  className="border-l-4 border-slate-300 pl-4 py-2"
+                  className="border-l-4 border-gray-300 pl-4 py-2"
                 >
                   <div className="flex items-start gap-2">
                     {/* Concern Type Badge */}
@@ -71,10 +71,10 @@ const JustificationCard = ({
 
                     {/* Ingredient Name */}
                     <div className="flex-1">
-                      <p className="font-medium text-slate-900">
+                      <p className="font-medium text-brand-dark">
                         {concern.ingredient}
                       </p>
-                      <p className="mt-1 text-sm text-slate-600">
+                      <p className="mt-1 text-sm text-gray-700">
                         {concern.reason}
                       </p>
                     </div>

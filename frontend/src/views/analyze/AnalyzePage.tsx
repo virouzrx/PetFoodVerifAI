@@ -124,14 +124,14 @@ const AnalyzePage = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-gradient-to-br from-brand-secondary/20 via-brand-accent/5 to-brand-primary/15">
       {/* Header */}
-      <header className="border-b border-slate-200 bg-white shadow-sm">
+      <header className="border-b border-brand-secondary/40 bg-gradient-to-r from-brand-primary/10 to-brand-secondary/10 backdrop-blur-sm shadow-md">
         <div className="mx-auto max-w-4xl px-4 py-4 sm:px-6 lg:px-8">
-          <h1 className="text-2xl font-bold text-slate-900">
+          <h1 className="text-2xl font-bold text-brand-dark">
             Analyze Pet Food Product
           </h1>
-          <p className="mt-1 text-sm text-slate-600">
+          <p className="mt-1 text-sm text-gray-700">
             Enter product details to get a personalized recommendation for your pet
           </p>
         </div>

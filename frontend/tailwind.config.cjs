@@ -4,9 +4,11 @@ const config = {
     extend: {
       colors: {
         brand: {
-          primary: '#1d4ed8',
-          secondary: '#2563eb',
-          accent: '#f97316',
+          primary: '#3E5641',
+          secondary: '#83BCA9',
+          accent: '#D36135',
+          tertiary: '#A24936',
+          dark: '#282B28',
         },
       },
     },

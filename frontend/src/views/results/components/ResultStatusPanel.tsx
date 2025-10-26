@@ -29,7 +29,7 @@ const ResultStatusPanel = ({
       >
         {/* Loading Spinner */}
         <svg
-          className="h-12 w-12 animate-spin text-blue-600"
+          className="h-12 w-12 animate-spin text-brand-primary"
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
           viewBox="0 0 24 24"
@@ -96,13 +96,13 @@ const ResultStatusPanel = ({
         <div className="mt-6 flex gap-3">
           <a
             href="/analyze"
-            className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+            className="rounded-md bg-brand-primary px-4 py-2 text-sm font-medium text-white hover:bg-brand-primary/90 focus:outline-none focus:ring-2 focus:ring-brand-secondary/50 focus:ring-offset-2"
           >
             Analyze New Product
           </a>
           <a
             href="/history"
-            className="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+            className="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-brand-secondary/50 focus:ring-offset-2"
           >
             View History
           </a>
@@ -200,7 +200,7 @@ const ResultStatusPanel = ({
           {error.type === 'unauthorized' ? (
             <a
               href="/login"
-              className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+              className="rounded-md bg-brand-primary px-4 py-2 text-sm font-medium text-white hover:bg-brand-primary/90 focus:outline-none focus:ring-2 focus:ring-brand-secondary/50 focus:ring-offset-2"
             >
               Log In
             </a>
@@ -208,7 +208,7 @@ const ResultStatusPanel = ({
             <button
               type="button"
               onClick={onRetry}
-              className="rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+              className="rounded-md bg-brand-primary px-4 py-2 text-sm font-medium text-white hover:bg-brand-primary/90 focus:outline-none focus:ring-2 focus:ring-brand-secondary/50 focus:ring-offset-2"
             >
               Try Again
             </button>

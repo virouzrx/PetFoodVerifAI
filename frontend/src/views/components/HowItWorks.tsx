@@ -4,13 +4,13 @@ const HowItWorks = ({ steps }: HowItWorksProps) => {
   return (
     <section
       aria-labelledby="how-it-works-heading"
-      className="rounded-3xl border border-slate-200 bg-white p-10 shadow-sm"
+      className="rounded-3xl border border-brand-secondary/40 bg-gradient-to-br from-white to-brand-secondary/10 p-10 shadow-md"
     >
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <h2 className="text-2xl font-semibold text-slate-900" id="how-it-works-heading">
+        <h2 className="text-2xl font-semibold text-brand-dark" id="how-it-works-heading">
           How it works
         </h2>
-        <p className="max-w-md text-sm text-slate-500">
+        <p className="max-w-md text-sm text-gray-600">
           Understand what information you provide and how PetFoodVerifAI evaluates the data to
           deliver useful insights.
         </p>
@@ -23,8 +23,8 @@ const HowItWorks = ({ steps }: HowItWorksProps) => {
               {index + 1}
             </span>
             <div className="space-y-2">
-              <h3 className="text-lg font-semibold text-slate-900">{step.title}</h3>
-              <p className="text-slate-600">{step.description}</p>
+              <h3 className="text-lg font-semibold text-brand-dark">{step.title}</h3>
+              <p className="text-gray-700">{step.description}</p>
             </div>
           </li>
         ))}

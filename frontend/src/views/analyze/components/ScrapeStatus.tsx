@@ -31,13 +31,13 @@ const ScrapeStatus = ({
     switch (state) {
       case 'scraping':
       case 'submitting':
-        return 'bg-blue-50 border-blue-200 text-blue-900';
+        return 'bg-brand-secondary/10 border-brand-secondary/30 text-brand-dark';
       case 'awaitingManual':
         return 'bg-amber-50 border-amber-200 text-amber-900';
       case 'manualReady':
         return 'bg-emerald-50 border-emerald-200 text-emerald-900';
       default:
-        return 'bg-slate-50 border-slate-200 text-slate-900';
+        return 'bg-gray-50 border-gray-200 text-brand-dark';
     }
   };
 

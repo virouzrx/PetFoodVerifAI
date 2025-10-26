@@ -28,19 +28,19 @@ const FeedbackSection = ({
 
   return (
     <section
-      className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm"
+      className="rounded-lg border border-brand-accent/40 bg-gradient-to-br from-white to-brand-accent/10 p-6 shadow-md"
       aria-labelledby="feedback-heading"
     >
       {/* Heading */}
       <h2
         id="feedback-heading"
-        className="text-lg font-semibold text-slate-900 mb-2"
+        className="text-lg font-semibold text-brand-dark mb-2"
       >
         Was this analysis helpful?
       </h2>
 
       {/* Description */}
-      <p className="text-sm text-slate-600 mb-4">
+      <p className="text-sm text-gray-700 mb-4">
         Your feedback helps us improve our recommendations and better serve the
         pet community.
       </p>

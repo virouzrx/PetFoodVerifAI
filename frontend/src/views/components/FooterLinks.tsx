@@ -2,8 +2,8 @@ import type { FooterLinksProps } from '../../types/landing'
 
 const FooterLinks = ({ links }: FooterLinksProps) => {
   return (
-    <footer className="border-t border-slate-200 bg-white">
-      <div className="mx-auto flex max-w-5xl flex-col items-center gap-4 px-6 py-8 text-sm text-slate-500 sm:flex-row sm:justify-between">
+    <footer className="border-t border-brand-primary/30 bg-gradient-to-r from-brand-primary/15 to-brand-secondary/15">
+      <div className="mx-auto flex max-w-5xl flex-col items-center gap-4 px-6 py-8 text-sm text-gray-600 sm:flex-row sm:justify-between">
         <p>&copy; {new Date().getFullYear()} PetFoodVerifAI.</p>
         <nav aria-label="Legal links" className="flex items-center gap-6">
           {links.map((link) => {

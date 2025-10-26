@@ -12,11 +12,11 @@ const AuthSwitchLink = ({
   to = '/login',
 }: AuthSwitchLinkProps) => {
   return (
-    <p className="text-sm text-center text-slate-600">
+    <p className="text-sm text-center text-gray-600">
       {prompt}{' '}
       <Link
         to={to}
-        className="font-semibold text-indigo-600 hover:text-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-200"
+        className="font-semibold text-brand-primary hover:text-brand-primary/80 focus:outline-none focus:ring-2 focus:ring-brand-secondary/30"
       >
         {label}
       </Link>

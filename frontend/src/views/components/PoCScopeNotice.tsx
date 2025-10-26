@@ -4,7 +4,7 @@ const PoCScopeNotice = ({ limitations, disclaimer, privacyNote }: PoCScopeNotice
   return (
     <section
       aria-labelledby="poc-scope-heading"
-      className="rounded-3xl border border-brand-primary/20 bg-brand-primary/5 p-8 text-left"
+      className="rounded-3xl border border-brand-primary/30 bg-gradient-to-br from-brand-primary/15 to-brand-primary/25 p-8 text-left shadow-md"
     >
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <h2 className="text-2xl font-semibold text-brand-primary" id="poc-scope-heading">
@@ -16,13 +16,13 @@ const PoCScopeNotice = ({ limitations, disclaimer, privacyNote }: PoCScopeNotice
         </p>
       </div>
 
-      <ul className="mt-6 list-disc space-y-3 pl-6 text-slate-700" role="list">
+      <ul className="mt-6 list-disc space-y-3 pl-6 text-gray-700" role="list">
         {limitations.map((limitation) => (
           <li key={limitation}>{limitation}</li>
         ))}
       </ul>
 
-      <div className="mt-6 space-y-3 rounded-2xl border border-brand-primary/30 bg-white/90 p-6 text-sm text-slate-600 shadow-sm">
+      <div className="mt-6 space-y-3 rounded-2xl border border-brand-primary/30 bg-white/90 p-6 text-sm text-gray-700 shadow-sm">
         <p>
           <span className="font-semibold text-brand-secondary">AI Disclaimer:</span> {disclaimer}
         </p>

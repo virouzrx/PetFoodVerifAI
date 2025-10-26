@@ -14,14 +14,14 @@ type InlineHelpProps = {
 const InlineHelp = ({ className = "" }: InlineHelpProps) => {
   return (
     <div
-      className={`rounded-lg border border-blue-200 bg-blue-50 p-4 ${className}`}
+      className={`rounded-lg border border-brand-secondary/30 bg-brand-secondary/10 p-4 ${className}`}
       role="note"
       aria-label="Help information"
     >
       <div className="flex items-start gap-3">
         <div className="flex-shrink-0">
           <svg
-            className="h-5 w-5 text-blue-600"
+            className="h-5 w-5 text-brand-primary"
             fill="currentColor"
             viewBox="0 0 20 20"
             aria-hidden="true"
@@ -34,10 +34,10 @@ const InlineHelp = ({ className = "" }: InlineHelpProps) => {
           </svg>
         </div>
         <div className="flex-1">
-          <h3 className="text-sm font-semibold text-blue-900">
+          <h3 className="text-sm font-semibold text-brand-dark">
             How Product Analysis Works
           </h3>
-          <div className="mt-2 text-sm text-blue-800">
+          <div className="mt-2 text-sm text-gray-800">
             <p className="mb-3">
               We'll attempt to automatically retrieve ingredient information from the 
               product URL you provide. If automatic scraping isn't possible, you'll 

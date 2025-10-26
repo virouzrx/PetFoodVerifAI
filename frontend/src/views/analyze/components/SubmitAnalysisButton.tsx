@@ -26,8 +26,8 @@ const SubmitAnalysisButton = ({
       disabled={isDisabled}
       className={`w-full rounded-md px-4 py-3 text-sm font-semibold text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 ${
         isDisabled
-          ? 'cursor-not-allowed bg-slate-400'
-          : 'bg-blue-600 hover:bg-blue-700 focus:ring-blue-500'
+          ? 'cursor-not-allowed bg-gray-400'
+          : 'bg-brand-primary hover:bg-brand-primary/90 focus:ring-brand-secondary/50'
       } transition-colors duration-150`}
       aria-busy={isLoading}
     >
