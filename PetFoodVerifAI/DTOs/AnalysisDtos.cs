@@ -103,6 +103,7 @@ public class AnalysisDetailsDto
       public string ProductUrl { get; set; } = string.Empty;
       public Recommendation Recommendation { get; set; }
       public string Justification { get; set; } = string.Empty;
+      public List<IngredientConcernDto> Concerns { get; set; } = new List<IngredientConcernDto>();
       public string? IngredientsText { get; set; }
       public Species Species { get; set; }
       public string? Breed { get; set; }

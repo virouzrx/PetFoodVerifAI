@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.AspNetCore.Identity;
+using System.Text.Json;
 
 namespace PetFoodVerifAI.Models;
 
@@ -38,6 +39,11 @@ public class Analysis
     public int? Age { get; set; }
 
     public string? AdditionalInfo { get; set; }
+
+    /// <summary>
+    /// JSON-serialized list of ingredient concerns (questionable or unacceptable)
+    /// </summary>
+    public string? ConcernsJson { get; set; }
 
     [Required]
     public DateTime CreatedAt { get; set; }

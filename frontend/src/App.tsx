@@ -6,6 +6,7 @@ import LoginView from './views/login/LoginView'
 import RegisterView from './views/register/RegisterView'
 
 const AnalyzeView = lazy(() => import('./views/AnalyzeView'))
+const ResultsView = lazy(() => import('./views/ResultsView'))
 
 const ProtectedRoute = ({ children }: { children: ReactNode }) => {
   const { isAuthenticated } = useAuth()
@@ -50,6 +51,16 @@ const App = () => {
             <ProtectedRoute>
               <Suspense fallback={<div className="p-6">Loading...</div>}>
                 <AnalyzeView />
+              </Suspense>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/results/:analysisId"
+          element={
+            <ProtectedRoute>
+              <Suspense fallback={<div className="p-6">Loading...</div>}>
+                <ResultsView />
               </Suspense>
             </ProtectedRoute>
           }

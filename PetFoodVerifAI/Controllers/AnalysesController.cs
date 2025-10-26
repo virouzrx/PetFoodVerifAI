@@ -89,7 +89,7 @@ namespace PetFoodVerifAI.Controllers
             try
             {
                 await _analysisService.CreateFeedbackAsync(analysisId, userId, request);
-                return Created();
+                return StatusCode(201);
             }
             catch (KeyNotFoundException)
             {

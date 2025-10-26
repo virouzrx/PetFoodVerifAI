@@ -3,6 +3,7 @@ using PetFoodVerifAI.Data;
 using PetFoodVerifAI.DTOs;
 using PetFoodVerifAI.Exceptions;
 using PetFoodVerifAI.Models;
+using System.Text.Json;
 
 namespace PetFoodVerifAI.Services
 {
@@ -51,6 +52,16 @@ namespace PetFoodVerifAI.Services
                 throw new ExternalServiceException("Failed to get analysis from the LLM service.", ex);
             }
             
+            // Serialize concerns to JSON for storage
+            var concernsJson = llmResponse.Concerns.Count > 0 
+                ? JsonSerializer.Serialize(llmResponse.Concerns.Select(c => new IngredientConcernDto
+                {
+                    Type = c.Type,
+                    Ingredient = c.Ingredient,
+                    Reason = c.Reason
+                }).ToList())
+                : null;
+
             var analysis = new Analysis
             {
                 ProductId = product.ProductId,
@@ -62,6 +73,7 @@ namespace PetFoodVerifAI.Services
                 Breed = request.Breed,
                 Age = request.Age,
                 AdditionalInfo = request.AdditionalInfo,
+                ConcernsJson = concernsJson,
                 CreatedAt = DateTime.UtcNow
             };
 
@@ -125,24 +137,45 @@ namespace PetFoodVerifAI.Services
             var analysis = await _context.Analyses
                 .Include(a => a.Product)
                 .Where(a => a.AnalysisId == analysisId && a.UserId == userId)
-                .Select(a => new AnalysisDetailsDto
-                {
-                    AnalysisId = a.AnalysisId,
-                    ProductId = a.ProductId,
-                    ProductName = a.Product.ProductName,
-                    ProductUrl = a.Product.ProductUrl,
-                    Recommendation = a.Recommendation,
-                    Justification = a.Justification,
-                    IngredientsText = a.IngredientsText,
-                    Species = a.Species,
-                    Breed = a.Breed,
-                    Age = a.Age,
-                    AdditionalInfo = a.AdditionalInfo,
-                    CreatedAt = a.CreatedAt
-                })
                 .FirstOrDefaultAsync();
 
-            return analysis;
+            if (analysis == null)
+            {
+                return null;
+            }
+
+            // Deserialize concerns from JSON
+            List<IngredientConcernDto> concerns = new List<IngredientConcernDto>();
+            if (!string.IsNullOrEmpty(analysis.ConcernsJson))
+            {
+                try
+                {
+                    concerns = JsonSerializer.Deserialize<List<IngredientConcernDto>>(analysis.ConcernsJson) 
+                        ?? new List<IngredientConcernDto>();
+                }
+                catch (JsonException)
+                {
+                    // If deserialization fails, return empty list
+                    concerns = new List<IngredientConcernDto>();
+                }
+            }
+
+            return new AnalysisDetailsDto
+            {
+                AnalysisId = analysis.AnalysisId,
+                ProductId = analysis.ProductId,
+                ProductName = analysis.Product.ProductName,
+                ProductUrl = analysis.Product.ProductUrl,
+                Recommendation = analysis.Recommendation,
+                Justification = analysis.Justification,
+                Concerns = concerns,
+                IngredientsText = analysis.IngredientsText,
+                Species = analysis.Species,
+                Breed = analysis.Breed,
+                Age = analysis.Age,
+                AdditionalInfo = analysis.AdditionalInfo,
+                CreatedAt = analysis.CreatedAt
+            };
         }
 
         public async Task CreateFeedbackAsync(Guid analysisId, string userId, CreateFeedbackRequest request)

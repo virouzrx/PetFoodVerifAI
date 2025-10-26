@@ -1,0 +1,5 @@
+---
+description: migration rule
+alwaysApply: true
+---
+-Whenever you plan to create new migration when editing code, first inspect the previous migrations to align the name format with previous ones. After creating the migration, always update the database. If it's not possible because the app is running, inform the user about it and wait for the user action.
