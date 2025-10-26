@@ -57,7 +57,7 @@ describe('useLogin', () => {
       email: 'user@test.com',
       password: 'password1',
     })
-    expect(loginMock).toHaveBeenCalledWith('token-123', 'user-456')
+    expect(loginMock).toHaveBeenCalledWith('token-123', 'user-456', 'user@test.com')
     expect(result.current.error).toEqual({})
     expect(result.current.isLoading).toBe(false)
   })

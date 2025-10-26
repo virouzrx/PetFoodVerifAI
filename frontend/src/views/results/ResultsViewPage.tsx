@@ -1,4 +1,5 @@
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
+import { useEffect } from 'react';
 import { useAuth } from '../../state/auth/AuthContext';
 import { useAnalysisDetail } from '../../hooks/useAnalysisDetail';
 import { useFeedbackSubmission } from '../../hooks/useFeedbackSubmission';
@@ -16,16 +17,31 @@ import ResultsContent from './components/ResultsContent';
  * - Fetches analysis data via useAnalysisDetail hook
  * - Manages feedback submission via useFeedbackSubmission hook
  * - Renders loading, error, not found, and success states
+ * - Navigates to /404 when analysis is not found
  * - Provides navigation actions (reanalyze, go to history)
  * - Integrates with authentication context
  */
 const ResultsViewPage = () => {
   const { analysisId } = useParams<{ analysisId: string }>();
   const navigate = useNavigate();
+  const location = useLocation();
   const { isAuthenticated } = useAuth();
 
   // Fetch analysis data
   const { status, data, error, refetch } = useAnalysisDetail(analysisId);
+
+  // Navigate to 404 page when analysis is not found
+  useEffect(() => {
+    if (status === 'notFound') {
+      navigate('/404', {
+        replace: true,
+        state: {
+          from: location.pathname,
+          reason: 'analysis-missing',
+        },
+      });
+    }
+  }, [status, navigate, location.pathname]);
 
   // Feedback submission
   const { feedbackState, submitFeedback } = useFeedbackSubmission(analysisId);

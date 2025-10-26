@@ -5,6 +5,7 @@ import LandingView from './views/LandingView'
 import LoginView from './views/login/LoginView'
 import RegisterView from './views/register/RegisterView'
 import AuthenticatedShell from './layouts/AuthenticatedShell'
+import NotFoundRoute from './views/not-found/NotFoundRoute'
 
 const AnalyzeView = lazy(() => import('./views/AnalyzeView'))
 const ResultsView = lazy(() => import('./views/ResultsView'))
@@ -70,7 +71,11 @@ const App = () => {
           />
         </Route>
         
-        <Route path="*" element={<Navigate to="/" replace />} />
+        {/* 404 Not Found route */}
+        <Route path="/404" element={<NotFoundRoute />} />
+        
+        {/* Catch-all redirect to 404 */}
+        <Route path="*" element={<Navigate to="/404" replace />} />
       </Routes>
     </BrowserRouter>
   )
