@@ -10,6 +10,7 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: './src/tests/setupTests.ts',
     globals: true,
+    hoistMocks: true,
   },
   css: {
     postcss: {
