@@ -33,7 +33,7 @@ const FormErrorSummary = ({ errors, onFocusField }: FormErrorSummaryProps) => {
       role="alert"
       ref={alertRef}
       tabIndex={-1}
-      className="rounded-md border border-rose-200 bg-rose-50 p-4 text-sm text-rose-800 shadow-sm"
+      className="rounded-md border-2 border-red-700 bg-red-50 p-4 text-sm text-red-900 shadow-sm"
     >
       <p className="font-semibold">Please review the following:</p>
       <ul className="mt-2 list-disc space-y-1 pl-5">

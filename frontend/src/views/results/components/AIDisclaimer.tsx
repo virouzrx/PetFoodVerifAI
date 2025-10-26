@@ -13,7 +13,7 @@
 const AIDisclaimer = () => {
   return (
     <aside
-      className="rounded-lg border-2 border-brand-accent/30 bg-brand-accent/10 p-4"
+      className="rounded-md border-l-4 border-l-brand-accent border border-brand-accent/30 bg-brand-secondary/80 p-4"
       role="note"
       aria-label="AI Analysis Disclaimer"
     >

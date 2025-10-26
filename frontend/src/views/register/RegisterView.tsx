@@ -63,9 +63,9 @@ const RegisterView = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-brand-secondary/25 via-brand-accent/10 to-brand-primary/20">
+    <div className="min-h-screen">
       <div className="mx-auto flex min-h-screen w-full max-w-4xl flex-col items-center justify-center px-4 py-8 sm:px-6 lg:px-8">
-        <main className="w-full max-w-md space-y-8 rounded-lg bg-white/95 backdrop-blur-sm px-5 py-8 shadow-xl ring-1 ring-brand-primary/30 sm:px-8">
+        <main className="w-full max-w-md space-y-8 rounded-lg bg-brand-secondary px-5 py-8 shadow-xl border-2 border-brand-primary sm:px-8">
           <header className="space-y-2 text-center">
             <p className="text-xs font-medium uppercase tracking-wide text-brand-primary">Welcome</p>
             <h1 className="text-3xl font-semibold text-brand-dark">Create your account</h1>

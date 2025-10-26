@@ -1,0 +1,312 @@
+# PetFoodVerifAI UI Component Design System
+
+## Color Palette
+
+### Tailwind Configuration
+```javascript
+colors: {
+  brand: {
+    primary: '#BC6C25',    // Rust Brown
+    secondary: '#FEFAE0',  // Cream
+    accent: '#DDA15E',     // Golden Tan
+    tertiary: '#606C38',   // Olive Green
+    dark: '#283618',       // Dark Forest Green
+  }
+}
+```
+
+## Color Hierarchy & Usage Rules
+
+### 1. Background Layer - `#606C38` (Olive Green / `brand-tertiary`)
+- **Usage**: Body background only
+- **Application**: `body { background: #606C38; }`
+- **Purpose**: Foundation layer for entire application
+
+### 2. Text & Typography - `#283618` (Dark Forest Green / `brand-dark`)
+- **Usage**: All text, headings, labels, body copy
+- **Application**: `text-brand-dark`
+- **Purpose**: Primary text color with excellent contrast on cream backgrounds
+
+### 3. Content Backgrounds - `#FEFAE0` (Cream / `brand-secondary`)
+- **Usage**: Cards, forms, headers, footers, main content areas
+- **Application**: `bg-brand-secondary`
+- **Purpose**: Clean, readable surfaces for content
+- **Examples**: Login/Register forms, Analysis form, Result cards, Headers/footers
+
+### 4. Secondary Accents - `#DDA15E` (Golden Tan / `brand-accent`)
+- **Usage**: Borders, highlights, informational elements, icons in disclaimers
+- **Application**: `border-brand-accent`, `text-brand-accent`
+- **Purpose**: Secondary emphasis without overwhelming
+- **Examples**: Section borders, Disclaimer accents, Help box styling, Info icons
+
+### 5. Primary Actions - `#BC6C25` (Rust Brown / `brand-primary`)
+- **Usage**: Buttons, CTAs, primary interactive elements, emphasis
+- **Application**: `bg-brand-primary` with `text-white`
+- **Purpose**: Main call-to-action elements that demand attention
+- **Examples**: Submit buttons, Primary CTAs, Important borders, Badge backgrounds
+
+## Component Styling Rules
+
+### Primary Content Cards
+```css
+bg-brand-secondary border-2 border-brand-accent rounded-lg shadow-md p-6
+```
+- Background: Solid cream
+- Border: Golden, 2px
+- Shadow: Medium depth
+- Corners: Large rounded
+- Purpose: Main content areas (forms, result cards)
+
+### Disclaimer / Informational Boxes
+```css
+bg-brand-secondary/80 border-l-4 border-l-brand-accent border border-brand-accent/30 rounded-md p-4
+```
+- Background: 80% cream opacity
+- Left Border: Thick golden accent bar (4px)
+- All Border: Subtle golden outline (30% opacity)
+- Shadow: None (flat appearance)
+- Corners: Medium rounded
+- Icon Color: `text-brand-accent` (golden)
+- Purpose: Help boxes, AI disclaimers, informational notes
+- Examples: "How Product Analysis Works", "AI-Generated Analysis"
+
+### Special Emphasis Cards (PoC Notice)
+```css
+bg-brand-tertiary/30 border-2 border-brand-primary rounded-3xl shadow-md p-8
+```
+- Background: Olive tint (30%) for warnings
+- Border: Rust, 2px
+- Shadow: Medium
+- Corners: Extra large rounded
+- Purpose: Important notices that need attention but aren't errors
+
+### Headers & Footers
+```css
+bg-brand-secondary border-b-2 border-brand-accent shadow-md
+```
+- Background: Cream
+- Border: Bottom (or top for footer) golden, 2px
+- Shadow: Medium
+- Purpose: Page structure elements
+
+### Buttons & CTAs
+
+#### Primary Action Buttons
+```css
+bg-brand-primary text-white hover:bg-brand-primary/90 focus:ring-2 focus:ring-brand-primary/30
+```
+- Background: Rust
+- Text: White
+- Hover: 90% opacity
+- Focus: Ring with 30% opacity
+- Purpose: Main actions (submit, register, analyze)
+
+#### Secondary/Outline Buttons
+```css
+border-2 border-brand-primary text-brand-primary hover:bg-brand-primary/10
+```
+- Background: Transparent or white
+- Border: Rust, 2px
+- Text: Rust
+- Hover: 10% rust tint
+- Purpose: Secondary actions (sign in, cancel)
+
+#### Disabled State
+```css
+bg-gray-400 text-white cursor-not-allowed
+```
+- Use gray for disabled states
+
+### Form Inputs
+```css
+bg-white border border-gray-300 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/30 text-brand-dark
+```
+- Background: White (NOT cream - for clarity)
+- Border Default: Gray
+- Border Focus: Rust
+- Ring Focus: Rust with 30% opacity
+- Text: Dark green
+
+### Recommendation Badges
+```css
+/* Recommended */
+bg-green-700 text-white border-green-900 shadow-lg
+/* Used with border-2 */
+
+/* Not Recommended */
+bg-red-700 text-white border-red-900 shadow-lg
+/* Used with border-2 */
+```
+- Recommended: Deep green background (positive, natural, clearly visible)
+- Not Recommended: Deep red (universally recognized danger, earthy shade)
+- Both use white text for contrast
+- Border: Darker shade (green-900/red-900) for strong definition
+- Border width: 2px (border-2) for balanced emphasis
+- Shadow: Large (shadow-lg) for depth and separation from background
+
+### Ingredient Concern Badges
+```css
+/* Unacceptable */
+bg-red-700 text-white border-red-900 shadow-lg
+/* Used with border (1px) */
+
+/* Questionable */
+bg-amber-600 text-white border-amber-900 shadow-lg
+/* Used with border (1px) */
+```
+- Unacceptable: Deep red background (danger, critical issue)
+- Questionable: Deep amber background (warning, caution)
+- Both use white text for contrast
+- Border: Darker shade (red-900/amber-900) for subtle definition
+- Border width: 1px (border) for delicate emphasis - thinner than main recommendation badges
+- Shadow: Large (shadow-lg) for depth and visibility
+- Size: Smaller badges (xs font, less padding) as they appear inline with ingredient details
+
+### Error States
+
+#### Global Error Alerts
+```css
+bg-red-50 text-red-900 ring-red-700
+```
+- Light red background
+- Dark red text
+- Deep red border (ring)
+
+#### Form Error Summaries
+```css
+border-2 border-red-700 bg-red-50 text-red-900
+```
+- Deep red border (2px)
+- Light red background
+- Dark red text
+- Icons: `text-red-700`
+- Links: `text-red-800`
+
+#### Inline Form Field Errors
+```css
+/* Error messages */
+text-red-700
+
+/* Required asterisks */
+text-red-700
+
+/* Error borders */
+border-red-600 focus:border-red-700 focus:ring-red-700
+```
+- Consistent deep red across all error states
+- More visible than rose colors
+- Matches "Not Recommended" badge styling
+
+### Step Indicators / Badges
+```css
+bg-brand-primary text-white rounded-full
+```
+- Rust background
+- White text
+- Circular shape
+- Purpose: Numbered steps, badges
+
+## Border Conventions
+
+- **Primary Content**: `border-2` with `border-brand-accent` (golden)
+- **Emphasis/Forms**: `border-2` with `border-brand-primary` (rust)
+- **Disclaimers**: `border-l-4 border-l-brand-accent` + `border border-brand-accent/30`
+- **Headers/Footers**: `border-b-2` or `border-t-2` with `border-brand-accent`
+- **Subtle Dividers**: `border` with `border-brand-accent/30`
+- **Error States**: `border-2` with `border-red-700`
+
+## Shadow Usage
+
+- **Content Cards**: `shadow-md` - visible depth
+- **Forms**: `shadow-xl` - prominent elevation
+- **Disclaimers**: No shadow - flat appearance
+- **Headers**: `shadow-md` - subtle separation
+- **Buttons**: `shadow-sm` or `shadow-md` - clickable indication
+
+## Special Element Rules
+
+### Password Strength Hints
+```css
+border-2 border-brand-accent bg-brand-accent/20 p-3
+```
+- Light golden tint background
+- Golden border
+
+### Ingredients Display Box
+```css
+bg-brand-accent/20 border-2 border-brand-accent rounded font-mono text-xs
+```
+- Light golden tint background
+- Golden border
+- Monospace font for data
+
+### Link Styling
+```css
+text-brand-primary hover:text-brand-primary/80
+```
+- Rust color
+- Hover: 80% opacity
+- Purpose: All hyperlinks
+
+## Semantic Colors (Reserved for Specific Uses)
+
+**Light semantic colors are reserved for:**
+- **Success Messages**: `bg-green-100 text-green-800` - Positive feedback, success alerts
+- **Error Messages**: `bg-red-100 text-red-800 border-red-300` - Error alerts, validation messages
+- **Warning Messages**: `bg-amber-100 text-amber-800 border-amber-300` - Warning alerts, informational messages
+- **Gray Neutrals**: Use standard Tailwind grays for disabled states, placeholder text
+
+**Dark semantic colors are used for badges** (see badge sections above)
+
+## Design Principles
+
+1. **No Gradients** - Use solid colors only
+2. **Hierarchy Through Color** - Background → Text → Content → Accents → Primary Actions
+3. **Contrast First** - White text on rust buttons, dark text on cream backgrounds
+4. **Subtle Transparency** - Only for disclaimers (80%) to differentiate from primary content
+5. **Consistent Borders** - Thicker (2px or 4px) for emphasis, thinner for subtlety
+6. **Purpose-Driven** - Rust for actions, golden for information, cream for content
+7. **Transitions** - Always add to interactive elements: `transition-colors duration-200`
+8. **Accessibility** - Test color contrast ratios (WCAG AA minimum)
+
+## Color Usage Summary Table
+
+| Element Type | Background | Text | Border |
+|--------------|------------|------|--------|
+| Body | `brand-tertiary` (#606C38) | - | - |
+| Content Cards | `brand-secondary` (#FEFAE0) | `brand-dark` | `brand-accent` |
+| Disclaimers | `brand-secondary/80` | `brand-dark` | `border-l-brand-accent` |
+| Primary Buttons | `brand-primary` (#BC6C25) | `white` | `brand-primary` |
+| Form Inputs | `white` | `brand-dark` | `gray-300` → `brand-primary` (focus) |
+| Headers/Footers | `brand-secondary` | `brand-dark` | `brand-accent` |
+| Recommended Badge | `green-700` | `white` | `green-900` (2px) + `shadow-lg` |
+| Not Recommended Badge | `red-700` | `white` | `red-900` (2px) + `shadow-lg` |
+| Unacceptable Badge | `red-700` | `white` | `red-900` (1px) + `shadow-lg` |
+| Questionable Badge | `amber-600` | `white` | `amber-900` (1px) + `shadow-lg` |
+| Error Alerts | `red-50` | `red-900` | `red-700` |
+| Error Inputs | `white` | `red-700` | `red-600` → `red-700` (focus) |
+
+## Common Mistakes to Avoid
+
+❌ **DON'T**:
+- Use `brand-tertiary` (olive) for anything except body background
+- Use brand colors for semantic states (success/error/warning)
+- Add gradients (`bg-gradient-*`, `from-*`, `to-*`, `via-*`)
+- Use thin borders (1px) for primary content
+- Apply shadows to disclaimers
+- Use rose colors for errors (use red instead)
+- Forget hover/focus states
+
+✅ **DO**:
+- Use `brand-dark` for all text
+- Use `brand-secondary` for all content surfaces
+- Use `brand-primary` for all primary actions
+- Use deep red (`red-700/800/900`) for all error states
+- Add shadows to cards and forms
+- Include focus states for accessibility
+- Test color contrast ratios
+- Keep design clean with no gradients
+
+---
+
+This design system ensures visual consistency, accessibility, and a cohesive natural/earthy aesthetic throughout PetFoodVerifAI.

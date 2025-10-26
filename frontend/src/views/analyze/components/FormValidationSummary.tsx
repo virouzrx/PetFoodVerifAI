@@ -36,12 +36,12 @@ const FormValidationSummary = ({
     <div
       role="alert"
       aria-live="assertive"
-      className="rounded-md border-2 border-rose-200 bg-rose-50 p-4"
+      className="rounded-md border-2 border-red-700 bg-red-50 p-4"
     >
       <div className="flex gap-3">
         <div className="flex-shrink-0">
           <svg
-            className="h-5 w-5 text-rose-600"
+            className="h-5 w-5 text-red-700"
             fill="currentColor"
             viewBox="0 0 20 20"
             aria-hidden="true"
@@ -54,7 +54,7 @@ const FormValidationSummary = ({
           </svg>
         </div>
         <div className="flex-1">
-          <h3 className="text-sm font-semibold text-rose-900">
+          <h3 className="text-sm font-semibold text-red-900">
             Please correct the following errors:
           </h3>
           <ul className="mt-2 space-y-1">
@@ -65,7 +65,7 @@ const FormValidationSummary = ({
                   <button
                     type="button"
                     onClick={() => onFocusField(fieldId)}
-                    className="text-sm text-rose-700 underline hover:text-rose-900 focus:outline-none focus:ring-2 focus:ring-rose-500 focus:ring-offset-2"
+                    className="text-sm text-red-800 underline hover:text-red-900 focus:outline-none focus:ring-2 focus:ring-red-700 focus:ring-offset-2"
                   >
                     {message}
                   </button>

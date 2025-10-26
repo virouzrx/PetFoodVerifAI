@@ -39,7 +39,7 @@ const ReanalyzeButton = ({
       disabled={!canReanalyze}
       className={`inline-flex items-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 ${
         canReanalyze
-          ? 'border border-brand-primary bg-brand-primary text-white hover:bg-brand-primary/90 focus:ring-brand-secondary/50'
+          ? 'border border-brand-primary bg-brand-primary text-white hover:bg-brand-primary/90 focus:ring-brand-primary/30'
           : 'border border-gray-300 bg-gray-100 text-gray-400 cursor-not-allowed'
       }`}
       aria-label={

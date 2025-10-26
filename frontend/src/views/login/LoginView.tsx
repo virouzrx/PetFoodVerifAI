@@ -110,9 +110,9 @@ const LoginView = () => {
   const hasFormError = Boolean(error.form || fieldErrors.form)
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-brand-secondary/25 via-brand-accent/10 to-brand-primary/20">
+    <div className="min-h-screen">
       <div className="mx-auto flex min-h-screen w-full max-w-4xl flex-col items-center justify-center px-4 py-8 sm:px-6 lg:px-8">
-        <main className="w-full max-w-md space-y-8 rounded-lg bg-white/95 backdrop-blur-sm px-5 py-8 shadow-xl ring-1 ring-brand-primary/30 sm:px-8">
+        <main className="w-full max-w-md space-y-8 rounded-lg bg-brand-secondary px-5 py-8 shadow-xl border-2 border-brand-primary sm:px-8">
           <header className="space-y-2 text-center">
             <p className="text-xs font-medium uppercase tracking-wide text-brand-primary">
               Welcome back
@@ -156,11 +156,11 @@ const LoginView = () => {
                     ? 'email-error'
                     : undefined
                 }
-                className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm transition focus:border-brand-primary focus:outline-none focus:ring-2 focus:ring-brand-secondary/30"
+                className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm transition focus:border-brand-primary focus:outline-none focus:ring-2 focus:ring-brand-primary/30"
                 disabled={isLoading}
               />
               {touched.email && (fieldErrors.email || error.email) ? (
-                <p id="email-error" className="text-xs text-rose-600">
+                <p id="email-error" className="text-xs text-red-700">
                   {fieldErrors.email ?? error.email}
                 </p>
               ) : null}
@@ -185,11 +185,11 @@ const LoginView = () => {
                     ? 'password-error'
                     : undefined
                 }
-                className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm transition focus:border-brand-primary focus:outline-none focus:ring-2 focus:ring-brand-secondary/30"
+                className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm transition focus:border-brand-primary focus:outline-none focus:ring-2 focus:ring-brand-primary/30"
                 disabled={isLoading}
               />
               {touched.password && (fieldErrors.password || error.password) ? (
-                <p id="password-error" className="text-xs text-rose-600">
+                <p id="password-error" className="text-xs text-red-700">
                   {fieldErrors.password ?? error.password}
                 </p>
               ) : null}

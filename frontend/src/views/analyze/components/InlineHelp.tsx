@@ -14,14 +14,14 @@ type InlineHelpProps = {
 const InlineHelp = ({ className = "" }: InlineHelpProps) => {
   return (
     <div
-      className={`rounded-lg border border-brand-secondary/30 bg-brand-secondary/10 p-4 ${className}`}
+      className={`rounded-md border-l-4 border-l-brand-accent border border-brand-accent/30 bg-brand-secondary/80 p-4 ${className}`}
       role="note"
       aria-label="Help information"
     >
       <div className="flex items-start gap-3">
         <div className="flex-shrink-0">
           <svg
-            className="h-5 w-5 text-brand-primary"
+            className="h-5 w-5 text-brand-accent"
             fill="currentColor"
             viewBox="0 0 20 20"
             aria-hidden="true"

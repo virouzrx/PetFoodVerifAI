@@ -4,7 +4,7 @@ const HowItWorks = ({ steps }: HowItWorksProps) => {
   return (
     <section
       aria-labelledby="how-it-works-heading"
-      className="rounded-3xl border border-brand-secondary/40 bg-gradient-to-br from-white to-brand-secondary/10 p-10 shadow-md"
+      className="rounded-3xl border-2 border-brand-accent bg-brand-secondary p-10 shadow-md"
     >
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <h2 className="text-2xl font-semibold text-brand-dark" id="how-it-works-heading">

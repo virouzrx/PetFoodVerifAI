@@ -199,8 +199,8 @@ export const getRecommendationBadgeClass = (
   recommendation: RecommendationKind
 ): string => {
   return recommendation === 'Recommended'
-    ? 'bg-green-100 text-green-800 border-green-300'
-    : 'bg-red-100 text-red-800 border-red-300';
+    ? 'bg-green-700 text-white border-green-900 shadow-lg'
+    : 'bg-red-700 text-white border-red-900 shadow-lg';
 };
 
 /**

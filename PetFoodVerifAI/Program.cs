@@ -5,6 +5,7 @@ using Microsoft.IdentityModel.Tokens;
 using PetFoodVerifAI.Data;
 using PetFoodVerifAI.Services;
 using System.Text;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -82,7 +83,12 @@ else
 }
 
 
-builder.Services.AddControllersWithViews();
+builder.Services.AddControllersWithViews()
+    .AddJsonOptions(options =>
+    {
+        // Serialize enums as strings instead of integers
+        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+    });
 
 builder.Services.AddCors(options =>
 {

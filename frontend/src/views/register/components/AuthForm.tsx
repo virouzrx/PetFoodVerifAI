@@ -74,10 +74,10 @@ const AuthForm = ({
           onBlur={() => handleBlur('email')}
           aria-invalid={Boolean(errors.email)}
           aria-describedby={errors.email ? 'email-error' : undefined}
-          className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm transition focus:border-brand-primary focus:outline-none focus:ring-2 focus:ring-brand-secondary/30"
+          className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm transition focus:border-brand-primary focus:outline-none focus:ring-2 focus:ring-brand-primary/30"
         />
         {touched.email && errors.email && (
-          <p id="email-error" className="text-xs text-rose-600">
+          <p id="email-error" className="text-xs text-red-700">
             {errors.email}
           </p>
         )}
@@ -99,22 +99,22 @@ const AuthForm = ({
             onBlur={() => handleBlur('password')}
             aria-invalid={Boolean(errors.password)}
             aria-describedby={errors.password ? 'password-error' : 'password-hint'}
-            className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm transition focus:border-brand-primary focus:outline-none focus:ring-2 focus:ring-brand-secondary/30"
+            className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm transition focus:border-brand-primary focus:outline-none focus:ring-2 focus:ring-brand-primary/30"
           />
           <button
             type="button"
-            className="absolute inset-y-0 right-3 flex items-center text-xs font-semibold text-brand-primary hover:text-brand-primary/80 focus:outline-none focus:ring-2 focus:ring-brand-secondary/30"
+            className="absolute inset-y-0 right-3 flex items-center text-xs font-semibold text-brand-primary hover:text-brand-primary/80 focus:outline-none focus:ring-2 focus:ring-brand-primary/30"
             onClick={() => setShowPassword((prev) => !prev)}
           >
             {showPassword ? 'Hide' : 'Show'}
           </button>
         </div>
         {errors.password && (
-          <p id="password-error" className="text-xs text-rose-600">
+          <p id="password-error" className="text-xs text-red-700">
             {errors.password}
           </p>
         )}
-        <div id="password-hint" className="mt-2 rounded-md border border-brand-secondary/30 bg-brand-secondary/5 p-3">
+        <div id="password-hint" className="mt-2 rounded-md border-2 border-brand-accent bg-brand-accent/20 p-3">
           <PasswordStrengthHint result={passwordStrength} />
         </div>
       </div>

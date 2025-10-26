@@ -26,7 +26,7 @@ const JustificationCard = ({
 
   return (
     <section
-      className="rounded-lg border border-brand-primary/40 bg-gradient-to-br from-white to-brand-primary/10 p-6 shadow-md"
+      className="rounded-lg border-2 border-brand-accent bg-brand-secondary p-6 shadow-md"
       aria-labelledby="justification-heading"
     >
       <h2
@@ -53,8 +53,8 @@ const JustificationCard = ({
             {concerns.map((concern, index) => {
               const isUnacceptable = concern.type === 'unacceptable';
               const badgeColor = isUnacceptable
-                ? 'bg-red-100 text-red-800 border-red-300'
-                : 'bg-amber-100 text-amber-800 border-amber-300';
+                ? 'bg-red-700 text-white border-red-900 shadow-lg'
+                : 'bg-amber-600 text-white border-amber-900 shadow-lg';
 
               return (
                 <li

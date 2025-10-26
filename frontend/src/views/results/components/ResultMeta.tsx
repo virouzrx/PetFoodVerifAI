@@ -1,7 +1,6 @@
 import type { AnalysisResultViewModel } from '../../../types/results';
 import {
   formatAnalysisDate,
-  formatPetSummary,
   isValidUrl,
 } from '../../../utils/resultsMappers';
 
@@ -24,16 +23,22 @@ type ResultMetaProps = {
  * - Analysis ID (with copy functionality optional)
  */
 const ResultMeta = ({ analysis }: ResultMetaProps) => {
-  const petSummary = formatPetSummary(
-    analysis.species,
-    analysis.breed,
-    analysis.age
-  );
   const formattedDate = formatAnalysisDate(analysis.createdAt);
   const hasValidUrl = isValidUrl(analysis.productUrl);
+  
+  // Format age display
+  const formatAge = (age: number | null): string => {
+    if (age === null) return 'Not specified';
+    return age === 1 ? '1 year old' : `${age} years old`;
+  };
+  
+  // Format species display
+  const formatSpecies = (species: string): string => {
+    return species.charAt(0).toUpperCase() + species.slice(1).toLowerCase();
+  };
 
   return (
-    <div className="rounded-lg border border-brand-secondary/40 bg-gradient-to-br from-white to-brand-secondary/10 p-6 shadow-md">
+    <div className="rounded-lg border-2 border-brand-accent bg-brand-secondary p-6 shadow-md">
       <h2 className="text-lg font-semibold text-brand-dark mb-4">
         Product & Pet Details
       </h2>
@@ -94,23 +99,54 @@ const ResultMeta = ({ analysis }: ResultMetaProps) => {
           </div>
         )}
 
-        {/* Pet Information */}
-        <div>
-          <dt className="text-sm font-medium text-gray-600">Pet Information</dt>
-          <dd className="mt-1 text-base text-brand-dark">{petSummary}</dd>
-        </div>
+        {/* Pet Information - Separated into subsections */}
+        <div className="pt-2 border-t border-brand-accent/30">
+          <h3 className="text-base font-semibold text-brand-dark mb-3">
+            Pet Information
+          </h3>
+          
+          <div className="space-y-3 pl-3">
+            {/* Species */}
+            <div>
+              <dt className="text-sm font-medium text-gray-600">Species</dt>
+              <dd className="mt-1 text-base text-brand-dark">
+                {formatSpecies(analysis.species)}
+              </dd>
+            </div>
 
-        {/* Additional Info */}
-        {analysis.additionalInfo && (
-          <div>
-            <dt className="text-sm font-medium text-gray-600">
-              Additional Context
-            </dt>
-            <dd className="mt-1 text-sm text-gray-800">
-              {analysis.additionalInfo}
-            </dd>
+            {/* Breed */}
+            {analysis.breed && (
+              <div>
+                <dt className="text-sm font-medium text-gray-600">Breed</dt>
+                <dd className="mt-1 text-base text-brand-dark">
+                  {analysis.breed}
+                </dd>
+              </div>
+            )}
+
+            {/* Age */}
+            {analysis.age !== null && (
+              <div>
+                <dt className="text-sm font-medium text-gray-600">Age</dt>
+                <dd className="mt-1 text-base text-brand-dark">
+                  {formatAge(analysis.age)}
+                </dd>
+              </div>
+            )}
+
+            {/* Additional Info */}
+            {analysis.additionalInfo && (
+              <div>
+                <dt className="text-sm font-medium text-gray-600">
+                  Additional Information
+                </dt>
+                <dd className="mt-1 text-sm text-gray-800">
+                  {analysis.additionalInfo}
+                </dd>
+              </div>
+            )}
           </div>
-        )}
+        </div>
 
         {/* Ingredients Preview */}
         {analysis.ingredientsText && (
@@ -123,7 +159,7 @@ const ResultMeta = ({ analysis }: ResultMetaProps) => {
                 <summary className="text-brand-primary hover:text-brand-primary/80">
                   View ingredients list
                 </summary>
-                <div className="mt-2 p-3 bg-brand-secondary/5 rounded border border-brand-secondary/30 text-xs font-mono whitespace-pre-wrap break-words">
+                <div className="mt-2 p-3 bg-brand-accent/20 rounded border-2 border-brand-accent text-xs font-mono whitespace-pre-wrap break-words">
                   {analysis.ingredientsText}
                 </div>
               </details>

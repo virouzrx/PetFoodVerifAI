@@ -60,7 +60,7 @@ const LandingView = () => {
   )
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-brand-secondary/20 via-brand-secondary/5 to-brand-accent/15">
+    <div className="min-h-screen">
       <MarketingHero {...viewModel.hero} />
       <main className="mx-auto flex max-w-5xl flex-col gap-12 px-6 pb-20">
         <HowItWorks steps={viewModel.steps} />

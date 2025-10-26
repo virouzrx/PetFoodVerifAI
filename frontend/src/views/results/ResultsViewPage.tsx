@@ -55,9 +55,9 @@ const ResultsViewPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-brand-secondary/20 via-brand-accent/5 to-brand-primary/15">
+    <div className="min-h-screen">
       {/* Header */}
-      <header className="border-b border-brand-secondary/40 bg-gradient-to-r from-brand-primary/10 to-brand-secondary/10 backdrop-blur-sm shadow-md">
+      <header className="border-b-2 border-brand-accent bg-brand-secondary shadow-md">
         <div className="mx-auto max-w-5xl px-4 py-4 sm:px-6 lg:px-8">
           <h1 className="text-2xl font-bold text-brand-dark">
             Analysis Results

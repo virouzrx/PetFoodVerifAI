@@ -43,7 +43,7 @@ const AdditionalInfoTextarea = ({
         maxLength={MAX_LENGTH}
         rows={4}
         aria-describedby={helperId}
-        className={`mt-1 block w-full rounded-md border px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-1 border-gray-300 focus:border-brand-primary focus:ring-brand-secondary/50 disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-500`}
+        className={`mt-1 block w-full rounded-md border px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-1 border-gray-300 focus:border-brand-primary focus:ring-brand-primary/30 disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-500`}
         placeholder="Any health conditions, allergies, or dietary preferences we should consider..."
       />
       <div className="mt-1 flex items-center justify-between">

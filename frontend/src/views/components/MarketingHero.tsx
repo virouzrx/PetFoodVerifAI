@@ -20,7 +20,7 @@ const MarketingHero = ({
       </div>
 
       {illustrationSrc ? (
-        <div className="mx-auto max-w-3xl overflow-hidden rounded-3xl bg-gradient-to-r from-brand-primary/10 via-brand-secondary/10 to-brand-accent/10 p-8 shadow-inner">
+        <div className="mx-auto max-w-3xl overflow-hidden rounded-3xl bg-brand-secondary p-8 shadow-inner">
           <img
             alt={illustrationAlt ?? ''}
             className={prefersReducedMotion ? 'rounded-2xl object-cover' : 'rounded-2xl object-cover transition-transform duration-700 ease-out hover:scale-[1.03]'}

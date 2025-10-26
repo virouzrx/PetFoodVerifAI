@@ -4,13 +4,13 @@ const PoCScopeNotice = ({ limitations, disclaimer, privacyNote }: PoCScopeNotice
   return (
     <section
       aria-labelledby="poc-scope-heading"
-      className="rounded-3xl border border-brand-primary/30 bg-gradient-to-br from-brand-primary/15 to-brand-primary/25 p-8 text-left shadow-md"
+      className="rounded-3xl border-2 border-brand-primary bg-brand-tertiary/30 p-8 text-left shadow-md"
     >
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <h2 className="text-2xl font-semibold text-brand-primary" id="poc-scope-heading">
           Proof of Concept Scope
         </h2>
-        <p className="max-w-md text-sm text-brand-primary/80">
+        <p className="max-w-md text-sm text-brand-dark">
           This PoC has limited coverage while we validate the experience. Review the constraints before
           proceeding to the analysis tool.
         </p>
@@ -22,12 +22,12 @@ const PoCScopeNotice = ({ limitations, disclaimer, privacyNote }: PoCScopeNotice
         ))}
       </ul>
 
-      <div className="mt-6 space-y-3 rounded-2xl border border-brand-primary/30 bg-white/90 p-6 text-sm text-gray-700 shadow-sm">
+      <div className="mt-6 space-y-3 rounded-2xl border-2 border-brand-primary bg-brand-secondary p-6 text-sm text-gray-700 shadow-sm">
         <p>
-          <span className="font-semibold text-brand-secondary">AI Disclaimer:</span> {disclaimer}
+          <span className="font-semibold text-brand-accent">AI Disclaimer:</span> {disclaimer}
         </p>
         <p>
-          <span className="font-semibold text-brand-secondary">Privacy Notice:</span> {privacyNote}
+          <span className="font-semibold text-brand-accent">Privacy Notice:</span> {privacyNote}
         </p>
       </div>
     </section>

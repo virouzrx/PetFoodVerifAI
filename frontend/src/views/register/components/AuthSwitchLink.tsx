@@ -16,7 +16,7 @@ const AuthSwitchLink = ({
       {prompt}{' '}
       <Link
         to={to}
-        className="font-semibold text-brand-primary hover:text-brand-primary/80 focus:outline-none focus:ring-2 focus:ring-brand-secondary/30"
+        className="font-semibold text-brand-primary hover:text-brand-primary/80 focus:outline-none focus:ring-2 focus:ring-brand-primary/30"
       >
         {label}
       </Link>

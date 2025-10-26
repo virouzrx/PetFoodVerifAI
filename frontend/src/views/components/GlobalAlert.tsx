@@ -5,7 +5,7 @@ type GlobalAlertProps = {
 }
 
 const variantStyles: Record<GlobalAlertProps['variant'], string> = {
-  error: 'bg-rose-50 text-rose-900 ring-rose-200',
+  error: 'bg-red-50 text-red-900 ring-red-700',
   success: 'bg-emerald-50 text-emerald-900 ring-emerald-200',
 }
 

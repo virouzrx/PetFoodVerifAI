@@ -28,7 +28,7 @@ const FeedbackSection = ({
 
   return (
     <section
-      className="rounded-lg border border-brand-accent/40 bg-gradient-to-br from-white to-brand-accent/10 p-6 shadow-md"
+      className="rounded-lg border-2 border-brand-primary bg-brand-secondary p-6 shadow-md"
       aria-labelledby="feedback-heading"
     >
       {/* Heading */}

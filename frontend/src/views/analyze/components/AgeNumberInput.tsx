@@ -40,7 +40,7 @@ const AgeNumberInput = ({
   return (
     <div>
       <label htmlFor={inputId} className="block text-sm font-medium text-brand-dark">
-        Age <span className="text-rose-600" aria-label="required">*</span>
+        Age <span className="text-red-700" aria-label="required">*</span>
       </label>
       <div className="relative mt-1">
         <input
@@ -56,8 +56,8 @@ const AgeNumberInput = ({
           aria-describedby={error ? errorId : showWarning ? warningId : undefined}
           className={`block w-full rounded-md border px-3 py-2 pr-16 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-1 ${
             error
-              ? 'border-rose-300 focus:border-rose-500 focus:ring-rose-500'
-              : 'border-gray-300 focus:border-brand-primary focus:ring-brand-secondary/50'
+              ? 'border-red-600 focus:border-red-700 focus:ring-red-700'
+              : 'border-gray-300 focus:border-brand-primary focus:ring-brand-primary/30'
           } disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-500`}
           placeholder="e.g., 3"
         />
@@ -66,7 +66,7 @@ const AgeNumberInput = ({
         </div>
       </div>
       {error ? (
-        <p id={errorId} className="mt-1 text-sm text-rose-600" role="alert">
+        <p id={errorId} className="mt-1 text-sm text-red-700" role="alert">
           {error}
         </p>
       ) : showWarning ? (
