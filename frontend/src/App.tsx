@@ -4,17 +4,10 @@ import { lazy, Suspense, type ReactNode } from 'react'
 import LandingView from './views/LandingView'
 import LoginView from './views/login/LoginView'
 import RegisterView from './views/register/RegisterView'
+import AuthenticatedShell from './layouts/AuthenticatedShell'
 
 const AnalyzeView = lazy(() => import('./views/AnalyzeView'))
 const ResultsView = lazy(() => import('./views/ResultsView'))
-
-const ProtectedRoute = ({ children }: { children: ReactNode }) => {
-  const { isAuthenticated } = useAuth()
-  if (!isAuthenticated) {
-    return <Navigate to="/" replace />
-  }
-  return <>{children}</>
-}
 
 const RedirectIfAuthenticated = ({ children }: { children: ReactNode }) => {
   const { isAuthenticated } = useAuth()
@@ -45,26 +38,38 @@ const App = () => {
             </RedirectIfAuthenticated>
           }
         />
-        <Route
-          path="/analyze"
-          element={
-            <ProtectedRoute>
+        
+        {/* Authenticated routes wrapped in shell */}
+        <Route element={<AuthenticatedShell />}>
+          <Route
+            path="/analyze"
+            element={
               <Suspense fallback={<div className="p-6">Loading...</div>}>
                 <AnalyzeView />
               </Suspense>
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/results/:analysisId"
-          element={
-            <ProtectedRoute>
+            }
+          />
+          <Route
+            path="/results/:analysisId"
+            element={
               <Suspense fallback={<div className="p-6">Loading...</div>}>
                 <ResultsView />
               </Suspense>
-            </ProtectedRoute>
-          }
-        />
+            }
+          />
+          <Route
+            path="/products"
+            element={
+              <Suspense fallback={<div className="p-6">Loading...</div>}>
+                <div className="p-8">
+                  <h1 className="text-2xl font-bold">My Products</h1>
+                  <p className="mt-4 text-gray-600">Product listing coming soon...</p>
+                </div>
+              </Suspense>
+            }
+          />
+        </Route>
+        
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>

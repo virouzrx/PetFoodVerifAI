@@ -51,7 +51,10 @@ export type PasswordStrengthResult = {
   }
 }
 
-export type AuthUser = { userId: string }
+export type AuthUser = {
+  userId: string
+  email: string
+}
 
 export type AuthState = {
   user?: AuthUser

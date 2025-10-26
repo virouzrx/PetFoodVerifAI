@@ -13,10 +13,10 @@ const MarketingHero = ({
         <span className="text-xs font-semibold uppercase tracking-[0.2em] text-brand-accent sm:text-sm">
           Proof of Concept
         </span>
-        <h1 className="text-4xl font-bold text-brand-dark sm:text-5xl lg:text-6xl">
+        <h1 className="text-4xl font-bold text-white sm:text-5xl lg:text-6xl">
           {headline}
         </h1>
-        <p className="mx-auto max-w-2xl text-lg text-gray-700 sm:text-xl">{subheadline}</p>
+        <p className="mx-auto max-w-2xl text-lg text-white sm:text-xl">{subheadline}</p>
       </div>
 
       {illustrationSrc ? (

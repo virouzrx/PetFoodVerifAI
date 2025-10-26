@@ -44,7 +44,7 @@ const useLogin = (): UseLoginResult => {
         }
 
         await sleep(Math.max(0, MIN_LOADING_DURATION_MS - (Date.now() - startedAt)))
-        setAuth(response.token, response.userId)
+        setAuth(response.token, response.userId, values.email.trim().toLowerCase())
       } catch (error) {
         if (latestRequest.current !== requestId) {
           return

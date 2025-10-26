@@ -125,20 +125,18 @@ const AnalyzePage = () => {
 
   return (
     <div className="min-h-screen">
-      {/* Header */}
-      <header className="border-b-2 border-brand-accent bg-brand-secondary shadow-md">
-        <div className="mx-auto max-w-4xl px-4 py-4 sm:px-6 lg:px-8">
-          <h1 className="text-2xl font-bold text-brand-dark">
+      {/* Main Content */}
+      <main className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
+        {/* Page Header */}
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-white">
             Analyze Pet Food Product
           </h1>
-          <p className="mt-1 text-sm text-gray-700">
+          <p className="mt-2 text-base text-white">
             Enter product details to get a personalized recommendation for your pet
           </p>
         </div>
-      </header>
 
-      {/* Main Content */}
-      <main className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
         {/* Status announcements for screen readers */}
         <div className="sr-only" role="status" aria-live="polite" aria-atomic="true">
           {statusMessage}
@@ -153,7 +151,7 @@ const AnalyzePage = () => {
               onDismiss={handleDismissError}
             />
             {apiError.details && (
-              <p className="mt-2 text-sm text-slate-600">{apiError.details}</p>
+              <p className="mt-2 text-sm text-brand-dark">{apiError.details}</p>
             )}
           </div>
         )}
@@ -162,7 +160,7 @@ const AnalyzePage = () => {
         <InlineHelp className="mb-6" />
 
         {/* Analysis Form */}
-        <div className="rounded-lg border-2 border-brand-accent bg-brand-secondary p-6 shadow-sm">
+        <div className="rounded-lg border-2 border-brand-accent bg-brand-secondary p-6 shadow-md">
           <AnalyzeForm
             onSubmit={handleSubmit}
             submissionStatus={submitStatus}

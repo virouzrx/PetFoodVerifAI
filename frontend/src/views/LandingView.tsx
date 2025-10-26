@@ -60,7 +60,7 @@ const LandingView = () => {
   )
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-brand-tertiary">
       <MarketingHero {...viewModel.hero} />
       <main className="mx-auto flex max-w-5xl flex-col gap-12 px-6 pb-20">
         <HowItWorks steps={viewModel.steps} />

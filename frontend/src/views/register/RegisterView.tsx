@@ -43,7 +43,7 @@ const RegisterView = () => {
 
     try {
       const response = await registerUser(payload)
-      login(response.token, response.userId)
+      login(response.token, response.userId, payload.email)
       setValues(initialFormValues)
       navigate('/analyze', { replace: true })
     } catch (error) {

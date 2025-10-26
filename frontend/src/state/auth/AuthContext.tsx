@@ -10,7 +10,7 @@ import type { AuthState } from '../../types/auth'
 
 type AuthContextValue = {
   state: AuthState
-  login: (token: string, userId: string) => void
+  login: (token: string, userId: string, email: string) => void
   logout: () => void
   isAuthenticated: boolean
 }
@@ -47,8 +47,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     persistState(state)
   }, [state])
 
-  const login = useCallback((token: string, userId: string) => {
-    setState({ token, user: { userId } })
+  const login = useCallback((token: string, userId: string, email: string) => {
+    setState({ token, user: { userId, email } })
   }, [])
 
   const logout = useCallback(() => {

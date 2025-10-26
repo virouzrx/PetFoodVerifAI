@@ -56,20 +56,18 @@ const ResultsViewPage = () => {
 
   return (
     <div className="min-h-screen">
-      {/* Header */}
-      <header className="border-b-2 border-brand-accent bg-brand-secondary shadow-md">
-        <div className="mx-auto max-w-5xl px-4 py-4 sm:px-6 lg:px-8">
-          <h1 className="text-2xl font-bold text-brand-dark">
+      {/* Main Content */}
+      <main className="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
+        {/* Page Header */}
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-white">
             Analysis Results
           </h1>
-          <p className="mt-1 text-sm text-gray-700">
+          <p className="mt-2 text-base text-white">
             Review your pet food analysis and recommendation
           </p>
         </div>
-      </header>
 
-      {/* Main Content */}
-      <main className="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
         {/* Status Panel - handles loading, error, and not found states */}
         {status !== 'ready' && (
           <ResultStatusPanel status={status} error={error} onRetry={refetch} />
