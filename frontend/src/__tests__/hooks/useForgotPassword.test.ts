@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { renderHook, act, waitFor } from '@testing-library/react';
+import { renderHook, act } from '@testing-library/react';
 import useForgotPassword from '../../hooks/useForgotPassword';
 import * as authService from '../../services/authService';
 import type { ForgotPasswordRequestDto } from '../../types/auth';
@@ -285,3 +285,5 @@ describe('useForgotPassword', () => {
     });
   });
 });
+
+

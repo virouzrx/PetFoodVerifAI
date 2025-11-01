@@ -1,5 +1,5 @@
 import '@testing-library/jest-dom/vitest'
-import { ReactNode } from 'react'
+import type { ReactNode } from 'react'
 import React from 'react'
 import { AuthProvider } from '../state/auth/AuthContext'
 

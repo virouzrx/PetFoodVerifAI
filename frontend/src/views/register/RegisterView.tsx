@@ -1,4 +1,4 @@
-﻿import { useCallback, useState } from 'react'
+import { useCallback, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import AuthForm from './components/AuthForm'
 import FormErrorSummary from './components/FormErrorSummary'
@@ -26,7 +26,7 @@ const RegisterView = () => {
   const [values, setValues] = useState<RegisterFormValues>(initialFormValues)
   const [errors, setErrors] = useState<FieldErrorMap>({})
   const [googleLoading, setGoogleLoading] = useState(false)
-  const hasGoogleClient = !!import.meta.env.VITE_GOOGLE_CLIENT_ID
+  // Commented: hasGoogleClient check
 
   const googleLoginHandler = useGoogleLogin({
     onSuccess: async (codeResponse) => {
@@ -119,7 +119,6 @@ const RegisterView = () => {
             isSubmitting={isSubmitting}
             errors={errors}
             onChange={setValues}
-            onFocusField={focusField}
           />
 
           <div className="space-y-4 border-t border-gray-200 pt-6">

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import usePasswordStrength from '../../../hooks/usePasswordStrength'
 import type { FieldErrorMap, RegisterFormValues } from '../../../types/auth'
 import PasswordStrengthHint from './PasswordStrengthHint'
@@ -10,7 +10,6 @@ type AuthFormProps = {
   onChange: (values: RegisterFormValues) => void
   isSubmitting: boolean
   errors: FieldErrorMap
-  onFocusField?: (field: keyof RegisterFormValues) => void
 }
 
 const defaultValues: RegisterFormValues = {
@@ -24,7 +23,6 @@ const AuthForm = ({
   onChange,
   isSubmitting,
   errors,
-  onFocusField,
 }: AuthFormProps) => {
   const [values, setValues] = useState<RegisterFormValues>(initialValues)
   const [touched, setTouched] = useState<Record<string, boolean>>({})
@@ -39,10 +37,6 @@ const AuthForm = ({
   }, [onChange, values])
 
   const passwordStrength = usePasswordStrength(values.password)
-
-  const isSubmitDisabled = useMemo(() => {
-    return isSubmitting || !values.email.trim() || !values.password
-  }, [isSubmitting, values.email, values.password])
 
   const handleBlur = (field: keyof RegisterFormValues) => {
     setTouched((prev) => ({ ...prev, [field]: true }))

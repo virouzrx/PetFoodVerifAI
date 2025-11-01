@@ -10,7 +10,6 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: './src/__tests__/setupTests.ts',
     globals: true,
-    hoistMocks: true,
     exclude: [
       '**/node_modules/**',
       '**/dist/**',
@@ -50,4 +49,4 @@ export default defineConfig({
       plugins: [tailwindcss(), autoprefixer()],
     },
   },
-})
+} as any)

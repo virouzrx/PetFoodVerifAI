@@ -20,6 +20,7 @@ export type AnalyzeFormErrors = {
   species?: string;
   breed?: string;
   age?: string;
+  additionalInfo?: string;
   ingredientsText?: string;
   manualAcknowledgement?: string;
   global?: string;

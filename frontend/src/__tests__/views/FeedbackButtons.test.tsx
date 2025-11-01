@@ -9,8 +9,8 @@ describe('FeedbackButtons', () => {
 
   const defaultFeedbackState: FeedbackState = {
     status: 'idle',
-    lastSubmitted: null,
-    message: null,
+    lastSubmitted: undefined,
+    message: undefined,
   };
 
   const defaultProps = {
@@ -120,7 +120,7 @@ describe('FeedbackButtons', () => {
       const submittingState: FeedbackState = {
         status: 'submitting',
         lastSubmitted: 'up',
-        message: null,
+        message: undefined,
       };
 
       render(
@@ -141,10 +141,10 @@ describe('FeedbackButtons', () => {
       const submittingState: FeedbackState = {
         status: 'submitting',
         lastSubmitted: 'up',
-        message: null,
+        message: undefined,
       };
 
-      const { container } = render(
+      render(
         <FeedbackButtons
           {...defaultProps}
           feedbackState={submittingState}
@@ -161,7 +161,7 @@ describe('FeedbackButtons', () => {
       const submittingState: FeedbackState = {
         status: 'submitting',
         lastSubmitted: 'up',
-        message: null,
+        message: undefined,
       };
 
       render(
@@ -179,10 +179,10 @@ describe('FeedbackButtons', () => {
       const submittingState: FeedbackState = {
         status: 'submitting',
         lastSubmitted: 'up',
-        message: null,
+        message: undefined,
       };
 
-      const { container } = render(
+      render(
         <FeedbackButtons
           {...defaultProps}
           feedbackState={submittingState}
@@ -200,7 +200,7 @@ describe('FeedbackButtons', () => {
       const submittingState: FeedbackState = {
         status: 'submitting',
         lastSubmitted: 'up',
-        message: null,
+        message: undefined,
       };
 
       render(
@@ -358,7 +358,7 @@ describe('FeedbackButtons', () => {
       const submittingState: FeedbackState = {
         status: 'submitting',
         lastSubmitted: 'up',
-        message: null,
+        message: undefined,
       };
 
       render(
@@ -550,7 +550,7 @@ describe('FeedbackButtons', () => {
     it('should handle null lastSubmitted in success state', () => {
       const successState: FeedbackState = {
         status: 'success',
-        lastSubmitted: null,
+        lastSubmitted: undefined,
         message: 'Thank you!',
       };
 
@@ -569,8 +569,8 @@ describe('FeedbackButtons', () => {
     it('should handle submitting state with null lastSubmitted', () => {
       const submittingState: FeedbackState = {
         status: 'submitting',
-        lastSubmitted: null,
-        message: null,
+        lastSubmitted: undefined,
+        message: undefined,
       };
 
       render(
@@ -610,7 +610,7 @@ describe('FeedbackButtons', () => {
       const submittingState: FeedbackState = {
         status: 'submitting',
         lastSubmitted: 'up',
-        message: null,
+        message: undefined,
       };
 
       rerender(
@@ -724,3 +724,4 @@ describe('FeedbackButtons', () => {
     });
   });
 });
+

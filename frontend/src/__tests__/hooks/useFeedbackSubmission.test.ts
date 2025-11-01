@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { renderHook, act, waitFor } from '@testing-library/react';
-import { ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import React from 'react';
 import { useFeedbackSubmission } from '../../hooks/useFeedbackSubmission';
 import { AuthProvider } from '../../state/auth/AuthContext';
@@ -490,9 +490,9 @@ describe('useFeedbackSubmission', () => {
 
   describe('double submission prevention', () => {
     it('should prevent double submission while submitting', async () => {
-      let resolveFirstFetch: any;
+      let _resolveFirstFetch: any;
       const firstFetchPromise = new Promise<Response>((resolve) => {
-        resolveFirstFetch = resolve;
+        _resolveFirstFetch = resolve;
       });
 
       vi.mocked(global.fetch).mockImplementation(
@@ -522,7 +522,7 @@ describe('useFeedbackSubmission', () => {
 
       // Complete first submission
       act(() => {
-        resolveFirstFetch({
+        _resolveFirstFetch({
           status: 201,
           json: async () => ({}),
         });
@@ -733,9 +733,8 @@ describe('useFeedbackSubmission', () => {
     });
 
     it('should handle multiple rapid feedback submissions (should be throttled)', async () => {
-      let resolveFirstFetch: any;
-      const firstFetchPromise = new Promise<Response>((resolve) => {
-        resolveFirstFetch = resolve;
+      const firstFetchPromise = new Promise<Response>((_resolve) => {
+        // Never resolve - testing throttling behavior
       });
 
       vi.mocked(global.fetch).mockImplementation(

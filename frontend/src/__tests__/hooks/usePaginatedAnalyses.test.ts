@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { renderHook, act, waitFor } from '@testing-library/react';
-import { ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import React from 'react';
 import { usePaginatedAnalyses } from '../../hooks/usePaginatedAnalyses';
 import * as analysisService from '../../services/analysisService';
@@ -450,8 +450,6 @@ describe('usePaginatedAnalyses', () => {
         expect(result.current.status).toBe('ready');
       });
 
-      const initialPage = result.current.data?.page;
-
       act(() => {
         result.current.setPage(0); // Invalid page
       });
@@ -566,7 +564,7 @@ describe('usePaginatedAnalyses', () => {
           pageSize: size,
         });
 
-        const { result } = renderHook(() => usePaginatedAnalyses(1, size), {
+        renderHook(() => usePaginatedAnalyses(1, size), {
           wrapper: createAuthWrapper()
         });
 
@@ -678,13 +676,14 @@ describe('usePaginatedAnalyses', () => {
 
   describe('abort controller', () => {
     it('should abort previous request when parameters change', async () => {
-      let abortCalled = false;
+      // @ts-ignore Used in mock class
+      let _abortCalled = false;
       const originalAbortController = AbortController;
       
       global.AbortController = class MockAbortController {
         signal = { aborted: false };
         abort = vi.fn(() => {
-          abortCalled = true;
+          _abortCalled = true;
           this.signal.aborted = true;
         });
       } as any;
@@ -717,13 +716,14 @@ describe('usePaginatedAnalyses', () => {
     });
 
     it('should abort pending request on unmount', async () => {
-      let abortCalled = false;
+      // @ts-ignore Used in mock class
+      let _abortCalled = false;
       const originalAbortController = AbortController;
       
       global.AbortController = class MockAbortController {
         signal = { aborted: false };
         abort = vi.fn(() => {
-          abortCalled = true;
+          _abortCalled = true;
           this.signal.aborted = true;
         });
       } as any;
@@ -744,7 +744,7 @@ describe('usePaginatedAnalyses', () => {
 
       unmount();
 
-      expect(abortCalled).toBe(true);
+      expect(_abortCalled).toBe(true);
       global.AbortController = originalAbortController;
     });
   });

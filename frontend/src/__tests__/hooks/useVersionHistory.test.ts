@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { renderHook, act, waitFor } from '@testing-library/react';
-import { ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import React from 'react';
 import { useVersionHistory } from '../../hooks/useVersionHistory';
 import * as analysisService from '../../services/analysisService';
@@ -690,13 +690,14 @@ describe('useVersionHistory', () => {
 
   describe('abort controller', () => {
     it('should abort previous request when productId changes', async () => {
-      let abortCalled = false;
+      // @ts-ignore Used in mock class
+      let _abortCalled = false;
       const originalAbortController = AbortController;
       
       global.AbortController = class MockAbortController {
         signal = { aborted: false };
         abort = vi.fn(() => {
-          abortCalled = true;
+          _abortCalled = true;
           this.signal.aborted = true;
         });
       } as any;
@@ -730,13 +731,14 @@ describe('useVersionHistory', () => {
     });
 
     it('should abort pending request on unmount', async () => {
-      let abortCalled = false;
+      // @ts-ignore Used in mock class
+      let _abortCalled = false;
       const originalAbortController = AbortController;
       
       global.AbortController = class MockAbortController {
         signal = { aborted: false };
         abort = vi.fn(() => {
-          abortCalled = true;
+          _abortCalled = true;
           this.signal.aborted = true;
         });
       } as any;
@@ -757,7 +759,7 @@ describe('useVersionHistory', () => {
 
       unmount();
 
-      expect(abortCalled).toBe(true);
+      expect(_abortCalled).toBe(true);
       global.AbortController = originalAbortController;
     });
   });

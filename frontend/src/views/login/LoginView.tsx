@@ -53,7 +53,7 @@ const LoginView = () => {
   const alertRef = useRef<HTMLDivElement>(null)
 
   const [googleLoading, setGoogleLoading] = useState(false)
-  const hasGoogleClient = !!import.meta.env.VITE_GOOGLE_CLIENT_ID
+  // Commented: hasGoogleClient check
 
   const googleLoginHandler = useGoogleLogin({
     onSuccess: async (codeResponse) => {
