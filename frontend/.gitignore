@@ -22,3 +22,14 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Testing
+coverage
+.nyc_output
+test-results
+playwright-report
+playwright/.cache
+screenshots
+
+# Vitest
+.vitest

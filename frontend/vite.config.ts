@@ -8,9 +8,42 @@ export default defineConfig({
   plugins: [react()],
   test: {
     environment: 'jsdom',
-    setupFiles: './src/tests/setupTests.ts',
+    setupFiles: './src/__tests__/setupTests.ts',
     globals: true,
     hoistMocks: true,
+    exclude: [
+      '**/node_modules/**',
+      '**/dist/**',
+      '**/e2e/**',
+      '**/.{idea,git,cache,output,temp}/**',
+      '**/{karma,rollup,webpack,vite,vitest,jest,ava,babel,nyc,cypress,playwright}.config.*'
+    ],
+    coverage: {
+      provider: 'v8',
+      reporter: ['text', 'json', 'html', 'lcov'],
+      exclude: [
+        'node_modules/',
+        'src/__tests__/',
+        '**/*.spec.ts',
+        '**/*.test.ts',
+        '**/*.spec.tsx',
+        '**/*.test.tsx',
+        '**/setupTests.ts',
+        'e2e/',
+        'dist/',
+        'vite.config.ts',
+        'playwright.config.ts',
+        'tailwind.config.cjs',
+        'postcss.config.cjs',
+        'eslint.config.js',
+      ],
+      thresholds: {
+        lines: 70,
+        functions: 70,
+        branches: 70,
+        statements: 70,
+      },
+    },
   },
   css: {
     postcss: {

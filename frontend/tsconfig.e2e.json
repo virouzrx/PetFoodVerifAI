@@ -1,0 +1,15 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "types": ["node", "@playwright/test"],
+    "moduleResolution": "bundler",
+    "module": "ESNext",
+    "target": "ES2021",
+    "lib": ["ES2021"],
+    "strict": true,
+    "skipLibCheck": true
+  },
+  "include": ["e2e/**/*"],
+  "exclude": ["node_modules"]
+}
+
