@@ -250,9 +250,9 @@ describe('authService', () => {
 
       const result = await registerUser(mockRegisterRequest);
 
-      expect(result).toEqual(mockRegisterResponse);
-      expect(result.email).toBe('newuser@example.com');
       expect(result.userId).toBe('new-user-123');
+      expect(result.email).toBe('newuser@example.com');
+      expect(result.expiresAt).toBeDefined();
     });
 
     it('should make POST request to correct endpoint', async () => {

@@ -5,6 +5,8 @@ import LandingView from './views/LandingView'
 import LoginView from './views/login/LoginView'
 import RegisterView from './views/register/RegisterView'
 import VerificationView from './views/verify-email/VerificationView'
+import ForgotPasswordView from './views/forgot-password/ForgotPasswordView'
+import ResetPasswordView from './views/reset-password/ResetPasswordView'
 import AuthenticatedShell from './layouts/AuthenticatedShell'
 import NotFoundRoute from './views/not-found/NotFoundRoute'
 
@@ -46,6 +48,22 @@ const App = () => {
           element={
             <RedirectIfAuthenticated>
               <LoginView />
+            </RedirectIfAuthenticated>
+          }
+        />
+        <Route
+          path="/forgot-password"
+          element={
+            <RedirectIfAuthenticated>
+              <ForgotPasswordView />
+            </RedirectIfAuthenticated>
+          }
+        />
+        <Route
+          path="/reset-password"
+          element={
+            <RedirectIfAuthenticated>
+              <ResetPasswordView />
             </RedirectIfAuthenticated>
           }
         />

@@ -4,7 +4,7 @@
 
 The application is a secure, accessible SPA with a pre-auth landing experience, authenticated analysis flow, results view with feedback capture, and a personal history with contextual versioning. Desktop and tablet are primary targets; smaller breakpoints adapt via utility classes. Authentication gates protect all data routes.
 
-- **Primary flows**: Landing → Register/Login → Analyze Product → Results (+Feedback) → My Products → Version History → Re-analyze.
+- **Primary flows**: Landing → Register/Login → Analyze Product → Results (+Feedback) → My Products → Version History → Re-analyze. Password recovery: Login → Forgot Password → Email → Reset Password → Login.
 - **State/data**: React Query (or RTK Query) for server sync; local component state for form drafts; optimistic feedback submission; global auth/session state with HTTP-only cookie-based auth, forced logout on 401.
 - **Accessibility**: WCAG 2.1 AA, semantic regions, form labeling, ARIA for dynamic status (scraping, analysis), keyboard-navigation-first drawers/modals.
 - **Security**: HTTP-only cookies (preferred) for tokens; CSRF protection when using cookies; least-privileged API calls; 401-driven sign-out; input validation mirrored client-side; no sensitive data persisted in client storage beyond ephemeral form drafts.
@@ -12,6 +12,7 @@ The application is a secure, accessible SPA with a pre-auth landing experience, 
 
 - **Key API endpoints** (compatibility summary):
   - POST `/api/auth/register`, POST `/api/auth/login`
+  - POST `/api/auth/forgot-password`, POST `/api/auth/reset-password`
   - POST `/api/analyses`
   - GET `/api/analyses` (paginated, optional `productId`)
   - GET `/api/analyses/{id}`
@@ -52,13 +53,38 @@ The application is a secure, accessible SPA with a pre-auth landing experience, 
 3) **Login**
 - **Path**: `/login`
 - **Main purpose**: Authenticate existing user.
-- **Key information**: Email, password; link to Register.
-- **Key view components**: `AuthForm`, `GlobalAlert` (invalid credentials), `SubmitButton` with progress, `AuthSwitchLink`.
+- **Key information**: Email, password; links to Register and Forgot Password.
+- **Key view components**: `AuthForm`, `GlobalAlert` (invalid credentials), `SubmitButton` with progress, `AuthSwitchLink`, `ForgotPasswordLink`.
 - **UX/Accessibility/Security**:
   - Handle 401 with non-disclosing error; prevent timing leaks in UI.
   - On success, set HTTP-only cookie (server), refresh auth state, route to `/analyze`.
+  - Include clear "Forgot Password?" link below form.
 
-4) **Analyze Product**
+4) **Forgot Password**
+- **Path**: `/forgot-password`
+- **Main purpose**: Initiate password recovery by requesting a reset email.
+- **Key information**: Email input; success message; link back to Login.
+- **Key view components**: `ForgotPasswordForm` (email only), `SubmitButton` with progress, `SuccessMessage`, `BackToLoginLink`, `FormErrorSummary`.
+- **UX/Accessibility/Security**:
+  - Always show generic success message to prevent user enumeration: "If an account with that email exists, we've sent a password reset link. Please check your email."
+  - Map 400 errors (invalid email format) to inline validation.
+  - Clear instructions; emphasize checking spam folder.
+  - Form resets after submission; success message persists.
+
+5) **Reset Password**
+- **Path**: `/reset-password`
+- **Main purpose**: Complete password recovery using token from email.
+- **Key information**: New password, confirm password; token and email from URL parameters; success/error messages; link to request new reset.
+- **Key view components**: `ResetPasswordForm` (new password, confirm password), `PasswordStrengthHint`, `SubmitButton` with progress, `SuccessMessage`, `ErrorAlert`, `RequestNewResetLink`.
+- **UX/Accessibility/Security**:
+  - Extract `email` and `token` from URL query parameters on mount.
+  - Validate password strength client-side (matches registration requirements).
+  - On success: Show success message and auto-redirect to `/login` after 3 seconds with countdown.
+  - On failure (invalid/expired token): Clear error with actionable link to `/forgot-password`.
+  - Handle missing URL parameters gracefully; prompt user to request reset.
+  - Token never displayed to user; handled internally.
+
+6) **Analyze Product**
 - **Path**: `/analyze` (default authenticated landing)
 - **Main purpose**: Collect product and pet details; orchestrate scraping fallback and submit for analysis.
 - **Key information**: Product Name, Product URL, Species (Cat/Dog), Breed, Age, Additional Info, Ingredients (manual fallback); notices about scraping and privacy; submission status.
@@ -72,7 +98,7 @@ The application is a secure, accessible SPA with a pre-auth landing experience, 
   - Loading indicators for scraping and analysis; progress is announced to screen readers.
   - On 503 from scraper/LLM, propose manual ingredients retry or later retry; preserve inputs.
 
-5) **Results**
+7) **Results**
 - **Path**: `/results/:analysisId`
 - **Main purpose**: Display recommendation badge, concise justification, AI disclaimer; allow feedback.
 - **Key information**: Product name/url; species/breed/age; recommendation (Recommended/Not Recommended); justification; timestamp; analysis ID; link to history and re-analyze.
@@ -82,16 +108,16 @@ The application is a secure, accessible SPA with a pre-auth landing experience, 
   - Feedback shows immediate confirmation, handles 409 (already submitted) gracefully.
   - Handle 404 for missing analysis; 401 triggers logout flow.
 
-6) **My Products**
+8) **My Products**
 - **Path**: `/products`
-- **Main purpose**: Show user’s analyzed products with last analysis info; afford re-analysis and version history access.
+- **Main purpose**: Show user's analyzed products with last analysis info; afford re-analysis and version history access.
 - **Key information**: Product name, last recommendation, last analyzed date; pagination.
 - **Key view components**: `ProductList`, `ProductListItem` (name, date, recommendation pill), `VersionHistoryTrigger` (opens drawer), `ReanalyzeButton`, `PaginationControls`, `EmptyState`.
 - **UX/Accessibility/Security**:
   - Keyboard-accessible list; large tap targets; clear empty state with CTA to Analyze.
   - Server-driven pagination; optimistic navigation; 401 sign-out.
 
-7) **Product Version History (Drawer/Modal)**
+9) **Product Version History (Drawer/Modal)**
 - **Path**: N/A (invoked from `/products`, optionally reflected via `?productId=`)
 - **Main purpose**: Contextual version history for a selected product.
 - **Key information**: List of analyses for product (createdAt, recommendation), with links to specific results.
@@ -100,7 +126,7 @@ The application is a secure, accessible SPA with a pre-auth landing experience, 
   - Focus trap; ESC to close; `aria-modal` with labelled title.
   - Paginated fetch with React Query; 404 handled as empty state; 401 sign-out.
 
-8) **Not Found**
+10) **Not Found**
 - **Path**: `/404` (and catch-all)
 - **Main purpose**: Graceful fallback for unknown routes.
 - **Key information**: Error copy; links to `/analyze` and `/products`.
@@ -108,7 +134,7 @@ The application is a secure, accessible SPA with a pre-auth landing experience, 
 - **UX/Accessibility/Security**:
   - Clear recovery actions; no sensitive data exposure.
 
-9) **Session Expired / Unauthorized**
+11) **Session Expired / Unauthorized**
 - **Path**: Inline banner/dialog triggered on 401
 - **Main purpose**: Inform about session expiry and guide to re-authenticate.
 - **Key information**: Brief message; action to Login.
@@ -116,7 +142,7 @@ The application is a secure, accessible SPA with a pre-auth landing experience, 
 - **UX/Accessibility/Security**:
   - Non-blocking banner that persists until action; safe redirect to `/login`.
 
-10) **Authenticated Shell (Layout)**
+12) **Authenticated Shell (Layout)**
 - **Path**: Wrapper for `/analyze`, `/products`, `/results/*`
 - **Main purpose**: Provide consistent navigation and global UI affordances.
 - **Key information**: App name; nav links; user menu.
@@ -139,13 +165,22 @@ The application is a secure, accessible SPA with a pre-auth landing experience, 
 - **Re-analyze flow**
   - From `/products`, click Re-analyze → `/analyze` with product fields pre-filled (URL, name). Submit → new result saved; Version History updates.
 
+- **Password recovery flow**
+  1. From `/login`, user clicks "Forgot Password?" link → routed to `/forgot-password`.
+  2. User enters email address and submits.
+  3. Always shows success message: "If an account with that email exists, we've sent a password reset link. Please check your email."
+  4. User checks email and clicks reset link → routed to `/reset-password?email=user@example.com&token=ABC123`.
+  5. User enters new password and confirms; client validates strength.
+  6. On successful submit → success message displayed, auto-redirect to `/login` after 3-second countdown.
+  7. On failure (invalid/expired token) → error message with link to request new reset at `/forgot-password`.
+
 - **Session expiry**
   - Any request returning 401 triggers `SessionExpiredBanner` and redirect to `/login` after user acknowledges.
 
 ## 4. Layout and Navigation Structure
 
 - **Routing**
-  - Public: `/`, `/login`, `/register`, `/404`.
+  - Public: `/`, `/login`, `/register`, `/forgot-password`, `/reset-password`, `/404`.
   - Authenticated (guarded): `/analyze` (default), `/results/:analysisId`, `/products`.
   - Contextual UI state: Version History via drawer from `/products` (optional URL param `?productId=` for deep-linking).
 
@@ -163,6 +198,8 @@ The application is a secure, accessible SPA with a pre-auth landing experience, 
 - **AuthGuard/ProtectedRoute**: Wraps authenticated routes; intercepts 401 to show session-expired UI and redirect.
 - **AppHeader**: Branding, primary nav (Analyze, My Products), account menu (Logout), responsive menu for tablet.
 - **GlobalAlertArea/Toast**: Surface API errors (400 mapped to forms, 401 session, 503 retry) and confirmations.
+- **ForgotPasswordForm**: Single email input form; always shows success message (prevents user enumeration); handles email validation errors.
+- **ResetPasswordForm**: New password and confirm password inputs; extracts token/email from URL; validates password strength; shows success with countdown redirect or error with recovery link.
 - **AnalyzeForm**: Structured form with validation and inline scraping fallback. Emits a normalized payload for POST `/api/analyses`.
 - **ScrapeStatus**: `aria-live` region reflecting scraping attempts and failures; toggles manual entry.
 - **AnalysisBadge**: Accessible status badge with text and icon states for Recommended/Not Recommended.
@@ -180,6 +217,8 @@ The application is a secure, accessible SPA with a pre-auth landing experience, 
 ### API compatibility details (by view)
 - Landing: none.
 - Register/Login: POST `/api/auth/register` / POST `/api/auth/login`; handle 400/401/409.
+- Forgot Password: POST `/api/auth/forgot-password`; always returns 200 OK (handles 400 for validation only); no user enumeration.
+- Reset Password: POST `/api/auth/reset-password` with email, token, newPassword; handle 400 (invalid token, weak password).
 - Analyze Product: POST `/api/analyses`; client triggers scraping or includes `ingredientsText` fallback; handle 400/503.
 - Results: GET `/api/analyses/{id}`; POST feedback `/api/analyses/{analysisId}/feedback` (201/409).
 - My Products: GET `/api/analyses` (paginated); filters by `productId` when opened in Version History drawer.
@@ -193,6 +232,10 @@ The application is a secure, accessible SPA with a pre-auth landing experience, 
 - Validation errors (400): Inline, field-specific messages; summary at top for screen readers.
 - Duplicate feedback (409): Surface as non-blocking info; keep visible confirmation.
 - Offline: Global offline indicator and deferred submission where feasible (no data loss locally).
+- Invalid/expired reset token: Clear error message with actionable link to request new reset at `/forgot-password`.
+- Missing URL parameters on reset password page: Prompt user to request password reset; provide link to `/forgot-password`.
+- Email service failure (forgot password): User sees success message (server logs error); prevents enumeration attack.
+- Password doesn't meet strength requirements (reset): Inline validation errors matching registration requirements.
 
 ### Requirements and user stories mapping (UI → PRD)
 - US-001/US-002 (Register/Login): Register/Login views with redirects and errors.
@@ -210,6 +253,9 @@ The application is a secure, accessible SPA with a pre-auth landing experience, 
 - Trust in recommendation: Prominent badge plus concise justification; AI disclaimer present.
 - Recoverability: Preserve form state on errors; clear recovery CTAs; meaningful error messages.
 - Navigation clarity: Persistent "Analyze" and "My Products"; contextual links between Results and History.
+- Password reset confusion: Clear messaging at each step; generic success message prevents enumeration; expired token errors provide clear path to request new reset.
+- Email delivery delays: Success message explicitly tells user to check spam folder; non-threatening copy if email doesn't arrive.
+- Reset link security: Token never displayed to user; handled internally from URL parameters; auto-redirect after success with countdown.
 
 
 

@@ -31,6 +31,20 @@ Authentication will be handled by the built-in endpoints provided by ASP.NET Ide
   - **Success Code**: 200 OK
   - **Error Codes**: 400 Bad Request, 401 Unauthorized (invalid credentials)
 
+- **POST `/api/auth/forgot-password`**
+  - **Description**: Initiates the password reset process for a user.
+  - **Request Payload**: `{ "email": "user@example.com" }`
+  - **Response Payload**: (Empty body)
+  - **Success Code**: 200 OK
+  - **Error Codes**: 400 Bad Request (invalid email format). Note: The endpoint should return 200 OK even if the email is not found to prevent user enumeration attacks.
+
+- **POST `/api/auth/reset-password`**
+  - **Description**: Resets the user's password using a token sent to their email.
+  - **Request Payload**: `{ "email": "user@example.com", "token": "...", "newPassword": "NewPassword123!" }`
+  - **Response Payload**: (Empty body)
+  - **Success Code**: 200 OK
+  - **Error Codes**: 400 Bad Request (invalid token, weak password, email does not match token).
+
 ### 2.2. Analyses
 
 - **POST `/api/analyses`**

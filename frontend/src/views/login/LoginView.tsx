@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import useLogin from '../../hooks/useLogin'
 import { useAuth } from '../../state/auth/AuthContext'
 import GlobalAlert from '../components/GlobalAlert'
@@ -228,7 +228,15 @@ const LoginView = () => {
                   {fieldErrors.password ?? error.password}
                 </p>
               ) : null}
-              <p className="text-xs text-gray-500">Password must be at least 8 characters.</p>
+              <div className="flex items-center justify-between">
+                <p className="text-xs text-gray-500">Password must be at least 8 characters.</p>
+                <Link
+                  to="/forgot-password"
+                  className="text-xs font-medium text-brand-primary hover:text-brand-primary/80 transition-colors"
+                >
+                  Forgot password?
+                </Link>
+              </div>
             </div>
 
             <SubmitButton

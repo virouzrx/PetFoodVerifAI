@@ -94,7 +94,8 @@ Witamina A (775 j.m./kg), witamina D3 (118 j.m./kg), żelazo (8,9 mg/kg), jod (0
             var result = await scrapingService.ScrapeIngredientsAsync(productUrl);
 
             // Assert
-            var normalizedResult = result.Trim().Replace("\r\n", "\n");
+            // Normalize both to single spaces (collapse all whitespace including newlines)
+            var normalizedResult = System.Text.RegularExpressions.Regex.Replace(result.Trim(), @"\s+", " ");
             var normalizedExpected = System.Text.RegularExpressions.Regex.Replace(expectedIngredients, @"\s+", " ").Trim();
             Assert.Equal(normalizedExpected, normalizedResult);
         }

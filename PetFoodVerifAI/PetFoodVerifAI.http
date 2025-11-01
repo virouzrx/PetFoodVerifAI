@@ -4,3 +4,115 @@ GET {{PetFoodVerifAI_HostAddress}}/weatherforecast/
 Accept: application/json
 
 ###
+
+# ============================================
+# AUTHENTICATION ENDPOINTS - Password Reset Flow
+# ============================================
+
+### Step 1: Request Password Reset Token
+POST {{PetFoodVerifAI_HostAddress}}/api/auth/forgot-password
+Content-Type: application/json
+
+{
+  "email": "test@example.com"
+}
+
+###
+
+### Step 2: Reset Password with Token
+# NOTE: Replace the token below with the actual token received from the email
+POST {{PetFoodVerifAI_HostAddress}}/api/auth/reset-password
+Content-Type: application/json
+
+{
+  "email": "test@example.com",
+  "token": "PASTE_TOKEN_FROM_EMAIL_HERE",
+  "newPassword": "NewSecurePassword123!"
+}
+
+###
+
+# ============================================
+# TEST SCENARIOS - Reset Password
+# ============================================
+
+### Test 1: Reset Password - Valid Token and Strong Password
+POST {{PetFoodVerifAI_HostAddress}}/api/auth/reset-password
+Content-Type: application/json
+
+{
+  "email": "test@example.com",
+  "token": "VALID_TOKEN_HERE",
+  "newPassword": "ValidPassword123!"
+}
+
+###
+
+### Test 2: Reset Password - Invalid/Expired Token
+POST {{PetFoodVerifAI_HostAddress}}/api/auth/reset-password
+Content-Type: application/json
+
+{
+  "email": "test@example.com",
+  "token": "InvalidOrExpiredToken123",
+  "newPassword": "ValidPassword123!"
+}
+
+###
+
+### Test 3: Reset Password - Weak Password (should fail validation)
+POST {{PetFoodVerifAI_HostAddress}}/api/auth/reset-password
+Content-Type: application/json
+
+{
+  "email": "test@example.com",
+  "token": "VALID_TOKEN_HERE",
+  "newPassword": "weak"
+}
+
+###
+
+### Test 4: Reset Password - Missing Required Fields
+POST {{PetFoodVerifAI_HostAddress}}/api/auth/reset-password
+Content-Type: application/json
+
+{
+  "email": "test@example.com"
+}
+
+###
+
+### Test 5: Reset Password - Invalid Email Format
+POST {{PetFoodVerifAI_HostAddress}}/api/auth/reset-password
+Content-Type: application/json
+
+{
+  "email": "not-an-email",
+  "token": "VALID_TOKEN_HERE",
+  "newPassword": "ValidPassword123!"
+}
+
+###
+
+### Test 6: Reset Password - Non-existent Email
+POST {{PetFoodVerifAI_HostAddress}}/api/auth/reset-password
+Content-Type: application/json
+
+{
+  "email": "nonexistent@example.com",
+  "token": "SOME_TOKEN",
+  "newPassword": "ValidPassword123!"
+}
+
+###
+
+### Test 7: Verify Login with New Password (after successful reset)
+POST {{PetFoodVerifAI_HostAddress}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "test@example.com",
+  "password": "NewSecurePassword123!"
+}
+
+###

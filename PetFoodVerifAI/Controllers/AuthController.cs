@@ -105,5 +105,54 @@ namespace PetFoodVerifAI.Controllers
 
             return Ok(result.Response);
         }
+
+        [HttpPost("forgot-password")]
+        public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordRequestDto request)
+        {
+            // Validate model state
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            try
+            {
+                // Call service to initiate password reset
+                await _authService.ForgotPasswordAsync(request);
+                
+                // Always return 200 OK (even if email doesn't exist - prevents enumeration)
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                // Log critical error
+                System.Diagnostics.Debug.WriteLine($"Critical error in ForgotPassword endpoint: {ex.Message}");
+                
+                // Return generic error (don't expose details)
+                return StatusCode(500, new { message = "An error occurred processing your request" });
+            }
+        }
+
+        [HttpPost("reset-password")]
+        public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequestDto request)
+        {
+            // Model validation is handled automatically by [ApiController] attribute
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            // Call service to reset password
+            var result = await _authService.ResetPasswordAsync(request);
+
+            if (!result.Succeeded)
+            {
+                // Return 400 Bad Request with error details
+                return BadRequest(new { Errors = result.Errors });
+            }
+
+            // Return 200 OK with empty body on success
+            return Ok();
+        }
     }
 }

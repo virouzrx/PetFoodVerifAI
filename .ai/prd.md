@@ -60,8 +60,39 @@ Pet owners are often skeptical about the quality of commercial pet food and find
   - Given I enter incorrect credentials,
   - Then an error message is displayed, and I remain on the login page.
 
-### Product Analysis
 - ID: US-003
+- Title: User Password Recovery
+- Description: As a registered user who has forgotten my password, I want to be able to reset it so that I can regain access to my account.
+- Acceptance Criteria:
+  - Given I am on the login page,
+  - When I click the "Forgot Password?" link,
+  - Then I am taken to a page where I can enter my registered email address.
+  - When I submit my email address,
+  - Then I receive an email with a link to reset my password.
+  - When I click the link in the email,
+  - Then I am taken to a page where I can enter and confirm a new password.
+  - When I submit my new password,
+  - Then my password is updated, and I can log in with the new password.
+
+- ID: US-004
+- Title: User Login with Google OAuth
+- Description: As a new or returning user, I want to be able to register and log in using my Google account so that I can access the application quickly without creating a new password.
+- Acceptance Criteria:
+  - Given I am on the login or registration page,
+  - When I click the "Continue with Google" button,
+  - Then I am redirected to Google's authentication page.
+  - When I successfully authenticate with Google and grant permissions,
+  - Then I am redirected back to the application.
+  - If this is my first time logging in with Google, then a new account is created automatically using my Google email.
+  - Then I am authenticated and redirected to the main analysis page.
+  - Given I have previously registered with Google,
+  - When I log in with Google again,
+  - Then I am authenticated using my existing account.
+  - Given my Google account email matches an existing email/password account,
+  - Then the system should handle the account linking appropriately or display an appropriate message.
+
+### Product Analysis
+- ID: US-005
 - Title: Analyze a product with successful ingredient scraping
 - Description: As a logged-in user, I want to submit a product URL and my pet's details to get an analysis of the food.
 - Acceptance Criteria:
@@ -71,7 +102,7 @@ Pet owners are often skeptical about the quality of commercial pet food and find
   - Then a loading indicator is displayed while the analysis is processing.
   - Then I am redirected to the results page, which shows a "Recommended" or "Not Recommended" badge and a justification.
 
-- ID: US-004
+- ID: US-006
 - Title: Analyze a product with failed ingredient scraping
 - Description: As a logged-in user, if the app cannot find the ingredients, I want to be prompted to enter them manually so I can still get an analysis.
 - Acceptance Criteria:
@@ -81,7 +112,7 @@ Pet owners are often skeptical about the quality of commercial pet food and find
   - When I paste the ingredients into the text box and resubmit,
   - Then the analysis proceeds, and I am shown the results page.
 
-- ID: US-005
+- ID: US-007
 - Title: Handle a product with no ingredient list
 - Description: As a user, if I submit a product that has no ingredient list available for scraping or manual entry, I want the system to flag it as not recommended.
 - Acceptance Criteria:
@@ -92,7 +123,7 @@ Pet owners are often skeptical about the quality of commercial pet food and find
   - And the justification states that an ingredient list could not be found.
 
 ### Results and History
-- ID: US-006
+- ID: US-008
 - Title: View analysis result
 - Description: As a user, after submitting a product for analysis, I want to see a clear and simple result.
 - Acceptance Criteria:
@@ -102,7 +133,7 @@ Pet owners are often skeptical about the quality of commercial pet food and find
   - The page must contain a short, concise justification for the recommendation.
   - The page must display a disclaimer that the advice is AI-generated and not from a veterinarian.
 
-- ID: US-007
+- ID: US-009
 - Title: Provide feedback on an analysis
 - Description: As a user, I want to provide feedback on the quality of an analysis to help improve the service.
 - Acceptance Criteria:
@@ -112,7 +143,7 @@ Pet owners are often skeptical about the quality of commercial pet food and find
   - Then my feedback is recorded by the system for developer review.
   - The UI should provide a visual confirmation that the feedback was submitted.
 
-- ID: US-008
+- ID: US-010
 - Title: View my product analysis history
 - Description: As a logged-in user, I want to view a list of all the products I have previously analyzed so I can refer back to them.
 - Acceptance Criteria:
@@ -121,7 +152,7 @@ Pet owners are often skeptical about the quality of commercial pet food and find
   - Then I see a list of all products I have analyzed previously.
   - Each item in the list should display the product name and the date of the last analysis.
 
-- ID: US-009
+- ID: US-011
 - Title: Re-analyze a product from history
 - Description: As a logged-in user, I want to re-analyze a product from my history to get an updated opinion or use different pet details.
 - Acceptance Criteria:

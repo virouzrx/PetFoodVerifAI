@@ -41,6 +41,8 @@ export type ApiErrorResponse = {
 export type FieldErrorMap = {
   email?: string
   password?: string
+  newPassword?: string
+  token?: string
   form?: string
 }
 
@@ -96,4 +98,16 @@ export type PendingVerificationResponse = {
   userId: string
   email: string
   expiresAt: Date
+}
+
+// Forgot Password Types
+export type ForgotPasswordRequestDto = {
+  email: string
+}
+
+// Reset Password Types
+export type ResetPasswordRequestDto = {
+  email: string
+  token: string
+  newPassword: string
 }

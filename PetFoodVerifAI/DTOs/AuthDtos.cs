@@ -77,4 +77,26 @@ namespace PetFoodVerifAI.DTOs
         [Required]
         public string GoogleToken { get; set; } = string.Empty;
     }
+
+    public class ForgotPasswordRequestDto
+    {
+        [Required(ErrorMessage = "Email is required")]
+        [EmailAddress(ErrorMessage = "Invalid email format")]
+        [MaxLength(256, ErrorMessage = "Email cannot exceed 256 characters")]
+        public string Email { get; set; } = string.Empty;
+    }
+
+    public class ResetPasswordRequestDto
+    {
+        [Required]
+        [EmailAddress]
+        public string Email { get; set; } = string.Empty;
+
+        [Required]
+        public string Token { get; set; } = string.Empty;
+
+        [Required]
+        [DataType(DataType.Password)]
+        public string NewPassword { get; set; } = string.Empty;
+    }
 }

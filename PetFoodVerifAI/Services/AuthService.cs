@@ -392,5 +392,129 @@ namespace PetFoodVerifAI.Services
                 };
             }
         }
+
+        public async Task<bool> ForgotPasswordAsync(ForgotPasswordRequestDto request)
+        {
+            try
+            {
+                // Normalize email for lookup
+                var normalizedEmail = request.Email.ToLowerInvariant().Trim();
+                
+                // Find user by email
+                var user = await _userManager.FindByEmailAsync(normalizedEmail);
+                
+                // If user doesn't exist, log and return success (prevent enumeration)
+                if (user == null)
+                {
+                    // Log at Information level - not an error
+                    System.Diagnostics.Debug.WriteLine($"Password reset requested for non-existent email: {normalizedEmail}");
+                    return true;
+                }
+                
+                // Generate password reset token
+                var resetToken = await _userManager.GeneratePasswordResetTokenAsync(user);
+                
+                // Build password reset link
+                var encodedToken = Uri.EscapeDataString(resetToken);
+                var encodedEmail = Uri.EscapeDataString(user.Email ?? "");
+                var resetLink = $"{_configuration["AppUrl"]}/reset-password?email={encodedEmail}&token={encodedToken}";
+                
+                // Send password reset email
+                try
+                {
+                    await _emailService.SendPasswordResetEmailAsync(user.Email ?? "", resetToken, resetLink);
+                    System.Diagnostics.Debug.WriteLine($"Password reset email sent successfully to {normalizedEmail}");
+                }
+                catch (Exception ex)
+                {
+                    // Log error but still return success to prevent enumeration
+                    System.Diagnostics.Debug.WriteLine($"Failed to send password reset email: {ex.Message}");
+                }
+                
+                return true;
+            }
+            catch (Exception ex)
+            {
+                // Log critical error
+                System.Diagnostics.Debug.WriteLine($"Critical error in ForgotPasswordAsync: {ex.Message}");
+                // Rethrow to let controller handle as 500 error
+                throw;
+            }
+        }
+
+        public async Task<AuthResultDto> ResetPasswordAsync(ResetPasswordRequestDto request)
+        {
+            try
+            {
+                // Normalize email for lookup
+                var normalizedEmail = request.Email.ToLowerInvariant().Trim();
+                
+                // Find user by email
+                var user = await _userManager.FindByEmailAsync(normalizedEmail);
+                
+                // Return generic error if user not found (security best practice - don't reveal if email exists)
+                if (user == null)
+                {
+                    System.Diagnostics.Debug.WriteLine($"Password reset attempt for non-existent email: {normalizedEmail}");
+                    return new AuthResultDto
+                    {
+                        Succeeded = false,
+                        Errors = new[] { new IdentityError { Description = "Invalid or expired password reset token." } }
+                    };
+                }
+
+                // URL-decode the token in case it arrives URL-encoded
+                var decodedToken = Uri.UnescapeDataString(request.Token);
+                
+                // Attempt to reset password using UserManager
+                // This validates:
+                // - Token format and signature
+                // - Token expiration
+                // - Token association with user
+                // - Password strength requirements
+                var result = await _userManager.ResetPasswordAsync(user, decodedToken, request.NewPassword);
+                
+                if (!result.Succeeded)
+                {
+                    // Try with the raw token if decode didn't help
+                    if (decodedToken != request.Token)
+                    {
+                        result = await _userManager.ResetPasswordAsync(user, request.Token, request.NewPassword);
+                    }
+                    
+                    if (!result.Succeeded)
+                    {
+                        System.Diagnostics.Debug.WriteLine($"Failed password reset attempt for email {normalizedEmail}");
+                        return new AuthResultDto
+                        {
+                            Succeeded = false,
+                            Errors = result.Errors.Any()
+                                ? result.Errors
+                                : new[] { new IdentityError { Description = "Invalid or expired password reset token." } }
+                        };
+                    }
+                }
+
+                // Log successful reset (without sensitive data)
+                System.Diagnostics.Debug.WriteLine($"Password reset successful for user {normalizedEmail}");
+                
+                return new AuthResultDto
+                {
+                    Succeeded = true,
+                    Response = new AuthResponseDto()
+                };
+            }
+            catch (Exception ex)
+            {
+                // Log critical error
+                System.Diagnostics.Debug.WriteLine($"Critical error in ResetPasswordAsync: {ex.Message}");
+                // Return generic error (don't expose internal details)
+                return new AuthResultDto
+                {
+                    Succeeded = false,
+                    Errors = new[] { new IdentityError { Description = "An unexpected error occurred." } }
+                };
+            }
+        }
     }
 }

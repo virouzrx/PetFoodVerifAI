@@ -24,5 +24,14 @@ namespace PetFoodVerifAI.Services
         /// <param name="body">Email body (HTML)</param>
         /// <returns>Task representing the asynchronous operation</returns>
         Task SendEmailAsync(string to, string subject, string body);
+
+        /// <summary>
+        /// Sends a password reset email to the specified email address
+        /// </summary>
+        /// <param name="email">Recipient email address</param>
+        /// <param name="resetToken">Password reset token</param>
+        /// <param name="resetLink">Full reset link to include in email</param>
+        /// <returns>Task representing the asynchronous operation</returns>
+        Task SendPasswordResetEmailAsync(string email, string resetToken, string resetLink);
     }
 }

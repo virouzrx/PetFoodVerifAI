@@ -8,6 +8,8 @@ import type {
   VerifyEmailResponseDto,
   ResendVerificationEmailDto,
   PendingVerificationResponse,
+  ForgotPasswordRequestDto,
+  ResetPasswordRequestDto,
 } from '../types/auth'
 
 const API_BASE_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:5135/api'
@@ -133,6 +135,42 @@ export const googleLogin = async (googleToken: string): Promise<LoginResponseDto
 
   if (response.ok) {
     return response.json() as Promise<LoginResponseDto>
+  }
+
+  throw await parseErrorResponse(response)
+}
+
+export const forgotPassword = async (payload: ForgotPasswordRequestDto): Promise<void> => {
+  const url = `${API_BASE_URL}/auth/forgot-password`
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    credentials: 'omit',
+    body: JSON.stringify(payload),
+  })
+
+  if (response.ok) {
+    return
+  }
+
+  throw await parseErrorResponse(response)
+}
+
+export const resetPassword = async (payload: ResetPasswordRequestDto): Promise<void> => {
+  const url = `${API_BASE_URL}/auth/reset-password`
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    credentials: 'omit',
+    body: JSON.stringify(payload),
+  })
+
+  if (response.ok) {
+    return
   }
 
   throw await parseErrorResponse(response)
