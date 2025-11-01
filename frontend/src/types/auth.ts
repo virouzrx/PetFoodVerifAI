@@ -1,4 +1,4 @@
-export type RegisterFormValues = {
+﻿export type RegisterFormValues = {
   email: string
   password: string
 }
@@ -10,7 +10,9 @@ export type RegisterRequestDto = {
 
 export type RegisterResponseDto = {
   userId: string
+  email: string
   token: string
+  emailConfirmed: boolean
 }
 
 export type LoginRequestDto = {
@@ -20,7 +22,9 @@ export type LoginRequestDto = {
 
 export type LoginResponseDto = {
   userId: string
+  email: string
   token: string
+  emailConfirmed: boolean
 }
 
 export type ApiErrorField = {
@@ -61,3 +65,35 @@ export type AuthState = {
   token?: string
 }
 
+// Email Verification Types
+export type VerificationFormValues = {
+  verificationCode: string
+}
+
+export type VerifyEmailRequestDto = {
+  userId: string
+  verificationToken: string
+}
+
+export type VerifyEmailResponseDto = {
+  userId: string
+  email: string
+  emailConfirmed: boolean
+  token: string
+}
+
+export type ResendVerificationEmailDto = {
+  email: string
+}
+
+export type EmailVerificationStatus = {
+  pendingEmail: string
+  userId: string
+  expiresAt?: Date
+}
+
+export type PendingVerificationResponse = {
+  userId: string
+  email: string
+  expiresAt: Date
+}

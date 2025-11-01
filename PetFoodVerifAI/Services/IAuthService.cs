@@ -1,4 +1,4 @@
-using PetFoodVerifAI.DTOs;
+﻿using PetFoodVerifAI.DTOs;
 using System.Threading.Tasks;
 
 namespace PetFoodVerifAI.Services
@@ -7,5 +7,8 @@ namespace PetFoodVerifAI.Services
     {
         Task<AuthResultDto> RegisterAsync(RegisterDto registerDto);
         Task<AuthResultDto> LoginAsync(LoginRequestDto loginRequest);
+        Task<AuthResultDto> ConfirmEmailAsync(VerifyEmailRequestDto verifyRequest);
+        Task<AuthResultDto> ResendVerificationEmailAsync(ResendVerificationEmailDto resendRequest);
+        Task<AuthResultDto> GoogleLoginAsync(GoogleLoginRequestDto googleRequest);
     }
 }

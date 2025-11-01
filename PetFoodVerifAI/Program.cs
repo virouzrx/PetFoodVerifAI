@@ -1,9 +1,10 @@
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using PetFoodVerifAI.Data;
 using PetFoodVerifAI.Services;
+using Resend;
 using System.Text;
 using System.Text.Json.Serialization;
 
@@ -44,10 +45,22 @@ builder.Services.AddAuthentication(options =>
         ValidIssuer = builder.Configuration["Jwt:Issuer"],
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!))
     };
+})
+.AddGoogle(options =>
+{
+    options.ClientId = builder.Configuration["Google:ClientId"] ?? throw new InvalidOperationException("Google ClientId not configured");
+    options.ClientSecret = builder.Configuration["Google:ClientSecret"] ?? throw new InvalidOperationException("Google ClientSecret not configured");
 });
 
 
 builder.Services.AddScoped<IAuthService, AuthService>();
+// Register Resend email service
+var resendApiKey = builder.Configuration["Email:Resend:ApiKey"] ?? throw new InvalidOperationException("Resend API key not configured");
+builder.Services.AddHttpClient();
+// Configure Resend with API key
+builder.Services.Configure<ResendClientOptions>(opt => opt.ApiToken = resendApiKey);
+builder.Services.AddHttpClient<IResend, ResendClient>();
+builder.Services.AddScoped<IEmailService, ResendEmailService>();
 
 // Register application services
 builder.Services.AddScoped<IAnalysisService, AnalysisService>();
@@ -235,3 +248,9 @@ record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
 {
     public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
 }
+
+
+
+
+
+

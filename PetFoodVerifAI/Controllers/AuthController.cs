@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using PetFoodVerifAI.DTOs;
 using PetFoodVerifAI.Services;
 using System.Threading.Tasks;
@@ -43,6 +43,60 @@ namespace PetFoodVerifAI.Controllers
             }
 
             var result = await _authService.LoginAsync(loginRequest);
+
+            if (!result.Succeeded)
+            {
+                return Unauthorized(new { Errors = result.Errors });
+            }
+
+            return Ok(result.Response);
+        }
+
+        [HttpPost("verify-email")]
+        public async Task<IActionResult> VerifyEmail([FromBody] VerifyEmailRequestDto verifyRequest)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var result = await _authService.ConfirmEmailAsync(verifyRequest);
+
+            if (!result.Succeeded)
+            {
+                return BadRequest(new { Errors = result.Errors });
+            }
+
+            return Ok(result.Response);
+        }
+
+        [HttpPost("resend-verification-email")]
+        public async Task<IActionResult> ResendVerificationEmail([FromBody] ResendVerificationEmailDto resendRequest)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var result = await _authService.ResendVerificationEmailAsync(resendRequest);
+
+            if (!result.Succeeded)
+            {
+                return BadRequest(new { Errors = result.Errors });
+            }
+
+            return Ok(new { Message = "Verification email sent successfully" });
+        }
+
+        [HttpPost("google-login")]
+        public async Task<IActionResult> GoogleLogin([FromBody] GoogleLoginRequestDto googleRequest)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var result = await _authService.GoogleLoginAsync(googleRequest);
 
             if (!result.Succeeded)
             {

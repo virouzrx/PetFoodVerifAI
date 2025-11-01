@@ -1,4 +1,4 @@
-import { renderHook, act } from '@testing-library/react'
+﻿import { renderHook, act } from '@testing-library/react'
 import { vi } from 'vitest'
 import useLogin from '../hooks/useLogin'
 import * as authService from '../services/authService'
@@ -41,6 +41,8 @@ describe('useLogin', () => {
     vi.mocked(authService.loginUser).mockResolvedValue({
       token: 'token-123',
       userId: 'user-456',
+      email: 'user@test.com',
+      emailConfirmed: true,
     })
 
     const { result } = renderHook(() => useLogin())
@@ -99,4 +101,5 @@ describe('useLogin', () => {
     expect(result.current.isLoading).toBe(false)
   })
 })
+
 

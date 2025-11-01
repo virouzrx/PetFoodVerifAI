@@ -1,9 +1,10 @@
-import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
+﻿import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { useAuth } from './state/auth/AuthContext'
 import { lazy, Suspense, type ReactNode } from 'react'
 import LandingView from './views/LandingView'
 import LoginView from './views/login/LoginView'
 import RegisterView from './views/register/RegisterView'
+import VerificationView from './views/verify-email/VerificationView'
 import AuthenticatedShell from './layouts/AuthenticatedShell'
 import NotFoundRoute from './views/not-found/NotFoundRoute'
 
@@ -29,6 +30,14 @@ const App = () => {
           element={
             <RedirectIfAuthenticated>
               <RegisterView />
+            </RedirectIfAuthenticated>
+          }
+        />
+        <Route
+          path="/verify-email"
+          element={
+            <RedirectIfAuthenticated>
+              <VerificationView />
             </RedirectIfAuthenticated>
           }
         />

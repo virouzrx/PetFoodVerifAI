@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+﻿import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { loginUser, registerUser } from './authService';
 import type { LoginRequestDto, RegisterRequestDto } from '../types/auth';
 
@@ -19,8 +19,9 @@ describe('authService', () => {
   };
 
   const mockRegisterResponse = {
-    token: 'new-user-jwt-token',
     userId: 'new-user-123',
+    email: 'newuser@example.com',
+    expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
   };
 
   beforeEach(() => {
@@ -250,7 +251,7 @@ describe('authService', () => {
       const result = await registerUser(mockRegisterRequest);
 
       expect(result).toEqual(mockRegisterResponse);
-      expect(result.token).toBe('new-user-jwt-token');
+      expect(result.email).toBe('newuser@example.com');
       expect(result.userId).toBe('new-user-123');
     });
 
@@ -527,7 +528,7 @@ describe('authService', () => {
     });
 
     it('should handle unicode in error messages', async () => {
-      const unicodeMessage = 'Errör: 你好 🎉';
+      const unicodeMessage = 'ErrĂ¶r: ä˝ ĺĄ˝ đźŽ‰';
 
       vi.mocked(global.fetch).mockResolvedValueOnce({
         ok: false,
@@ -623,6 +624,7 @@ describe('authService', () => {
     });
   });
 });
+
 
 
 
