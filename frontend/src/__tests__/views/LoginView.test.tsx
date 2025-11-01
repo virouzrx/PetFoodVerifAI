@@ -2,11 +2,11 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import { vi, type Mock } from 'vitest'
 import { MemoryRouter } from 'react-router-dom'
 import { GoogleOAuthProvider } from '@react-oauth/google'
-import LoginView from '../views/login/LoginView'
-import useLogin from '../hooks/useLogin'
-import { AuthProvider } from '../state/auth/AuthContext'
+import LoginView from '../../views/login/LoginView'
+import useLogin from '../../hooks/useLogin'
+import { AuthProvider } from '../../state/auth/AuthContext'
 
-vi.mock('../hooks/useLogin')
+vi.mock('../../hooks/useLogin')
 
 const renderWithRouter = () =>
   render(

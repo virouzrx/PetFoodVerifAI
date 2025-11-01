@@ -4,7 +4,7 @@ import {
   SessionExpiredProvider,
   useSessionExpiredContext,
   useSessionExpiry,
-} from './SessionExpiredContext'
+} from '../../state/session/SessionExpiredContext'
 import type { ReactNode } from 'react'
 
 // Mock react-router-dom

@@ -2,8 +2,8 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { renderHook, act, waitFor } from '@testing-library/react';
 import { ReactNode } from 'react';
 import React from 'react';
-import { useFeedbackSubmission } from './useFeedbackSubmission';
-import { AuthProvider } from '../state/auth/AuthContext';
+import { useFeedbackSubmission } from '../../hooks/useFeedbackSubmission';
+import { AuthProvider } from '../../state/auth/AuthContext';
 
 // Mock localStorage globally
 const localStorageMock = (() => {

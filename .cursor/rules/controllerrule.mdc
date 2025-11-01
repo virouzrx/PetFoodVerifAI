@@ -1,5 +1,0 @@
----
-description: Rule for controllers
-alwaysApply: false
----
-When creating API endpoints, do not use minimal APIs directly in Program.cs. Instead, create separate controller files for different resources. Each controller should be in its own file within a `Controllers` directory.

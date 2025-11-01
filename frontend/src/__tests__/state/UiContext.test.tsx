@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { renderHook, act } from '@testing-library/react'
-import { UiProvider, useUiState } from './UiContext'
+import { UiProvider, useUiState } from '../../state/ui/UiContext'
 import type { ReactNode} from 'react'
 
 describe('UiContext', () => {

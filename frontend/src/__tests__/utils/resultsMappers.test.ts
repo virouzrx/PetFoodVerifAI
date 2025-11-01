@@ -10,8 +10,8 @@ import {
   mapToReanalyzePayload,
   getRecommendationBadgeClass,
   getRecommendationLabel,
-} from './resultsMappers'
-import type { AnalysisDetailDto, AnalysisResultViewModel } from '../types/results'
+} from '../../utils/resultsMappers'
+import type { AnalysisDetailDto, AnalysisResultViewModel } from '../../types/results'
 
 describe('resultsMappers', () => {
   describe('mapAnalysisDetailToViewModel', () => {

@@ -1,0 +1,374 @@
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { renderHook, act, waitFor } from '@testing-library/react';
+import { useAnalysisDetail } from './useAnalysisDetail';
+import * as authContext from '../state/auth/AuthContext';
+import * as resultsMappers from '../utils/resultsMappers';
+
+// Mock the auth context
+vi.mock('../state/auth/AuthContext', () => ({
+  useAuth: vi.fn(),
+}));
+
+// Mock the results mappers
+vi.mock('../utils/resultsMappers', () => ({
+  mapAnalysisDetailToViewModel: vi.fn(),
+  classifyApiError: vi.fn(),
+  isValidUuid: vi.fn(),
+}));
+
+describe('useAnalysisDetail', () => {
+  const mockValidAnalysisId = '123e4567-e89b-12d3-a456-426614174000';
+  const mockInvalidAnalysisId = 'invalid-id';
+  const mockAuthToken = 'test-token-123';
+  const mockAnalysisDetailDto = {
+    id: mockValidAnalysisId,
+    productName: 'Test Product',
+    recommendation: 'safe',
+    concerns: [],
+    createdAt: '2023-01-01T00:00:00Z',
+  };
+  const mockViewModel = {
+    id: mockValidAnalysisId,
+    productName: 'Test Product',
+    recommendation: 'safe',
+    concerns: [],
+    createdAt: new Date('2023-01-01T00:00:00Z'),
+  };
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    global.fetch = vi.fn();
+
+    // Default mocks
+    vi.mocked(authContext.useAuth).mockReturnValue({
+      state: { token: mockAuthToken, user: { userId: 'test-user', email: 'test@example.com' } },
+      login: vi.fn(),
+      logout: vi.fn(),
+    });
+
+    vi.mocked(resultsMappers.isValidUuid).mockReturnValue(true);
+    vi.mocked(resultsMappers.mapAnalysisDetailToViewModel).mockReturnValue(mockViewModel);
+  });
+
+  afterEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('should initialize with loading status when analysisId is provided', () => {
+    const { result } = renderHook(() => useAnalysisDetail(mockValidAnalysisId));
+
+    expect(result.current.status).toBe('loading');
+    expect(result.current.data).toBeNull();
+    expect(result.current.error).toBeNull();
+    expect(typeof result.current.refetch).toBe('function');
+  });
+
+  it('should not fetch when analysisId is undefined', () => {
+    vi.mocked(resultsMappers.isValidUuid).mockReturnValue(false);
+
+    const { result } = renderHook(() => useAnalysisDetail(undefined));
+
+    expect(result.current.status).toBe('error');
+    expect(result.current.data).toBeNull();
+    expect(result.current.error).toEqual({
+      type: 'network',
+      message: 'Invalid analysis ID format. Please check the URL and try again.',
+    });
+    expect(global.fetch).not.toHaveBeenCalled();
+  });
+
+  it('should set error for invalid UUID format', () => {
+    vi.mocked(resultsMappers.isValidUuid).mockReturnValue(false);
+
+    const { result } = renderHook(() => useAnalysisDetail(mockInvalidAnalysisId));
+
+    expect(result.current.status).toBe('error');
+    expect(result.current.data).toBeNull();
+    expect(result.current.error).toEqual({
+      type: 'network',
+      message: 'Invalid analysis ID format. Please check the URL and try again.',
+    });
+    expect(global.fetch).not.toHaveBeenCalled();
+  });
+
+  it('should set error when user is not authenticated', () => {
+    vi.mocked(authContext.useAuth).mockReturnValue({
+      state: { token: null, user: null },
+      login: vi.fn(),
+      logout: vi.fn(),
+    });
+
+    const { result } = renderHook(() => useAnalysisDetail(mockValidAnalysisId));
+
+    expect(result.current.status).toBe('error');
+    expect(result.current.data).toBeNull();
+    expect(result.current.error).toEqual({
+      type: 'unauthorized',
+      message: 'You must be logged in to view this analysis.',
+    });
+    expect(global.fetch).not.toHaveBeenCalled();
+  });
+
+  it('should successfully fetch and map analysis data', async () => {
+    vi.mocked(global.fetch).mockResolvedValueOnce({
+      ok: true,
+      json: async () => mockAnalysisDetailDto,
+    } as Response);
+
+    const { result } = renderHook(() => useAnalysisDetail(mockValidAnalysisId));
+
+    await waitFor(() => {
+      expect(result.current.status).toBe('ready');
+    });
+
+    expect(result.current.data).toEqual(mockViewModel);
+    expect(result.current.error).toBeNull();
+
+    expect(global.fetch).toHaveBeenCalledWith(
+      `http://localhost:5135/api/analyses/${mockValidAnalysisId}`,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${mockAuthToken}`,
+        },
+        credentials: 'include',
+        signal: expect.any(AbortSignal),
+      }
+    );
+
+    expect(resultsMappers.mapAnalysisDetailToViewModel).toHaveBeenCalledWith(mockAnalysisDetailDto);
+  });
+
+  it('should handle 401 unauthorized and trigger logout', async () => {
+    const mockLogout = vi.fn();
+    vi.mocked(authContext.useAuth).mockReturnValue({
+      state: { token: mockAuthToken, user: { userId: 'test-user', email: 'test@example.com' } },
+      login: vi.fn(),
+      logout: mockLogout,
+    });
+
+    vi.mocked(global.fetch).mockResolvedValueOnce({
+      ok: false,
+      status: 401,
+    } as Response);
+
+    vi.mocked(resultsMappers.classifyApiError).mockReturnValue({
+      type: 'unauthorized',
+      message: 'Unauthorized access',
+    });
+
+    const { result } = renderHook(() => useAnalysisDetail(mockValidAnalysisId));
+
+    await waitFor(() => {
+      expect(result.current.status).toBe('error');
+    });
+
+    expect(result.current.data).toBeNull();
+    expect(result.current.error).toEqual({
+      type: 'unauthorized',
+      message: 'Unauthorized access',
+    });
+    expect(mockLogout).toHaveBeenCalledTimes(1);
+  });
+
+  it('should handle 404 not found', async () => {
+    vi.mocked(global.fetch).mockResolvedValueOnce({
+      ok: false,
+      status: 404,
+    } as Response);
+
+    vi.mocked(resultsMappers.classifyApiError).mockReturnValue({
+      type: 'notFound',
+      message: 'Analysis not found',
+    });
+
+    const { result } = renderHook(() => useAnalysisDetail(mockValidAnalysisId));
+
+    await waitFor(() => {
+      expect(result.current.status).toBe('notFound');
+    });
+
+    expect(result.current.data).toBeNull();
+    expect(result.current.error).toEqual({
+      type: 'notFound',
+      message: 'Analysis not found',
+    });
+  });
+
+  it('should handle other error statuses', async () => {
+    vi.mocked(global.fetch).mockResolvedValueOnce({
+      ok: false,
+      status: 500,
+      json: async () => ({ message: 'Internal server error' }),
+    } as Response);
+
+    vi.mocked(resultsMappers.classifyApiError).mockReturnValue({
+      type: 'server',
+      message: 'Server error occurred',
+    });
+
+    const { result } = renderHook(() => useAnalysisDetail(mockValidAnalysisId));
+
+    await waitFor(() => {
+      expect(result.current.status).toBe('error');
+    });
+
+    expect(result.current.data).toBeNull();
+    expect(result.current.error).toEqual({
+      type: 'server',
+      message: 'Server error occurred',
+    });
+
+    expect(resultsMappers.classifyApiError).toHaveBeenCalledWith(500, 'Internal server error');
+  });
+
+  it('should handle network errors', async () => {
+    vi.mocked(global.fetch).mockRejectedValueOnce(new Error('Network error'));
+
+    const { result } = renderHook(() => useAnalysisDetail(mockValidAnalysisId));
+
+    await waitFor(() => {
+      expect(result.current.status).toBe('error');
+    });
+
+    expect(result.current.data).toBeNull();
+    expect(result.current.error).toEqual({
+      type: 'network',
+      message: 'Unable to load analysis. Please check your connection and try again.',
+    });
+  });
+
+  it('should handle AbortError gracefully (no state change)', async () => {
+    vi.mocked(global.fetch).mockRejectedValueOnce(new Error('AbortError'));
+
+    const { result } = renderHook(() => useAnalysisDetail(mockValidAnalysisId));
+
+    // AbortError should not change state, so it should remain loading
+    expect(result.current.status).toBe('loading');
+    expect(result.current.data).toBeNull();
+    expect(result.current.error).toBeNull();
+  });
+
+  it('should refetch data when refetch is called', async () => {
+    vi.mocked(global.fetch).mockResolvedValueOnce({
+      ok: true,
+      json: async () => mockAnalysisDetailDto,
+    } as Response);
+
+    const { result } = renderHook(() => useAnalysisDetail(mockValidAnalysisId));
+
+    await waitFor(() => {
+      expect(result.current.status).toBe('ready');
+    });
+
+    // Mock a different response for refetch
+    const updatedDto = { ...mockAnalysisDetailDto, productName: 'Updated Product' };
+    const updatedViewModel = { ...mockViewModel, productName: 'Updated Product' };
+    vi.mocked(global.fetch).mockResolvedValueOnce({
+      ok: true,
+      json: async () => updatedDto,
+    } as Response);
+    vi.mocked(resultsMappers.mapAnalysisDetailToViewModel).mockReturnValue(updatedViewModel);
+
+    act(() => {
+      result.current.refetch();
+    });
+
+    await waitFor(() => {
+      expect(result.current.data).toEqual(updatedViewModel);
+    });
+
+    expect(global.fetch).toHaveBeenCalledTimes(2);
+  });
+
+  it('should abort pending request when component unmounts', async () => {
+    vi.useFakeTimers();
+
+    const abortSpy = vi.fn();
+    const mockAbortController = {
+      abort: abortSpy,
+      signal: {},
+    };
+
+    // Mock AbortController constructor
+    global.AbortController = vi.fn().mockImplementation(() => mockAbortController);
+
+    vi.mocked(global.fetch).mockImplementation(
+      () => new Promise(resolve => setTimeout(resolve, 1000)) // Never resolves
+    );
+
+    const { unmount } = renderHook(() => useAnalysisDetail(mockValidAnalysisId));
+
+    // Wait a bit then unmount
+    await vi.advanceTimersByTimeAsync(100);
+    unmount();
+
+    expect(abortSpy).toHaveBeenCalled();
+
+    vi.useRealTimers();
+  });
+
+  it('should abort pending request when analysisId changes', async () => {
+    vi.useFakeTimers();
+
+    const abortSpy = vi.fn();
+    const mockAbortController = {
+      abort: abortSpy,
+      signal: {},
+    };
+
+    global.AbortController = vi.fn().mockImplementation(() => mockAbortController);
+
+    vi.mocked(global.fetch).mockImplementation(
+      () => new Promise(resolve => setTimeout(resolve, 1000)) // Never resolves
+    );
+
+    const { rerender } = renderHook(
+      ({ analysisId }) => useAnalysisDetail(analysisId),
+      { initialProps: { analysisId: mockValidAnalysisId } }
+    );
+
+    // Wait a bit then change analysisId
+    await vi.advanceTimersByTimeAsync(100);
+    rerender({ analysisId: 'different-id' });
+
+    expect(abortSpy).toHaveBeenCalled();
+
+    vi.useRealTimers();
+  });
+
+  it('should abort pending request when token changes', async () => {
+    vi.useFakeTimers();
+
+    const abortSpy = vi.fn();
+    const mockAbortController = {
+      abort: abortSpy,
+      signal: {},
+    };
+
+    global.AbortController = vi.fn().mockImplementation(() => mockAbortController);
+
+    vi.mocked(global.fetch).mockImplementation(
+      () => new Promise(resolve => setTimeout(resolve, 1000)) // Never resolves
+    );
+
+    let token = mockAuthToken;
+    vi.mocked(authContext.useAuth).mockImplementation(() => ({
+      state: { token, user: { userId: 'test-user', email: 'test@example.com' } },
+      login: vi.fn(),
+      logout: vi.fn(),
+    }));
+
+    const { rerender } = renderHook(() => useAnalysisDetail(mockValidAnalysisId));
+
+    // Wait a bit then change token
+    await vi.advanceTimersByTimeAsync(100);
+    token = 'new-token';
+    rerender();
+
+    expect(abortSpy).toHaveBeenCalled();
+
+    vi.useRealTimers();
+  });
+});

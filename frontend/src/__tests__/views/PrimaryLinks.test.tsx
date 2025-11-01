@@ -1,9 +1,9 @@
 import { render, screen, fireEvent } from '@testing-library/react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { MemoryRouter } from 'react-router-dom'
-import PrimaryLinks from '../components/PrimaryLinks'
-import { AuthProvider } from '../../../state/auth/AuthContext'
-import type { NotFoundLink } from '../types'
+import PrimaryLinks from '../../views/not-found/components/PrimaryLinks'
+import { AuthProvider } from '../../state/auth/AuthContext'
+import type { NotFoundLink } from '../../views/not-found/types'
 
 const mockLinks: NotFoundLink[] = [
   {

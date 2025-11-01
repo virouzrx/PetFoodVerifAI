@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react'
 import { describe, it, expect } from 'vitest'
-import NotFoundMessage from '../components/NotFoundMessage'
+import NotFoundMessage from '../../views/not-found/components/NotFoundMessage'
 
 describe('NotFoundMessage', () => {
   it('renders title and description correctly', () => {

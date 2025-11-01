@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach } from 'vitest'
 import { renderHook, act } from '@testing-library/react'
-import { useAnalyzeForm } from './useAnalyzeForm'
-import type { AnalyzeFormValues } from '../../../types/analyze'
+import { useAnalyzeForm } from '../../views/analyze/hooks/useAnalyzeForm'
+import type { AnalyzeFormValues } from '../../types/analyze'
 
 describe('useAnalyzeForm', () => {
   describe('initialization', () => {

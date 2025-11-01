@@ -1,8 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import AuthForm from './AuthForm';
-import type { FieldErrorMap } from '../../../types/auth';
+import AuthForm from '../../views/register/components/AuthForm';
+import type { FieldErrorMap } from '../../types/auth';
 
 describe('AuthForm', () => {
   const mockOnSubmit = vi.fn();

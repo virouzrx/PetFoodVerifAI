@@ -1,8 +1,8 @@
 import { render, screen } from '@testing-library/react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { MemoryRouter } from 'react-router-dom'
-import NotFoundRoute from '../NotFoundRoute'
-import { AuthProvider } from '../../../state/auth/AuthContext'
+import NotFoundRoute from '../../views/not-found/NotFoundRoute'
+import { AuthProvider } from '../../state/auth/AuthContext'
 
 const mockNavigate = vi.fn()
 let mockLocationState: any = null

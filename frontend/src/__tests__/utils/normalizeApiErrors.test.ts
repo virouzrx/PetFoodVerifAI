@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
-import { normalizeApiErrors } from './normalizeApiErrors'
-import type { ApiErrorResponse } from '../types/auth'
+import { normalizeApiErrors } from '../../utils/normalizeApiErrors'
+import type { ApiErrorResponse } from '../../types/auth'
 
 describe('normalizeApiErrors', () => {
   describe('field error mapping', () => {

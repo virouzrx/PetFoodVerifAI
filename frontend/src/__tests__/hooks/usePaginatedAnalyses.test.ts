@@ -2,9 +2,9 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { renderHook, act, waitFor } from '@testing-library/react';
 import { ReactNode } from 'react';
 import React from 'react';
-import { usePaginatedAnalyses } from './usePaginatedAnalyses';
-import * as analysisService from '../services/analysisService';
-import { AuthProvider } from '../state/auth/AuthContext';
+import { usePaginatedAnalyses } from '../../hooks/usePaginatedAnalyses';
+import * as analysisService from '../../services/analysisService';
+import { AuthProvider } from '../../state/auth/AuthContext';
 
 // Mock localStorage
 const localStorageMock = (() => {
@@ -35,7 +35,7 @@ const createAuthWrapper = () => {
 };
 
 // Mock analysisService
-vi.mock('../services/analysisService', () => ({
+vi.mock('../../services/analysisService', () => ({
   fetchPaginatedAnalyses: vi.fn(),
 }));
 

@@ -4,13 +4,13 @@ import {
   fetchPaginatedAnalyses,
   fetchProductVersionHistory,
   fetchAnalysisDetail,
-} from './analysisService';
+} from '../../services/analysisService';
 import type {
   CreateAnalysisRequest,
   AnalysisCreatedResponse,
-} from '../types/analyze';
-import type { PaginatedAnalysesResponse } from '../types/products';
-import type { AnalysisDetailDto } from '../types/results';
+} from '../../types/analyze';
+import type { PaginatedAnalysesResponse } from '../../types/products';
+import type { AnalysisDetailDto } from '../../types/results';
 
 describe('analysisService', () => {
   const mockToken = 'test-jwt-token-123';

@@ -1,6 +1,6 @@
 ﻿import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { loginUser, registerUser } from './authService';
-import type { LoginRequestDto, RegisterRequestDto } from '../types/auth';
+import { loginUser, registerUser } from '../../services/authService';
+import type { LoginRequestDto, RegisterRequestDto } from '../../types/auth';
 
 describe('authService', () => {
   const mockLoginRequest: LoginRequestDto = {

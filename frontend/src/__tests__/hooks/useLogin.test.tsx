@@ -1,11 +1,11 @@
 ﻿import { renderHook, act } from '@testing-library/react'
 import { vi } from 'vitest'
-import useLogin from '../hooks/useLogin'
-import * as authService from '../services/authService'
+import useLogin from '../../hooks/useLogin'
+import * as authService from '../../services/authService'
 
 const loginMock = vi.fn()
 
-vi.mock('../state/auth/AuthContext', () => {
+vi.mock('../../state/auth/AuthContext', () => {
   return {
     useAuth: () => {
       const mockFn = vi.fn()
@@ -17,7 +17,7 @@ vi.mock('../state/auth/AuthContext', () => {
   }
 })
 
-vi.mock('../services/authService', () => ({
+vi.mock('../../services/authService', () => ({
   loginUser: vi.fn(),
 }))
 

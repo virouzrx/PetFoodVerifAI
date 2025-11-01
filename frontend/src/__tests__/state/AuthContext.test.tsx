@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { renderHook, act } from '@testing-library/react'
-import { AuthProvider, useAuth } from './AuthContext'
+import { AuthProvider, useAuth } from '../../state/auth/AuthContext'
 import type { ReactNode } from 'react'
 
 // Mock localStorage
