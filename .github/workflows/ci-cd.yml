@@ -163,26 +163,27 @@ jobs:
           echo "Backend did not become ready in time" >&2
           exit 1
 
-      - name: Build frontend
-        run: npm run build
-
       - name: Start frontend dev server
         run: |
-          npm run dev &
+          npm run dev -- --host 0.0.0.0 --port 5173 &
           echo "FRONTEND_PID=$!" >> $GITHUB_ENV
         env:
           VITE_API_URL: http://127.0.0.1:5135/api
 
       - name: Wait for frontend readiness
         run: |
-          for i in {1..30}; do
+          echo "Waiting for frontend to start on http://127.0.0.1:5173..."
+          for i in {1..60}; do
             if curl -sf http://127.0.0.1:5173 > /dev/null; then
               echo "Frontend is ready"
               exit 0
             fi
+            echo "Attempt $i/60 - Frontend not ready yet..."
             sleep 2
           done
           echo "Frontend did not become ready in time" >&2
+          echo "Checking if Vite process is running:"
+          ps aux | grep vite || true
           exit 1
 
       - name: Run E2E tests
