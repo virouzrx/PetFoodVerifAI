@@ -81,12 +81,41 @@ jobs:
   frontend-e2e-tests:
     name: Frontend E2E Tests
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: petfoodverifai
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      ASPNETCORE_ENVIRONMENT: Development
+      ConnectionStrings__DefaultConnection: Host=127.0.0.1;Port=5432;Database=petfoodverifai;Username=postgres;Password=postgres
+      AppUrl: http://127.0.0.1:5173
+      UseMockLLM: 'true'
+      Email__Resend__ApiKey: ${{ secrets.RESEND_API_KEY || 'test-e2e-key' }}
+      Jwt__Key: ${{ secrets.JWT_KEY || 'set-a-secure-jwt-key' }}
+      BASE_URL: http://127.0.0.1:5173
+      VITE_API_URL: http://127.0.0.1:5135/api
+      CI: 'true'
     defaults:
       run:
         working-directory: ./frontend
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -101,10 +130,41 @@ jobs:
       - name: Install Playwright browsers
         run: npx playwright install chromium --with-deps
 
+      - name: Install dotnet-ef tool
+        run: dotnet tool install --global dotnet-ef
+
+      - name: Restore backend dependencies
+        run: dotnet restore
+        working-directory: ./PetFoodVerifAI
+
+      - name: Apply database migrations
+        run: dotnet ef database update
+        working-directory: ./PetFoodVerifAI
+
+      - name: Build backend
+        run: dotnet build --no-restore
+        working-directory: ./PetFoodVerifAI
+
+      - name: Start backend API
+        run: |
+          dotnet run --no-build --urls http://0.0.0.0:5135 &
+          echo "BACKEND_PID=$!" >> $GITHUB_ENV
+        working-directory: ./PetFoodVerifAI
+
+      - name: Wait for backend readiness
+        run: |
+          for i in {1..30}; do
+            if curl -sf http://127.0.0.1:5135/api/health/database > /dev/null; then
+              echo "Backend is ready"
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "Backend did not become ready in time" >&2
+          exit 1
+
       - name: Run E2E tests
         run: npm run e2e
-        env:
-          CI: true
 
       - name: Upload Playwright report
         if: always()
@@ -121,6 +181,10 @@ jobs:
           name: playwright-test-results
           path: test-results/
           retention-days: 30
+
+      - name: Stop backend API
+        if: always() && env.BACKEND_PID != ''
+        run: kill $BACKEND_PID || true
 
   lint:
     name: Lint
