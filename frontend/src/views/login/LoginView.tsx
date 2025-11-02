@@ -21,9 +21,7 @@ const validateEmail = (value: string) => {
     return 'Email is required.'
   }
   const normalized = value.trim().toLowerCase()
-  const emailRegex =
-    // eslint-disable-next-line no-control-regex
-    /^(?:[a-zA-Z0-9_'^&\/+{}=!?$*%#`~.-]+)@(?:[a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}$/
+  const emailRegex = /^(?:[a-zA-Z0-9_'^&/+{}=!?$*%#`~.-]+)@(?:[a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}$/
   if (!emailRegex.test(normalized)) {
     return 'Enter a valid email address.'
   }
@@ -66,9 +64,9 @@ const LoginView = () => {
         setAuth(response.token, response.userId, response.email)
         console.log('Logged in, navigating to analyze...')
         navigate('/analyze', { replace: true })
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.error('Google login error:', err)
-        const errorMsg = err?.message || 'Google login failed'
+        const errorMsg = err instanceof Error ? err.message : 'Google login failed'
         clearError()
         setFieldErrors({ form: errorMsg })
       } finally {

@@ -31,7 +31,7 @@ test.describe('Home Page', () => {
   });
 
   // Visual regression test example
-  test('should match homepage screenshot', async ({ page, homePage }) => {
+  test('should match homepage screenshot', async ({ page }) => {
     // Visual comparison test
     await expect(page).toHaveScreenshot('homepage.png', {
       fullPage: true,

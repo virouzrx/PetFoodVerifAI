@@ -125,7 +125,7 @@ export const useFeedbackSubmission = (
           status: 'error',
           message: errorMessage,
         });
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.error('Failed to submit feedback:', err);
         setFeedbackState({
           status: 'error',

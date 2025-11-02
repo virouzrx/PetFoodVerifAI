@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 import type { AnalyzeFormValues, SubmitStatus } from '../../../types/analyze';
 import { useAnalyzeForm } from '../hooks/useAnalyzeForm';
 import ProductNameInput from './ProductNameInput';
@@ -56,15 +56,20 @@ const AnalyzeForm = ({ onSubmit, submissionStatus, scrapeStateFromParent, apiErr
   const scrapeState = scrapeStateFromParent || localScrapeState;
 
   // Map API errors to form errors when they arrive
-  const mergedErrors = { ...formErrors };
-  if (apiErrors) {
-    Object.entries(apiErrors).forEach(([field, messages]) => {
-      const fieldKey = field.charAt(0).toLowerCase() + field.slice(1);
-      if (messages && messages.length > 0) {
-        mergedErrors[fieldKey as keyof typeof mergedErrors] = messages[0];
-      }
-    });
-  }
+  const mergedErrors = useMemo(() => {
+    const combined = { ...formErrors };
+
+    if (apiErrors) {
+      Object.entries(apiErrors).forEach(([field, messages]) => {
+        const fieldKey = field.charAt(0).toLowerCase() + field.slice(1);
+        if (messages && messages.length > 0) {
+          combined[fieldKey as keyof typeof combined] = messages[0];
+        }
+      });
+    }
+
+    return combined;
+  }, [apiErrors, formErrors]);
 
   const handleFormSubmit = useCallback(
     (e: React.FormEvent) => {

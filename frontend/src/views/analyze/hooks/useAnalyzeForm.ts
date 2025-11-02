@@ -6,8 +6,10 @@ import type {
   ManualIngredientsState,
 } from '../../../types/analyze';
 
+type AnalyzeFieldValue = AnalyzeFormValues[keyof AnalyzeFormValues];
+
 type FormAction =
-  | { type: 'SET_FIELD'; field: keyof AnalyzeFormValues; value: any }
+  | { type: 'SET_FIELD'; field: keyof AnalyzeFormValues; value: AnalyzeFieldValue }
   | { type: 'SET_MANUAL_INGREDIENTS'; value: string }
   | { type: 'SET_NO_INGREDIENTS'; value: boolean }
   | { type: 'ENABLE_MANUAL' }
@@ -75,11 +77,14 @@ export const useAnalyzeForm = (initialValues?: Partial<AnalyzeFormValues>) => {
     if (initialValues) {
       initializeForm(initialValues);
     }
-  }, []); // Only run once on mount
+  }, [initialValues, initializeForm]);
 
   // Field update handler
-  const updateField = useCallback((field: keyof AnalyzeFormValues, value: any) => {
-    dispatch({ type: 'SET_FIELD', field, value });
+  const updateField = useCallback(<K extends keyof AnalyzeFormValues>(
+    field: K,
+    value: AnalyzeFormValues[K],
+  ) => {
+    dispatch({ type: 'SET_FIELD', field, value: value as AnalyzeFieldValue });
     // Clear error for this field when user updates it
     setFormErrors((prev) => {
       const updated = { ...prev };

@@ -14,6 +14,52 @@ import type {
 } from '../../types/analyze';
 import { speciesStringToEnum } from '../../types/analyze';
 
+type AnalyzeNavigationState = {
+  fromReanalysis?: boolean;
+  productName?: string;
+  productUrl?: string;
+  species?: AnalyzeFormValues['species'];
+  breed?: string;
+  age?: AnalyzeFormValues['age'];
+  additionalInfo?: string;
+};
+
+const isAnalyzeNavigationState = (value: unknown): value is AnalyzeNavigationState => {
+  if (typeof value !== 'object' || value === null) {
+    return false;
+  }
+
+  const record = value as Record<string, unknown>;
+
+  const optionalString = (key: keyof AnalyzeNavigationState) =>
+    record[key] === undefined || typeof record[key] === 'string';
+
+  const speciesValid =
+    record.species === undefined ||
+    record.species === '' ||
+    record.species === 'Cat' ||
+    record.species === 'Dog';
+
+  const ageValue = record.age;
+  const ageValid =
+    ageValue === undefined ||
+    typeof ageValue === 'number' ||
+    ageValue === '';
+
+  const fromReanalysisValid =
+    record.fromReanalysis === undefined || typeof record.fromReanalysis === 'boolean';
+
+  return (
+    fromReanalysisValid &&
+    optionalString('productName') &&
+    optionalString('productUrl') &&
+    optionalString('breed') &&
+    optionalString('additionalInfo') &&
+    speciesValid &&
+    ageValid
+  );
+};
+
 /**
  * AnalyzePage Component
  * 
@@ -37,7 +83,9 @@ const AnalyzePage = () => {
   const [scrapeState, setScrapeState] = useState<ScrapeState>('idle');
 
   // Check if this is a reanalysis (from My Products view)
-  const navigationState = location.state as any;
+  const navigationState = isAnalyzeNavigationState(location.state)
+    ? location.state
+    : null;
   const isReanalysis = navigationState?.fromReanalysis === true;
   
   // Prepare initial values and locked fields for reanalysis

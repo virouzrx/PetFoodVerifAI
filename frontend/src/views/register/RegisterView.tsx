@@ -19,6 +19,15 @@ const initialFormValues: RegisterFormValues = {
   password: '',
 }
 
+const isApiErrorResponse = (value: unknown): value is ApiErrorResponse => {
+  if (typeof value !== 'object' || value === null) {
+    return false
+  }
+
+  const record = value as Record<string, unknown>
+  return typeof record.status === 'number'
+}
+
 const RegisterView = () => {
   const navigate = useNavigate()
   const { login } = useAuth()
@@ -39,9 +48,9 @@ const RegisterView = () => {
         login(response.token, response.userId, response.email)
         console.log('Logged in, navigating to analyze...')
         navigate('/analyze', { replace: true })
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.error('Google login error:', err)
-        const errorMsg = err?.message || 'Google sign-up failed'
+        const errorMsg = err instanceof Error ? err.message : 'Google sign-up failed'
         setErrors({ form: errorMsg })
       } finally {
         setGoogleLoading(false)
@@ -84,13 +93,14 @@ const RegisterView = () => {
         },
       })
     } catch (error) {
-      const apiError = error as ApiErrorResponse
-      if (apiError?.status === 409) {
+      if (isApiErrorResponse(error) && error.status === 409) {
         setErrors({ email: 'An account with this email already exists.' })
-      } else if (apiError?.status === 429) {
+      } else if (isApiErrorResponse(error) && error.status === 429) {
         setErrors({ form: 'Too many attempts. Please wait and try again.' })
       } else {
-        const normalized = normalizeApiErrors(apiError)
+        const normalized = normalizeApiErrors(
+          isApiErrorResponse(error) ? error : undefined,
+        )
         setErrors(normalized)
       }
     } finally {

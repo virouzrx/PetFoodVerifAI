@@ -32,7 +32,7 @@ export const useNotFoundViewModel = (): NotFoundViewModel => {
     }
 
     // Define primary recovery links
-    const links: NotFoundLink[] = [
+    const allLinks: NotFoundLink[] = [
       {
         id: 'analyze',
         label: 'Analyze a Product',
@@ -51,12 +51,16 @@ export const useNotFoundViewModel = (): NotFoundViewModel => {
 
     // Validate that both required links are present (dev sanity check)
     if (process.env.NODE_ENV === 'development') {
-      const hasAnalyze = links.some((link) => link.to === '/analyze')
-      const hasProducts = links.some((link) => link.to === '/products')
+      const hasAnalyze = allLinks.some((link) => link.to === '/analyze')
+      const hasProducts = allLinks.some((link) => link.to === '/products')
       if (!hasAnalyze || !hasProducts) {
         console.warn('[useNotFoundViewModel] Missing required links: /analyze or /products')
       }
     }
+
+    const links = allLinks.filter((link) =>
+      link.requiresAuth ? isAuthenticated : true,
+    )
 
     return {
       title: 'Page Not Found',

@@ -115,9 +115,9 @@ export const useAnalysisDetail = (
       setStatus('error');
       setError(errorState);
       setData(null);
-    } catch (err: any) {
+    } catch (err: unknown) {
       // Handle abort - don't update state
-      if (err.name === 'AbortError') {
+      if (err instanceof DOMException && err.name === 'AbortError') {
         return;
       }
 

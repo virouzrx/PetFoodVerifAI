@@ -17,7 +17,7 @@ const FormValidationSummary = ({
   onFocusField,
   show,
 }: FormValidationSummaryProps) => {
-  const errorEntries = Object.entries(errors).filter(([_, value]) => value);
+  const errorEntries = Object.entries(errors).filter(([, value]) => value);
 
   if (!show || errorEntries.length === 0) {
     return null;

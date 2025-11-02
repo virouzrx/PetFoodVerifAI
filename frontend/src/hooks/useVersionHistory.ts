@@ -5,6 +5,16 @@ import type {
   UseVersionHistoryResult,
 } from '../types/products';
 import { fetchProductVersionHistory } from '../services/analysisService';
+import type { ApiErrorShape } from '../types/analyze';
+
+const isApiErrorShape = (error: unknown): error is ApiErrorShape => {
+  if (typeof error !== 'object' || error === null) {
+    return false;
+  }
+
+  const maybeRecord = error as Record<string, unknown>;
+  return typeof maybeRecord.status === 'number';
+};
 
 /**
  * Custom hook to fetch and manage version history for a specific product
@@ -79,16 +89,16 @@ export const useVersionHistory = (
       
       setStatus('ready');
       setError(null);
-    } catch (err: any) {
+    } catch (err: unknown) {
       // Handle abort - don't update state
-      if (err.name === 'AbortError') {
+      if (err instanceof DOMException && err.name === 'AbortError') {
         return;
       }
 
       console.error('Failed to fetch version history:', err);
 
       // Handle 401 - trigger logout
-      if (err.status === 401) {
+      if (isApiErrorShape(err) && err.status === 401) {
         logout();
         setStatus('error');
         setError('Your session has expired. Please log in again.');
@@ -98,9 +108,14 @@ export const useVersionHistory = (
 
       // Handle other errors
       setStatus('error');
-      setError(
-        err.message || 'Unable to load version history. Please try again later.'
-      );
+      const fallbackMessage = 'Unable to load version history. Please try again later.';
+      if (isApiErrorShape(err)) {
+        setError(err.message || fallbackMessage);
+      } else if (err instanceof Error) {
+        setError(err.message || fallbackMessage);
+      } else {
+        setError(fallbackMessage);
+      }
     }
   }, [authState.token, logout, pageSize]);
 

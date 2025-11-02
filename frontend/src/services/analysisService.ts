@@ -10,8 +10,33 @@ import type { AnalysisDetailDto } from '../types/results';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:5135/api';
 
+type ErrorPayload = {
+  message?: string;
+  details?: string;
+  errors?: Record<string, string[]>;
+};
+
+const isErrorPayload = (value: unknown): value is ErrorPayload => {
+  if (typeof value !== 'object' || value === null) {
+    return false;
+  }
+
+  const record = value as Record<string, unknown>;
+  const detailsValid =
+    record.details === undefined || typeof record.details === 'string';
+  const errorsValid =
+    record.errors === undefined ||
+    (typeof record.errors === 'object' && record.errors !== null);
+
+  return (
+    (record.message === undefined || typeof record.message === 'string') &&
+    detailsValid &&
+    errorsValid
+  );
+};
+
 const parseErrorResponse = async (response: Response): Promise<ApiErrorShape> => {
-  let payload: any = undefined;
+  let payload: unknown = undefined;
   const text = await response.text();
   try {
     payload = JSON.parse(text);
@@ -22,9 +47,11 @@ const parseErrorResponse = async (response: Response): Promise<ApiErrorShape> =>
 
   return {
     status: response.status,
-    message: payload?.message || 'An unexpected error occurred',
-    details: payload?.details,
-    errors: payload?.errors,
+    message:
+      (isErrorPayload(payload) && payload.message) ||
+      'An unexpected error occurred',
+    details: isErrorPayload(payload) ? payload.details : undefined,
+    errors: isErrorPayload(payload) ? payload.errors : undefined,
   };
 };
 

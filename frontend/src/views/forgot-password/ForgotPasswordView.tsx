@@ -16,9 +16,7 @@ const validateEmail = (value: string) => {
     return 'Email is required.'
   }
   const normalized = value.trim().toLowerCase()
-  const emailRegex =
-    // eslint-disable-next-line no-control-regex
-    /^(?:[a-zA-Z0-9_'^&\/+{}=!?$*%#`~.-]+)@(?:[a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}$/
+  const emailRegex = /^(?:[a-zA-Z0-9_'^&/+{}=!?$*%#`~.-]+)@(?:[a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}$/
   if (!emailRegex.test(normalized)) {
     return 'Enter a valid email address.'
   }

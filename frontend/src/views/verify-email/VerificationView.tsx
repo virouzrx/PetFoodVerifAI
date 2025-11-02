@@ -13,6 +13,28 @@ interface LocationState {
   expiresAt?: string
 }
 
+const isLocationState = (value: unknown): value is LocationState => {
+  if (typeof value !== 'object' || value === null) {
+    return false
+  }
+
+  const record = value as Record<string, unknown>
+  const emailValid = record.email === undefined || typeof record.email === 'string'
+  const userIdValid = record.userId === undefined || typeof record.userId === 'string'
+  const expiresAtValid = record.expiresAt === undefined || typeof record.expiresAt === 'string'
+
+  return emailValid && userIdValid && expiresAtValid
+}
+
+const isApiErrorResponse = (value: unknown): value is ApiErrorResponse => {
+  if (typeof value !== 'object' || value === null) {
+    return false
+  }
+
+  const record = value as Record<string, unknown>
+  return typeof record.status === 'number'
+}
+
 const VerificationView = () => {
   const location = useLocation()
   const navigate = useNavigate()
@@ -20,14 +42,14 @@ const VerificationView = () => {
   const [searchParams] = useSearchParams()
 
   // Try to get email from state first, then use placeholder
-  const state = location.state as LocationState | null
+  const state = isLocationState(location.state) ? location.state : null
   const email = state?.email || 'your email'
   
   // Get userId and token from query parameters
   const userId = searchParams.get('userId') || state?.userId || ''
   const tokenFromParams = searchParams.get('token') || ''
   
-  const expiresAt = state?.expiresAt ? new Date(state.expiresAt) : null
+  const expiresAtIso = typeof state?.expiresAt === 'string' ? state.expiresAt : null
 
   const [isSubmitting, setSubmitting] = useState(false)
   const [isResending, setResending] = useState(false)
@@ -46,8 +68,12 @@ const VerificationView = () => {
 
   // Countdown timer for token expiration
   useEffect(() => {
-    if (!expiresAt) return
+    if (!expiresAtIso) {
+      setTimeRemaining('')
+      return
+    }
 
+    const expiresAt = new Date(expiresAtIso)
     const updateCountdown = () => {
       const now = new Date()
       const diff = expiresAt.getTime() - now.getTime()
@@ -67,7 +93,7 @@ const VerificationView = () => {
     updateCountdown()
     const interval = setInterval(updateCountdown, 1000)
     return () => clearInterval(interval)
-  }, [expiresAt])
+  }, [expiresAtIso])
 
   // Auto-submit if token is already present from URL query params
   useEffect(() => {
@@ -89,11 +115,12 @@ const VerificationView = () => {
             }, 1000)
           }
         } catch (error) {
-          const apiError = error as ApiErrorResponse
-          if (apiError?.status === 400) {
+          if (isApiErrorResponse(error) && error.status === 400) {
             setErrors({ form: 'Invalid or expired verification token. Please try again or request a new email.' })
           } else {
-            const normalized = normalizeApiErrors(apiError)
+            const normalized = normalizeApiErrors(
+              isApiErrorResponse(error) ? error : undefined,
+            )
             setErrors(normalized)
           }
         } finally {
@@ -103,7 +130,7 @@ const VerificationView = () => {
 
       submitForm()
     }
-  }, [tokenFromParams, userId, login, navigate])
+  }, [tokenFromParams, userId, login, navigate, isSubmitting])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -122,11 +149,12 @@ const VerificationView = () => {
         }, 1000)
       }
     } catch (error) {
-      const apiError = error as ApiErrorResponse
-      if (apiError?.status === 400) {
+      if (isApiErrorResponse(error) && error.status === 400) {
         setErrors({ form: 'Invalid or expired verification token. Please try again or request a new email.' })
       } else {
-        const normalized = normalizeApiErrors(apiError)
+        const normalized = normalizeApiErrors(
+          isApiErrorResponse(error) ? error : undefined,
+        )
         setErrors(normalized)
       }
     } finally {
@@ -144,8 +172,13 @@ const VerificationView = () => {
       setSuccessMessage('Verification email sent! Check your inbox.')
       setVerificationCode('')
     } catch (error) {
-      const apiError = error as ApiErrorResponse
-      setErrors({ form: apiError?.message || 'Failed to resend verification email. Please try again.' })
+      if (isApiErrorResponse(error)) {
+        setErrors({ form: error.message || 'Failed to resend verification email. Please try again.' })
+      } else if (error instanceof Error) {
+        setErrors({ form: error.message })
+      } else {
+        setErrors({ form: 'Failed to resend verification email. Please try again.' })
+      }
     } finally {
       setResending(false)
     }

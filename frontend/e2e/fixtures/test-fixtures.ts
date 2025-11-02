@@ -28,24 +28,24 @@ type TestFixtures = {
  * });
  */
 export const test = base.extend<TestFixtures>({
-  loginPage: async ({ page }, use) => {
+  loginPage: async ({ page }, provide) => {
     const loginPage = new LoginPage(page);
-    await use(loginPage);
+    await provide(loginPage);
   },
 
-  homePage: async ({ page }, use) => {
+  homePage: async ({ page }, provide) => {
     const homePage = new HomePage(page);
-    await use(homePage);
+    await provide(homePage);
   },
 
-  registerPage: async ({ page }, use) => {
+  registerPage: async ({ page }, provide) => {
     const registerPage = new RegisterPage(page);
-    await use(registerPage);
+    await provide(registerPage);
   },
 
-  verifyEmailPage: async ({ page }, use) => {
+  verifyEmailPage: async ({ page }, provide) => {
     const verifyEmailPage = new VerifyEmailPage(page);
-    await use(verifyEmailPage);
+    await provide(verifyEmailPage);
   },
 });
 
