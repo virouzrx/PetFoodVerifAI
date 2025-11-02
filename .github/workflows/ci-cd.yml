@@ -16,11 +16,14 @@ jobs:
       with:
         dotnet-version: '8.0.x'
     - name: Restore dependencies
-      run: dotnet restore PetFoodVerifAI.Tests/PetFoodVerifAI.Tests.csproj
+      run: dotnet restore
+      working-directory: ./PetFoodVerifAI.Tests
     - name: Build
-      run: dotnet build PetFoodVerifAI.Tests/PetFoodVerifAI.Tests.csproj --no-restore
+      run: dotnet build --no-restore
+      working-directory: ./PetFoodVerifAI.Tests
     - name: Test
-      run: dotnet test PetFoodVerifAI.Tests/PetFoodVerifAI.Tests.csproj --no-build --verbosity normal
+      run: dotnet test --no-build --verbosity normal
+      working-directory: ./PetFoodVerifAI.Tests
 
   build-and-test-frontend:
     runs-on: ubuntu-latest
