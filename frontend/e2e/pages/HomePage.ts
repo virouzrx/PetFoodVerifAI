@@ -25,7 +25,7 @@ export class HomePage extends BasePage {
   }
 
   get navigationBar() {
-    return this.getByRole('navigation');
+    return this.getByRole('navigation', { name: /primary call to action/i });
   }
 
   /**
