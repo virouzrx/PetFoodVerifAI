@@ -1,5 +1,8 @@
 import { test, expect } from './fixtures/test-fixtures';
 
+// Declare process for Node.js environment variables
+declare const process: { env: { CI?: string } };
+
 /**
  * Example E2E test demonstrating Page Object Model pattern
  * This test suite shows best practices for Playwright testing
@@ -31,7 +34,10 @@ test.describe('Home Page', () => {
   });
 
   // Visual regression test example
+  // Skip in CI because screenshots are platform-specific (Linux vs Windows vs macOS)
   test('should match homepage screenshot', async ({ page }) => {
+    test.skip(!!process.env.CI, 'Skipping visual regression test in CI - screenshots are platform-specific');
+    
     // Visual comparison test
     await expect(page).toHaveScreenshot('homepage.png', {
       fullPage: true,
