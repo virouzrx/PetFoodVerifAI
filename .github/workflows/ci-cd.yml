@@ -163,6 +163,28 @@ jobs:
           echo "Backend did not become ready in time" >&2
           exit 1
 
+      - name: Build frontend
+        run: npm run build
+
+      - name: Start frontend dev server
+        run: |
+          npm run dev &
+          echo "FRONTEND_PID=$!" >> $GITHUB_ENV
+        env:
+          VITE_API_URL: http://127.0.0.1:5135/api
+
+      - name: Wait for frontend readiness
+        run: |
+          for i in {1..30}; do
+            if curl -sf http://127.0.0.1:5173 > /dev/null; then
+              echo "Frontend is ready"
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "Frontend did not become ready in time" >&2
+          exit 1
+
       - name: Run E2E tests
         run: npm run e2e
 
@@ -181,6 +203,10 @@ jobs:
           name: playwright-test-results
           path: test-results/
           retention-days: 30
+
+      - name: Stop frontend dev server
+        if: always() && env.FRONTEND_PID != ''
+        run: kill $FRONTEND_PID || true
 
       - name: Stop backend API
         if: always() && env.BACKEND_PID != ''
