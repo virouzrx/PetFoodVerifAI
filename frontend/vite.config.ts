@@ -1,7 +1,13 @@
-import { defineConfig } from 'vitest/config'
+/// <reference types="vitest" />
+
+import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from 'tailwindcss'
 import autoprefixer from 'autoprefixer'
+import type { UserConfig } from 'vite'
+import type { UserConfig as VitestUserConfig } from 'vitest/config'
+
+type ExtendedConfig = UserConfig & { test?: VitestUserConfig['test'] }
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -49,4 +55,4 @@ export default defineConfig({
       plugins: [tailwindcss(), autoprefixer()],
     },
   },
-})
+} as ExtendedConfig)

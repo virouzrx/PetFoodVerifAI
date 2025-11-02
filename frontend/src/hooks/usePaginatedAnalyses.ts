@@ -152,6 +152,14 @@ export const usePaginatedAnalyses = (
   const setPage = useCallback((newPage: number) => {
     const validated = validateParams(newPage, pageSize);
     setPageInternal(validated.page);
+    setData((previous) =>
+      previous
+        ? {
+            ...previous,
+            page: validated.page,
+          }
+        : previous,
+    );
   }, [pageSize, validateParams]);
 
   // Page size setter with validation
@@ -160,6 +168,15 @@ export const usePaginatedAnalyses = (
     setPageSizeInternal(validated.pageSize);
     // Reset to page 1 when changing page size
     setPageInternal(1);
+    setData((previous) =>
+      previous
+        ? {
+            ...previous,
+            page: 1,
+            pageSize: validated.pageSize,
+          }
+        : previous,
+    );
   }, [page, validateParams]);
 
   return {

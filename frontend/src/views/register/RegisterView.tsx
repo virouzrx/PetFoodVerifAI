@@ -93,15 +93,16 @@ const RegisterView = () => {
         },
       })
     } catch (error) {
-      if (isApiErrorResponse(error) && error.status === 409) {
-        setErrors({ email: 'An account with this email already exists.' })
-      } else if (isApiErrorResponse(error) && error.status === 429) {
-        setErrors({ form: 'Too many attempts. Please wait and try again.' })
+      if (isApiErrorResponse(error)) {
+        if (error.status === 409) {
+          setErrors({ email: 'An account with this email already exists.' })
+        } else if (error.status === 429) {
+          setErrors({ form: 'Too many attempts. Please wait and try again.' })
+        } else {
+          setErrors(normalizeApiErrors(error))
+        }
       } else {
-        const normalized = normalizeApiErrors(
-          isApiErrorResponse(error) ? error : undefined,
-        )
-        setErrors(normalized)
+        setErrors({ form: 'Something went wrong. Please try again.' })
       }
     } finally {
       setSubmitting(false)

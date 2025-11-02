@@ -35,7 +35,7 @@ export type ApiErrorField = {
 export type ApiErrorResponse = {
   status: number
   message?: string
-  errors?: ApiErrorField[]
+  errors?: ApiErrorField[] | Record<string, string[]>
 }
 
 export type FieldErrorMap = {

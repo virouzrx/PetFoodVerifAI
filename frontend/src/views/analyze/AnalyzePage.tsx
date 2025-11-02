@@ -11,6 +11,7 @@ import type {
   ApiErrorShape,
   CreateAnalysisRequest,
   ScrapeState,
+  SpeciesOption,
 } from '../../types/analyze';
 import { speciesStringToEnum } from '../../types/analyze';
 
@@ -89,14 +90,16 @@ const AnalyzePage = () => {
   const isReanalysis = navigationState?.fromReanalysis === true;
   
   // Prepare initial values and locked fields for reanalysis
-  const initialValues = isReanalysis ? {
-    productName: navigationState?.productName || '',
-    productUrl: navigationState?.productUrl || '',
-    species: navigationState?.species || '',
-    breed: navigationState?.breed || '',
-    age: navigationState?.age || '',
-    additionalInfo: navigationState?.additionalInfo || '',
-  } : undefined;
+  const initialValues: Partial<AnalyzeFormValues> | undefined = isReanalysis
+    ? {
+        productName: navigationState?.productName ?? '',
+        productUrl: navigationState?.productUrl ?? '',
+        species: (navigationState?.species ?? '') as SpeciesOption,
+        breed: navigationState?.breed ?? '',
+        age: typeof navigationState?.age === 'number' ? navigationState.age : '',
+        additionalInfo: navigationState?.additionalInfo ?? '',
+      }
+    : undefined;
   
   const lockedFields: ('productName' | 'productUrl')[] = isReanalysis ? ['productName', 'productUrl'] : [];
 

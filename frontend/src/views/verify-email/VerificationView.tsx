@@ -117,11 +117,10 @@ const VerificationView = () => {
         } catch (error) {
           if (isApiErrorResponse(error) && error.status === 400) {
             setErrors({ form: 'Invalid or expired verification token. Please try again or request a new email.' })
+          } else if (isApiErrorResponse(error)) {
+            setErrors(normalizeApiErrors(error))
           } else {
-            const normalized = normalizeApiErrors(
-              isApiErrorResponse(error) ? error : undefined,
-            )
-            setErrors(normalized)
+            setErrors({ form: 'Something went wrong. Please try again.' })
           }
         } finally {
           setSubmitting(false)
@@ -151,11 +150,10 @@ const VerificationView = () => {
     } catch (error) {
       if (isApiErrorResponse(error) && error.status === 400) {
         setErrors({ form: 'Invalid or expired verification token. Please try again or request a new email.' })
+      } else if (isApiErrorResponse(error)) {
+        setErrors(normalizeApiErrors(error))
       } else {
-        const normalized = normalizeApiErrors(
-          isApiErrorResponse(error) ? error : undefined,
-        )
-        setErrors(normalized)
+        setErrors({ form: 'Something went wrong. Please try again.' })
       }
     } finally {
       setSubmitting(false)

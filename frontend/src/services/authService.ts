@@ -10,13 +10,14 @@ import type {
   PendingVerificationResponse,
   ForgotPasswordRequestDto,
   ResetPasswordRequestDto,
+  ApiErrorField,
 } from '../types/auth'
 
 const API_BASE_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:5135/api'
 
 type ErrorPayload = {
   message?: string
-  errors?: Record<string, string[]>
+  errors?: unknown
 }
 
 const isErrorPayload = (value: unknown): value is ErrorPayload => {
@@ -26,11 +27,50 @@ const isErrorPayload = (value: unknown): value is ErrorPayload => {
 
   const record = value as Record<string, unknown>
   const messageValid = record.message === undefined || typeof record.message === 'string'
-  const errorsValid =
-    record.errors === undefined ||
-    (typeof record.errors === 'object' && record.errors !== null)
+  const errorsValid = record.errors === undefined || typeof record.errors !== 'undefined'
 
   return messageValid && errorsValid
+}
+
+const normalizeErrorFields = (value: unknown): ApiErrorResponse['errors'] => {
+  if (!value) {
+    return undefined
+  }
+
+  if (Array.isArray(value)) {
+    const normalized = value.filter((item): item is ApiErrorField => {
+      return (
+        typeof item === 'object' &&
+        item !== null &&
+        typeof (item as ApiErrorField).message === 'string'
+      )
+    })
+
+    return normalized.length > 0 ? normalized : undefined
+  }
+
+  if (typeof value === 'object') {
+    const record = value as Record<string, unknown>
+    const normalizedRecord: Record<string, string[]> = {}
+
+    for (const [field, messages] of Object.entries(record)) {
+      if (Array.isArray(messages)) {
+        const filtered = messages.filter(
+          (message): message is string => typeof message === 'string' && message.trim().length > 0,
+        )
+
+        if (filtered.length > 0) {
+          normalizedRecord[field] = filtered
+        }
+      } else if (typeof messages === 'string' && messages.trim()) {
+        normalizedRecord[field] = [messages]
+      }
+    }
+
+    return Object.keys(normalizedRecord).length > 0 ? normalizedRecord : undefined
+  }
+
+  return undefined
 }
 
 const parseErrorResponse = async (response: Response): Promise<ApiErrorResponse> => {
@@ -46,7 +86,7 @@ const parseErrorResponse = async (response: Response): Promise<ApiErrorResponse>
   return {
     status: response.status,
     message: isErrorPayload(payload) ? payload.message : undefined,
-    errors: isErrorPayload(payload) ? payload.errors : undefined,
+    errors: isErrorPayload(payload) ? normalizeErrorFields(payload.errors) : undefined,
   }
 }
 
