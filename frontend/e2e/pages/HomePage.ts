@@ -17,11 +17,11 @@ export class HomePage extends BasePage {
   }
 
   get loginButton() {
-    return this.getByRole('link', { name: /login|sign in/i });
+    return this.getByRole('button', { name: /sign in/i });
   }
 
   get signUpButton() {
-    return this.getByRole('link', { name: /sign up|register|get started/i });
+    return this.getByRole('button', { name: /create account/i });
   }
 
   get navigationBar() {

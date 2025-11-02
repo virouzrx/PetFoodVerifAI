@@ -62,6 +62,7 @@ const useLogin = (): UseLoginResult => {
 
         await sleep(Math.max(0, MIN_LOADING_DURATION_MS - (Date.now() - startedAt)))
         setError(fieldErrors)
+        throw error
       } finally {
         if (latestRequest.current === requestId) {
           setIsLoading(false)

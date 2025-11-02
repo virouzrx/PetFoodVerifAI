@@ -22,7 +22,7 @@ export class LoginPage extends BasePage {
   }
 
   get loginButton() {
-    return this.getByRole('button', { name: /sign in|log in/i });
+    return this.getByRole('button', { name: 'Sign in', exact: true });
   }
 
   get forgotPasswordLink() {

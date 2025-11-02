@@ -46,7 +46,7 @@ namespace PetFoodVerifAI.Controllers
 
             if (!result.Succeeded)
             {
-                return Unauthorized(new { Errors = result.Errors });
+                return Unauthorized(new { message = "Invalid email or password.", errors = result.Errors });
             }
 
             return Ok(result.Response);

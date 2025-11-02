@@ -27,7 +27,7 @@ const isErrorPayload = (value: unknown): value is ErrorPayload => {
 
   const record = value as Record<string, unknown>
   const messageValid = record.message === undefined || typeof record.message === 'string'
-  const errorsValid = record.errors === undefined || typeof record.errors !== 'undefined'
+  const errorsValid = record.errors === undefined || typeof record.errors === 'object'
 
   return messageValid && errorsValid
 }

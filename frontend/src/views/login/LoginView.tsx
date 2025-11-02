@@ -135,10 +135,10 @@ const LoginView = () => {
   )
 
   useEffect(() => {
-    if (!isLoading) {
+    if (!isLoading && !error.form) {
       setValues((prev) => ({ ...prev, password: '' }))
     }
-  }, [isLoading])
+  }, [isLoading, error.form])
 
   const hasFormError = Boolean(error.form || fieldErrors.form)
 

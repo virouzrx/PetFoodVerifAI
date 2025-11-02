@@ -69,10 +69,8 @@ describe('useLogin', () => {
 
     const { result } = renderHook(() => useLogin())
 
-    let loginPromise: Promise<void>
-
     await act(async () => {
-      loginPromise = result.current.login({ email: 'user@test.com', password: 'wrongpass' })
+      const loginPromise = result.current.login({ email: 'user@test.com', password: 'wrongpass' }).catch(() => {})
       await flushAsync()
       await loginPromise
     })
@@ -89,10 +87,8 @@ describe('useLogin', () => {
 
     const { result } = renderHook(() => useLogin())
 
-    let loginPromise: Promise<void>
-
     await act(async () => {
-      loginPromise = result.current.login({ email: 'user@test.com', password: 'password1' })
+      const loginPromise = result.current.login({ email: 'user@test.com', password: 'password1' }).catch(() => {})
       await flushAsync()
       await loginPromise
     })

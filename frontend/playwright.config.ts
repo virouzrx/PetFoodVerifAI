@@ -36,6 +36,14 @@ export default defineConfig({
     screenshot: 'only-on-failure',
     /* Video on failure */
     video: 'retain-on-failure',
+    launchOptions: {
+      // 1
+      args: ["--start-maximized"],
+    },
+      viewport: { 
+        width: 1920, 
+        height: 1080 
+      },
   },
 
   /* Configure projects for major browsers - using Chromium only as specified */
