@@ -727,9 +727,8 @@ describe('useFeedbackSubmission', () => {
 
       await waitFor(() => {
         expect(global.fetch).toHaveBeenCalled();
+        expect(result.current.feedbackState.status).toBe('success');
       });
-
-      expect(result.current.feedbackState.status).toBe('success');
     });
 
     it('should handle multiple rapid feedback submissions (should be throttled)', async () => {
