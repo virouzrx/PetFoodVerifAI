@@ -16,9 +16,9 @@ jobs:
       with:
         dotnet-version: '8.0.x'
     - name: Restore dependencies
-      run: dotnet restore PetFoodVerifAI/PetFoodVerifAI.csproj
+      run: dotnet restore PetFoodVerifAI.Tests/PetFoodVerifAI.Tests.csproj
     - name: Build
-      run: dotnet build PetFoodVerifAI/PetFoodVerifAI.csproj --no-restore
+      run: dotnet build PetFoodVerifAI.Tests/PetFoodVerifAI.Tests.csproj --no-restore
     - name: Test
       run: dotnet test PetFoodVerifAI.Tests/PetFoodVerifAI.Tests.csproj --no-build --verbosity normal
 
