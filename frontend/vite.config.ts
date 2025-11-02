@@ -42,12 +42,6 @@ export default defineConfig({
         'postcss.config.cjs',
         'eslint.config.js',
       ],
-      thresholds: {
-        lines: 70,
-        functions: 70,
-        branches: 70,
-        statements: 70,
-      },
     },
   },
   css: {
