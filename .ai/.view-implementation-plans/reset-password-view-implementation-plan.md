@@ -153,3 +153,4 @@ A custom hook, `useResetPassword`, will be created to encapsulate the view's log
 8. Add the new route `/reset-password` in the main router file, pointing to `ResetPasswordView`.
 9. Update the `authService` to include the `resetPassword` function that makes the `POST` request.
 10. Write unit and integration tests for the `useResetPassword` hook and the `ResetPasswordView` component to cover all scenarios (success, API error, invalid link).
+

@@ -1,6 +1,8 @@
 import { test as base } from '@playwright/test';
 import { LoginPage } from '../pages/LoginPage';
 import { HomePage } from '../pages/HomePage';
+import { RegisterPage } from '../pages/RegisterPage';
+import { VerifyEmailPage } from '../pages/VerifyEmailPage';
 
 /**
  * Custom test fixtures that extend Playwright's base test
@@ -9,6 +11,8 @@ import { HomePage } from '../pages/HomePage';
 type TestFixtures = {
   loginPage: LoginPage;
   homePage: HomePage;
+  registerPage: RegisterPage;
+  verifyEmailPage: VerifyEmailPage;
 };
 
 /**
@@ -28,10 +32,20 @@ export const test = base.extend<TestFixtures>({
     const loginPage = new LoginPage(page);
     await use(loginPage);
   },
-  
+
   homePage: async ({ page }, use) => {
     const homePage = new HomePage(page);
     await use(homePage);
+  },
+
+  registerPage: async ({ page }, use) => {
+    const registerPage = new RegisterPage(page);
+    await use(registerPage);
+  },
+
+  verifyEmailPage: async ({ page }, use) => {
+    const verifyEmailPage = new VerifyEmailPage(page);
+    await use(verifyEmailPage);
   },
 });
 

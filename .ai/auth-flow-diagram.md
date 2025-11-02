@@ -584,3 +584,4 @@ classDiagram
 - Authentication state managed via React Context
 - JWT tokens stored in localStorage (consider httpOnly cookies for enhanced security)
 
+
