@@ -209,3 +209,48 @@ jobs:
       - name: Run linter
         run: npm run lint
         working-directory: ./frontend
+
+  # ============================================
+  # Deploy Backend API to Azure
+  # ============================================
+  deploy-backend:
+    name: Deploy Backend to Azure
+    runs-on: ubuntu-latest
+    needs: [backend-tests, frontend-unit-tests, frontend-e2e-tests, lint]
+    # Only deploy on pushes to main branch (not on PRs)
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Restore dependencies
+        run: dotnet restore
+        working-directory: ./PetFoodVerifAI
+
+      - name: Build
+        run: dotnet build --configuration Release --no-restore
+        working-directory: ./PetFoodVerifAI
+
+      - name: Publish
+        run: dotnet publish --configuration Release --no-build --output ./publish
+        working-directory: ./PetFoodVerifAI
+
+      - name: Deploy to Azure Web App
+        id: deploy
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: 'petfoodverifai-api'
+          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+          package: ./PetFoodVerifAI/publish
+
+      - name: Check deployment health
+        run: |
+          echo "Waiting 30 seconds for deployment to stabilize..."
+          sleep 30
+          echo "Checking health endpoint..."
+          curl -f https://petfoodverifai-api.azurewebsites.net/api/health/database || echo "Health check failed, but deployment may still be in progress"

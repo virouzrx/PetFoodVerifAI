@@ -137,3 +137,4 @@ The view's logic will be encapsulated in a custom hook, `useForgotPassword`, to 
 8.  **Styling**: Style all new components using Tailwind CSS according to the application's design system.
 9.  **Testing**: Write unit/integration tests for the `useForgotPassword` hook and the `ForgotPasswordView` to cover form submission, validation, success, and error states.
 
+
