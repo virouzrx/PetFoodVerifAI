@@ -107,10 +107,19 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
     {
+        // Environment-aware CORS configuration
+        var allowedOrigins = builder.Environment.IsDevelopment()
+            ? ["http://localhost:5173", "http://127.0.0.1:5173"]
+            : new[] { 
+                "https://www.petfoodverifai.com",
+                "https://petfoodverifai.com",
+                "brave-ocean-0a250d80f.3.azurestaticapps.net"
+            };
+        
         policy
+            .WithOrigins(allowedOrigins)
             .AllowAnyHeader()
             .AllowAnyMethod()
-            .SetIsOriginAllowed(_ => true)
             .AllowCredentials();
     });
 });
