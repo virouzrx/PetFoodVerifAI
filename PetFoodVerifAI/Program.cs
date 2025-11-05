@@ -113,7 +113,7 @@ builder.Services.AddCors(options =>
             : new[] { 
                 "https://www.petfoodverifai.com",
                 "https://petfoodverifai.com",
-                "brave-ocean-0a250d80f.3.azurestaticapps.net"
+                "https://brave-ocean-0a250d80f.3.azurestaticapps.net"  // TODO: Remove after custom domain is configured
             };
         
         policy
