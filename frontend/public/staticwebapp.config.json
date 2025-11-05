@@ -1,6 +1,10 @@
 {
   "navigationFallback": {
-    "rewrite": "/index.html"
+    "rewrite": "/index.html",
+    "exclude": ["/assets/*", "*.{css,js,json,ico,png,jpg,jpeg,gif,svg,woff,woff2,ttf,eot}"]
+  },
+  "globalHeaders": {
+    "X-Config-Test": "processed"
   },
   "mimeTypes": {
     ".js": "application/javascript",
