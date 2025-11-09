@@ -4,11 +4,16 @@
     "exclude": ["/assets/*", "*.{css,js,json,ico,png,jpg,jpeg,gif,svg,woff,woff2,ttf,eot}"]
   },
   "mimeTypes": {
-    ".js": "text/javascript",
-    ".mjs": "text/javascript",
+    ".js": "application/javascript",
+    ".mjs": "application/javascript",
     ".json": "application/json",
     ".css": "text/css",
     ".html": "text/html"
+  },
+  "globalHeaders": {
+    "X-StaticWebApp-Config": "loaded",
+    "X-Config-Test": "FROM-PUBLIC-FOLDER",
+    "X-Config-Location": "frontend/public/staticwebapp.config.json"
   }
 }
 

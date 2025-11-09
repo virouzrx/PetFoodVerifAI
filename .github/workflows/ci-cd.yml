@@ -294,20 +294,21 @@ jobs:
           VITE_API_URL: https://petfoodverifai-api-fjftbmfmbtfpgjh2.canadacentral-01.azurewebsites.net/api
           VITE_GOOGLE_CLIENT_ID: ${{ secrets.VITE_GOOGLE_CLIENT_ID }}
 
-      - name: Ensure staticwebapp.config.json is in dist
+      - name: Ensure staticwebapp.config.json is in dist root
         run: |
-          echo "Checking for config file in public..."
+          echo "Ensuring config file is in dist..."
           if [ -f "./frontend/public/staticwebapp.config.json" ]; then
-            echo "Found config in public, copying to dist..."
             cp ./frontend/public/staticwebapp.config.json ./frontend/dist/staticwebapp.config.json
+            echo "Copied from public/"
           elif [ -f "./frontend/staticwebapp.config.json" ]; then
-            echo "Found config in frontend root, copying to dist..."
             cp ./frontend/staticwebapp.config.json ./frontend/dist/staticwebapp.config.json
+            echo "Copied from frontend root"
           fi
-          echo "Verifying config file exists in dist:"
-          ls -la ./frontend/dist/staticwebapp.config.json || echo "WARNING: Config file not found in dist!"
-          echo "Contents of dist folder:"
-          ls -la ./frontend/dist/ | head -20
+          echo "Verifying config file in dist:"
+          cat ./frontend/dist/staticwebapp.config.json
+          echo ""
+          echo "Listing dist contents:"
+          ls -la ./frontend/dist/
 
       - name: Deploy to Azure Static Web Apps
         uses: Azure/static-web-apps-deploy@v1
