@@ -146,6 +146,8 @@ namespace PetFoodVerifAI.Services
                         AnalysisId = a.AnalysisId,
                         ProductId = a.ProductId,
                         ProductName = a.Product.ProductName,
+                        ProductUrl = a.Product.ProductUrl,
+                        IsManualEntry = a.Product.IsManualEntry,
                         Recommendation = a.Recommendation,
                         CreatedAt = a.CreatedAt
                     })
@@ -171,6 +173,8 @@ namespace PetFoodVerifAI.Services
                     AnalysisId = a.AnalysisId,
                     ProductId = a.ProductId,
                     ProductName = a.Product.ProductName,
+                    ProductUrl = a.Product.ProductUrl,
+                    IsManualEntry = a.Product.IsManualEntry,
                     Recommendation = a.Recommendation,
                     CreatedAt = a.CreatedAt
                 })

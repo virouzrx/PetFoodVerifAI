@@ -37,7 +37,7 @@ const ReanalyzeButton = ({
   const [isNavigating, setIsNavigating] = useState(false);
 
   // Check if product is manual entry (from backend data)
-  const isManualEntry = !payload.productUrl; // Products with no URL are manual entries
+  const isManualEntry = payload.isManualEntry ?? false; // Use explicit flag from backend
 
   // Don't render button for manual entries
   if (isManualEntry) {

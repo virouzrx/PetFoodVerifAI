@@ -23,7 +23,8 @@ type ProductListItemProps = {
  */
 const ProductListItem = ({ item, onOpenVersionHistory }: ProductListItemProps) => {
   const formattedDate = formatAnalysisDate(item.createdAt);
-  const hasVersionHistory = !!onOpenVersionHistory && !!item.productId;
+  // Hide version history for manual entries
+  const hasVersionHistory = !!onOpenVersionHistory && !!item.productId && !item.isManualEntry;
 
   const handleVersionHistoryClick = () => {
     if (hasVersionHistory && item.productId) {
@@ -36,6 +37,7 @@ const ProductListItem = ({ item, onOpenVersionHistory }: ProductListItemProps) =
     analysisId: item.analysisId,
     productName: item.productName,
     productUrl: item.productUrl,
+    isManualEntry: item.isManualEntry,
     species: item.species,
     breed: item.breed,
     age: item.age,
@@ -61,7 +63,7 @@ const ProductListItem = ({ item, onOpenVersionHistory }: ProductListItemProps) =
                 </Link>
 
                 {/* Manual entry badge */}
-                {!item.productUrl && (
+                {item.isManualEntry && (
                   <span
                     className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-amber-100 text-amber-800 border border-amber-200"
                     title="This product was entered manually"

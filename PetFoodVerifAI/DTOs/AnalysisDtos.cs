@@ -61,6 +61,8 @@ public class AnalysisSummaryDto
     public Guid AnalysisId { get; set; }
     public Guid ProductId { get; set; }
     public string ProductName { get; set; } = string.Empty;
+    public string? ProductUrl { get; set; } // Nullable for manual entries
+    public bool IsManualEntry { get; set; } // Explicit flag to determine if product was manually entered
     public Recommendation Recommendation { get; set; }
     public DateTime CreatedAt { get; set; }
 }

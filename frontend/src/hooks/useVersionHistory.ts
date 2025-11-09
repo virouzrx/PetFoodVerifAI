@@ -72,6 +72,8 @@ export const useVersionHistory = (
         analysisId: item.analysisId,
         productId: item.productId,
         productName: item.productName,
+        productUrl: item.productUrl || undefined,
+        isManualEntry: item.isManualEntry,
         recommendation: item.recommendation,
         createdAt: item.createdAt,
       }));

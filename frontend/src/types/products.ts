@@ -7,6 +7,8 @@ export type AnalysisSummaryDto = {
   analysisId: string;
   productId: string;
   productName: string;
+  productUrl?: string | null; // Nullable for manual entries
+  isManualEntry: boolean; // Explicit flag to determine if product was manually entered
   recommendation: RecommendationKind;
   createdAt: string; // ISO date string
 };
@@ -31,6 +33,7 @@ export type ProductAnalysisSummary = {
   age?: number;
   breed?: string;
   productUrl?: string;
+  isManualEntry?: boolean; // Explicit flag to determine if product was manually entered
   additionalInfo?: string;
 };
 
@@ -53,6 +56,7 @@ export type ReanalyzeNavigationPayload = {
   analysisId: string;
   productName: string;
   productUrl?: string;
+  isManualEntry?: boolean; // Explicit flag to determine if product was manually entered
   species?: SpeciesKind;
   breed?: string;
   age?: number;
