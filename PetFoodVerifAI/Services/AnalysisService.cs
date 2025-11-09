@@ -15,30 +15,50 @@ namespace PetFoodVerifAI.Services
 
         public async Task<AnalysisCreatedResponse> CreateAnalysisAsync(CreateAnalysisRequest request, string userId)
         {
-            var product = await _context.Products
-                .FirstOrDefaultAsync(p => p.ProductName == request.ProductName && p.ProductUrl == request.ProductUrl);
+            string productName;
+            string ingredients;
+            Product? product;
 
-            if (product == null)
+            if (request.IsManual)
             {
+                productName = request.ProductName!;
+                ingredients = request.IngredientsText!;
+                
                 product = new Product
                 {
-                    ProductName = request.ProductName,
-                    ProductUrl = request.ProductUrl,
+                    ProductName = productName,
+                    ProductUrl = null,
+                    IsManualEntry = true,
                     CreatedAt = DateTime.UtcNow
                 };
                 _context.Products.Add(product);
             }
-
-            var ingredients = request.IngredientsText;
-            if (string.IsNullOrWhiteSpace(ingredients))
+            else
             {
                 try
                 {
-                    ingredients = await _scrapingService.ScrapeIngredientsAsync(request.ProductUrl);
+                    var scrapedData = await _scrapingService.ScrapeProductDataAsync(request.ProductUrl!);
+                    productName = scrapedData.ProductName;
+                    ingredients = scrapedData.Ingredients;
                 }
                 catch (Exception ex)
                 {
-                    throw new ExternalServiceException("Failed to scrape ingredients.", ex);
+                    throw new ExternalServiceException("Failed to scrape product data.", ex);
+                }
+                
+                product = await _context.Products
+                    .FirstOrDefaultAsync(p => p.ProductName == productName && p.ProductUrl == request.ProductUrl && !p.IsManualEntry);
+                    
+                if (product == null)
+                {
+                    product = new Product
+                    {
+                        ProductName = productName,
+                        ProductUrl = request.ProductUrl,
+                        IsManualEntry = false,
+                        CreatedAt = DateTime.UtcNow
+                    };
+                    _context.Products.Add(product);
                 }
             }
             

@@ -9,6 +9,7 @@ describe('useAnalyzeForm', () => {
       const { result } = renderHook(() => useAnalyzeForm())
 
       expect(result.current.formValues).toEqual({
+        inputMode: 'url',
         productName: '',
         productUrl: '',
         species: '',
@@ -17,7 +18,6 @@ describe('useAnalyzeForm', () => {
         additionalInfo: '',
         ingredientsText: '',
         hasManualIngredients: false,
-        noIngredientsAvailable: false,
       })
     })
 
@@ -569,17 +569,6 @@ describe('useAnalyzeForm', () => {
       expect(result.current.formErrors.ingredientsText).toBeUndefined()
     })
 
-    it('should pass when noIngredientsAvailable is checked', () => {
-      const { result } = renderHook(() => useAnalyzeForm())
-
-      act(() => {
-        result.current.enableManualIngredients()
-        result.current.toggleNoIngredients(true)
-        result.current.handleBlur('ingredientsText')
-      })
-
-      expect(result.current.formErrors.ingredientsText).toBeUndefined()
-    })
 
     it('should fail when manual mode and empty', () => {
       const { result } = renderHook(() => useAnalyzeForm())
@@ -594,7 +583,7 @@ describe('useAnalyzeForm', () => {
       })
 
       expect(result.current.formErrors.ingredientsText).toBe(
-        'Please enter ingredients or check "No ingredient list available"'
+        'Please enter the ingredients list'
       )
     })
 
@@ -754,8 +743,7 @@ describe('useAnalyzeForm', () => {
       const { result } = renderHook(() => useAnalyzeForm())
 
       act(() => {
-        result.current.updateField('productName', '') // Invalid
-        result.current.updateField('productUrl', 'https://example.com')
+        result.current.updateField('productUrl', '') // Invalid URL in URL mode
         result.current.updateField('species', 'Dog')
         result.current.updateField('breed', 'Labrador')
         result.current.updateField('age', 5)
@@ -776,8 +764,7 @@ describe('useAnalyzeForm', () => {
         result.current.validateForm()
       })
 
-      expect(result.current.formErrors.productName).toBeTruthy()
-      expect(result.current.formErrors.productUrl).toBeTruthy()
+      expect(result.current.formErrors.productUrl).toBeTruthy() // URL mode: productUrl required
       expect(result.current.formErrors.species).toBeTruthy()
       expect(result.current.formErrors.breed).toBeTruthy()
       expect(result.current.formErrors.age).toBeTruthy()
@@ -936,17 +923,6 @@ describe('useAnalyzeForm', () => {
         expect(result.current.formValues.ingredientsText).toBe('')
       })
 
-      it('should clear noIngredientsAvailable', () => {
-        const { result } = renderHook(() => useAnalyzeForm())
-
-        act(() => {
-          result.current.enableManualIngredients()
-          result.current.toggleNoIngredients(true)
-          result.current.resetManualIngredients()
-        })
-
-        expect(result.current.formValues.noIngredientsAvailable).toBe(false)
-      })
 
       it('should reset scrapeState to "idle"', () => {
         const { result } = renderHook(() => useAnalyzeForm())
@@ -1005,50 +981,6 @@ describe('useAnalyzeForm', () => {
       })
     })
 
-    describe('toggleNoIngredients', () => {
-      it('should set noIngredientsAvailable when checked', () => {
-        const { result } = renderHook(() => useAnalyzeForm())
-
-        act(() => {
-          result.current.enableManualIngredients()
-          result.current.toggleNoIngredients(true)
-        })
-
-        expect(result.current.formValues.noIngredientsAvailable).toBe(true)
-      })
-
-      it('should clear ingredientsText error when checked', () => {
-        const { result } = renderHook(() => useAnalyzeForm())
-
-        act(() => {
-          result.current.enableManualIngredients()
-        })
-
-        act(() => {
-          result.current.handleBlur('ingredientsText') // Creates error
-        })
-
-        expect(result.current.formErrors.ingredientsText).toBeTruthy()
-
-        act(() => {
-          result.current.toggleNoIngredients(true)
-        })
-
-        expect(result.current.formErrors.ingredientsText).toBeUndefined()
-      })
-
-      it('should unset noIngredientsAvailable when unchecked', () => {
-        const { result } = renderHook(() => useAnalyzeForm())
-
-        act(() => {
-          result.current.enableManualIngredients()
-          result.current.toggleNoIngredients(true)
-          result.current.toggleNoIngredients(false)
-        })
-
-        expect(result.current.formValues.noIngredientsAvailable).toBe(false)
-      })
-    })
 
     describe('manualIngredientsState', () => {
       it('should reflect isVisible based on hasManualIngredients', () => {
@@ -1074,16 +1006,6 @@ describe('useAnalyzeForm', () => {
         expect(result.current.manualIngredientsState.value).toBe('Test ingredients')
       })
 
-      it('should reflect noIngredientsAvailable', () => {
-        const { result } = renderHook(() => useAnalyzeForm())
-
-        act(() => {
-          result.current.enableManualIngredients()
-          result.current.toggleNoIngredients(true)
-        })
-
-        expect(result.current.manualIngredientsState.noIngredientsAvailable).toBe(true)
-      })
     })
   })
 
@@ -1157,14 +1079,12 @@ describe('useAnalyzeForm', () => {
       const { result } = renderHook(() => useAnalyzeForm())
 
       act(() => {
-        result.current.updateField('productName', 'A') // Too short
-        result.current.updateField('productUrl', 'invalid') // Invalid URL
+        result.current.updateField('productUrl', 'invalid') // Invalid URL in URL mode
         result.current.updateField('breed', '123') // Only numbers
         result.current.updateField('age', 0.5) // Decimal
         result.current.validateForm()
       })
 
-      expect(result.current.formErrors.productName).toBeTruthy()
       expect(result.current.formErrors.productUrl).toBeTruthy()
       expect(result.current.formErrors.breed).toBeTruthy()
       expect(result.current.formErrors.age).toBeTruthy()
@@ -1205,6 +1125,180 @@ describe('useAnalyzeForm', () => {
         result.current.updateField('age', 5)
       })
       expect(result.current.formErrors.age).toBeUndefined()
+    })
+  })
+
+  describe('input mode functionality', () => {
+    it('should default to URL mode', () => {
+      const { result } = renderHook(() => useAnalyzeForm())
+
+      expect(result.current.formValues.inputMode).toBe('url')
+    })
+
+    it('should initialize with provided inputMode', () => {
+      const initialValues = {
+        inputMode: 'manual' as const,
+        productName: 'Test Product',
+      }
+
+      const { result } = renderHook(() => useAnalyzeForm(initialValues))
+
+      expect(result.current.formValues.inputMode).toBe('manual')
+      expect(result.current.formValues.productName).toBe('Test Product')
+    })
+
+    it('should switch to manual mode and clear URL fields', () => {
+      const { result } = renderHook(() => useAnalyzeForm())
+
+      act(() => {
+        result.current.updateField('productUrl', 'https://example.com')
+        result.current.updateField('productName', 'Existing Name')
+        result.current.updateField('ingredientsText', 'Existing ingredients')
+        result.current.updateField('hasManualIngredients', true)
+      })
+
+      expect(result.current.formValues.productUrl).toBe('https://example.com')
+      expect(result.current.formValues.hasManualIngredients).toBe(true)
+
+      act(() => {
+        result.current.setInputMode('manual')
+      })
+
+      expect(result.current.formValues.inputMode).toBe('manual')
+      expect(result.current.formValues.productUrl).toBe('') // URL cleared
+      expect(result.current.formValues.ingredientsText).toBe('') // Manual ingredients cleared when switching modes
+      expect(result.current.formValues.hasManualIngredients).toBe(true) // But manual mode enabled
+      expect(result.current.formValues.productName).toBe('Existing Name')
+    })
+
+    it('should switch to URL mode and clear manual fields', () => {
+      const { result } = renderHook(() => useAnalyzeForm())
+
+      act(() => {
+        result.current.setInputMode('manual')
+        result.current.updateField('productName', 'Manual Product')
+        result.current.updateField('ingredientsText', 'Manual ingredients')
+        result.current.updateField('hasManualIngredients', true)
+      })
+
+      expect(result.current.formValues.productName).toBe('Manual Product')
+      expect(result.current.formValues.ingredientsText).toBe('Manual ingredients')
+      expect(result.current.formValues.hasManualIngredients).toBe(true)
+
+      act(() => {
+        result.current.setInputMode('url')
+      })
+
+      expect(result.current.formValues.inputMode).toBe('url')
+      expect(result.current.formValues.productName).toBe('')
+      expect(result.current.formValues.ingredientsText).toBe('')
+      expect(result.current.formValues.hasManualIngredients).toBe(false)
+    })
+
+    it('should clear validation errors when switching modes', () => {
+      const { result } = renderHook(() => useAnalyzeForm())
+
+      // Create errors in URL mode
+      act(() => {
+        result.current.updateField('productUrl', 'invalid-url')
+        result.current.handleBlur('productUrl')
+      })
+
+      expect(result.current.formErrors.productUrl).toBeTruthy()
+
+      // Switch to manual mode
+      act(() => {
+        result.current.setInputMode('manual')
+      })
+
+      expect(result.current.formErrors.productUrl).toBeUndefined()
+      expect(result.current.showValidationSummary).toBe(false)
+    })
+
+    it('should validate URL in URL mode', () => {
+      const { result } = renderHook(() => useAnalyzeForm())
+
+      act(() => {
+        result.current.updateField('species', 'Dog')
+        result.current.updateField('breed', 'Labrador')
+        result.current.updateField('age', 5)
+      })
+
+      let isValid = false
+      act(() => {
+        isValid = result.current.validateForm()
+      })
+
+      expect(isValid).toBe(false)
+      expect(result.current.formErrors.productUrl).toBe('Product URL is required')
+    })
+
+    it('should validate product name and ingredients in manual mode', () => {
+      const { result } = renderHook(() => useAnalyzeForm())
+
+      act(() => {
+        result.current.setInputMode('manual')
+        result.current.updateField('species', 'Cat')
+        result.current.updateField('breed', 'Persian')
+        result.current.updateField('age', 3)
+      })
+
+      let isValid = false
+      act(() => {
+        isValid = result.current.validateForm()
+      })
+
+      expect(isValid).toBe(false)
+      expect(result.current.formErrors.productName).toBe('Product name is required')
+      expect(result.current.formErrors.ingredientsText).toBe('Please enter the ingredients list')
+    })
+
+    it('should validate manual ingredients when provided in URL mode', () => {
+      const { result } = renderHook(() => useAnalyzeForm())
+
+      act(() => {
+        result.current.updateField('productUrl', 'https://example.com')
+        result.current.updateField('species', 'Dog')
+        result.current.updateField('breed', 'Labrador')
+        result.current.updateField('age', 5)
+        result.current.enableManualIngredients()
+        // Don't provide ingredients text
+      })
+
+      let isValid = false
+      act(() => {
+        isValid = result.current.validateForm()
+      })
+
+      expect(isValid).toBe(false)
+      expect(result.current.formErrors.ingredientsText).toBeTruthy()
+    })
+
+    it('should allow manual ingredients in URL mode', () => {
+      const { result } = renderHook(() => useAnalyzeForm())
+
+      act(() => {
+        result.current.updateField('productUrl', 'https://example.com')
+        result.current.updateField('species', 'Dog')
+        result.current.updateField('breed', 'Labrador')
+        result.current.updateField('age', 5)
+        result.current.enableManualIngredients()
+        result.current.updateManualIngredients('Chicken, rice, vegetables')
+      })
+
+      let isValid = false
+      act(() => {
+        isValid = result.current.validateForm()
+      })
+
+      expect(isValid).toBe(true)
+      expect(result.current.formErrors.ingredientsText).toBeUndefined()
+    })
+
+    it('should export setInputMode function', () => {
+      const { result } = renderHook(() => useAnalyzeForm())
+
+      expect(typeof result.current.setInputMode).toBe('function')
     })
   })
 })

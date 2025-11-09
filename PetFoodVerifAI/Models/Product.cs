@@ -13,8 +13,12 @@ public class Product
     [Required]
     public string ProductName { get; set; } = string.Empty;
 
+    // Remove [Required] attribute, make nullable (null for manual entries)
+    public string? ProductUrl { get; set; }
+
+    // NEW: Explicit flag to track manual vs scraped products
     [Required]
-    public string ProductUrl { get; set; } = string.Empty;
+    public bool IsManualEntry { get; set; }
 
     [Required]
     public DateTime CreatedAt { get; set; }

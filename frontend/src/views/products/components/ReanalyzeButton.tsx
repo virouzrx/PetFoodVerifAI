@@ -36,10 +36,19 @@ const ReanalyzeButton = ({
   const { state: authState } = useAuth();
   const [isNavigating, setIsNavigating] = useState(false);
 
+  // Check if product is manual entry (from backend data)
+  const isManualEntry = !payload.productUrl; // Products with no URL are manual entries
+
+  // Don't render button for manual entries
+  if (isManualEntry) {
+    return null;
+  }
+
   // Validate payload has required fields
   const isValid = !!(
     payload.analysisId &&
-    payload.productName
+    payload.productName &&
+    payload.productUrl // NEW: require URL for re-analysis
   );
 
   const handleClick = async () => {

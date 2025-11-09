@@ -5,13 +5,17 @@ namespace PetFoodVerifAI.DTOs;
 
 public class CreateAnalysisRequest
 {
+    // NEW: Explicit flag to indicate input mode
     [Required]
-    public string ProductName { get; set; } = string.Empty;
+    public bool IsManual { get; set; }
+    
+    // Optional - required based on IsManual flag
+    public string? ProductName { get; set; }
+    
+    // Optional - required if IsManual = false
+    public string? ProductUrl { get; set; }
 
-    [Required]
-    [Url]
-    public string ProductUrl { get; set; } = string.Empty;
-
+    // Optional - required if IsManual = true, otherwise scraped
     public string? IngredientsText { get; set; }
 
     [Required]
@@ -66,7 +70,7 @@ public class AnalysisDetailDto
     public Guid AnalysisId { get; set; }
     public Guid ProductId { get; set; }
     public string ProductName { get; set; } = string.Empty;
-    public string ProductUrl { get; set; } = string.Empty;
+    public string? ProductUrl { get; set; } // Nullable for manual entries
     public Recommendation Recommendation { get; set; }
     public string Justification { get; set; } = string.Empty;
     public string IngredientsText { get; set; } = string.Empty;
@@ -82,7 +86,7 @@ public class AnalysisDetailsDto
       public Guid AnalysisId { get; set; }
       public Guid ProductId { get; set; }
       public string ProductName { get; set; } = string.Empty;
-      public string ProductUrl { get; set; } = string.Empty;
+      public string? ProductUrl { get; set; } // Nullable for manual entries
       public Recommendation Recommendation { get; set; }
       public string Justification { get; set; } = string.Empty;
       public List<IngredientConcernDto> Concerns { get; set; } = new List<IngredientConcernDto>();

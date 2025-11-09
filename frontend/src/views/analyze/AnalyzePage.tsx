@@ -92,6 +92,7 @@ const AnalyzePage = () => {
   // Prepare initial values and locked fields for reanalysis
   const initialValues: Partial<AnalyzeFormValues> | undefined = isReanalysis
     ? {
+        inputMode: (navigationState?.productUrl ?? '').trim() ? 'url' : 'manual',
         productName: navigationState?.productName ?? '',
         productUrl: navigationState?.productUrl ?? '',
         species: (navigationState?.species ?? '') as SpeciesOption,
@@ -101,40 +102,53 @@ const AnalyzePage = () => {
       }
     : undefined;
   
-  const lockedFields: ('productName' | 'productUrl')[] = isReanalysis ? ['productName', 'productUrl'] : [];
+  const lockedFields: ('productName' | 'productUrl')[] = isReanalysis
+    ? (navigationState?.productUrl ?? '').trim() ? ['productName', 'productUrl'] : ['productName']
+    : [];
 
   const handleSubmit = useCallback(
     async (formValues: AnalyzeFormValues) => {
-      // Clear previous errors and set scraping state
+      // Clear previous errors and status
       setApiError(null);
       setSubmitStatus('submitting');
-      
-      // Determine if we're scraping or submitting with manual ingredients
-      if (!formValues.hasManualIngredients) {
+
+      // Build payload based on input mode
+      const payload: CreateAnalysisRequest = {
+        isManual: formValues.inputMode === 'manual',
+        species: speciesStringToEnum(formValues.species as 'Cat' | 'Dog'),
+        breed: formValues.breed.trim(),
+        age: formValues.age as number,
+        additionalInfo: formValues.additionalInfo.trim() || null,
+        productName: null,
+        productUrl: null,
+        ingredientsText: null,
+      };
+
+      if (formValues.inputMode === 'url') {
+        // URL mode: send URL, backend will scrape product name and ingredients
+        payload.productUrl = formValues.productUrl.trim();
+        payload.productName = null; // Backend will scrape
+
+        // If user provided manual ingredients (scraping fallback), include them
+        if (formValues.hasManualIngredients) {
+          payload.ingredientsText = formValues.ingredientsText.trim();
+        } else {
+          payload.ingredientsText = null; // Backend will scrape
+        }
+
         setScrapeState('scraping');
-        setStatusMessage('Attempting to retrieve ingredients from product page...');
+        setStatusMessage('Retrieving product information from URL...');
       } else {
+        // Manual mode: send product name and ingredients, no URL
+        payload.productName = formValues.productName.trim();
+        payload.productUrl = null;
+        payload.ingredientsText = formValues.ingredientsText.trim();
+
         setScrapeState('submitting');
         setStatusMessage('Submitting your analysis request...');
       }
 
       try {
-        // Build the API request payload
-        const payload: CreateAnalysisRequest = {
-          productName: formValues.productName.trim(),
-          productUrl: formValues.productUrl.trim(),
-          species: speciesStringToEnum(formValues.species as 'Cat' | 'Dog'),
-          breed: formValues.breed.trim(),
-          age: formValues.age as number,
-          additionalInfo: formValues.additionalInfo.trim() || null,
-          ingredientsText:
-            formValues.hasManualIngredients
-              ? formValues.noIngredientsAvailable
-                ? ''
-                : formValues.ingredientsText.trim()
-              : null,
-        };
-
         // Call the API
         const response = await createAnalysis(payload, authState.token!);
 
@@ -149,38 +163,23 @@ const AnalyzePage = () => {
         }, 500);
       } catch (error) {
         setSubmitStatus('failed');
-        
-        if (error && typeof error === 'object' && 'status' in error) {
-          const apiError = error as ApiErrorShape;
-          setApiError(apiError);
+        setScrapeState('idle');
 
-          // Handle specific error cases
-          if (apiError.status === 401) {
-            setScrapeState('idle');
-            setStatusMessage('Your session has expired. Please log in again.');
-            setTimeout(() => {
-              navigate('/login');
-            }, 2000);
-          } else if (apiError.status === 503) {
-            // Service unavailable - likely scraping failed, offer manual entry
-            setScrapeState('awaitingManual');
-            setStatusMessage('Unable to automatically retrieve ingredients. Please use manual entry.');
-          } else if (apiError.status === 400) {
-            // Validation error - reset states so user can correct
-            setScrapeState('idle');
-            setStatusMessage('Please correct the validation errors and try again.');
+        // Handle API errors
+        if (error && typeof error === 'object' && 'response' in error) {
+          const apiError = error as { response?: { data?: ApiErrorShape } };
+          const errorData = apiError.response?.data;
+
+          if (errorData) {
+            setApiError(errorData);
+            setStatusMessage(
+              errorData.message || 'An error occurred while processing your request.'
+            );
           } else {
-            // Other errors - reset state
-            setScrapeState('idle');
-            setStatusMessage('Analysis submission failed.');
+            setStatusMessage('An unexpected error occurred. Please try again.');
           }
         } else {
-          setScrapeState('idle');
-          setStatusMessage('An unexpected error occurred. Please try again.');
-          setApiError({
-            status: 500,
-            message: 'An unexpected error occurred. Please try again.',
-          });
+          setStatusMessage('Network error. Please check your connection and try again.');
         }
       }
     },

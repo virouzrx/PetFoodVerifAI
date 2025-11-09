@@ -11,13 +11,14 @@ type AnalyzeFieldValue = AnalyzeFormValues[keyof AnalyzeFormValues];
 type FormAction =
   | { type: 'SET_FIELD'; field: keyof AnalyzeFormValues; value: AnalyzeFieldValue }
   | { type: 'SET_MANUAL_INGREDIENTS'; value: string }
-  | { type: 'SET_NO_INGREDIENTS'; value: boolean }
   | { type: 'ENABLE_MANUAL' }
   | { type: 'RESET_MANUAL' }
   | { type: 'RESET_FORM' }
-  | { type: 'INIT_FORM'; values: Partial<AnalyzeFormValues> };
+  | { type: 'INIT_FORM'; values: Partial<AnalyzeFormValues> }
+  | { type: 'SET_INPUT_MODE'; mode: import('../../../types/analyze').InputMode };
 
 const initialFormValues: AnalyzeFormValues = {
+  inputMode: 'url',
   productName: '',
   productUrl: '',
   species: '',
@@ -26,7 +27,6 @@ const initialFormValues: AnalyzeFormValues = {
   additionalInfo: '',
   ingredientsText: '',
   hasManualIngredients: false,
-  noIngredientsAvailable: false,
 };
 
 const formReducer = (state: AnalyzeFormValues, action: FormAction): AnalyzeFormValues => {
@@ -35,8 +35,6 @@ const formReducer = (state: AnalyzeFormValues, action: FormAction): AnalyzeFormV
       return { ...state, [action.field]: action.value };
     case 'SET_MANUAL_INGREDIENTS':
       return { ...state, ingredientsText: action.value };
-    case 'SET_NO_INGREDIENTS':
-      return { ...state, noIngredientsAvailable: action.value };
     case 'ENABLE_MANUAL':
       return { ...state, hasManualIngredients: true };
     case 'RESET_MANUAL':
@@ -44,12 +42,31 @@ const formReducer = (state: AnalyzeFormValues, action: FormAction): AnalyzeFormV
         ...state,
         hasManualIngredients: false,
         ingredientsText: '',
-        noIngredientsAvailable: false,
       };
     case 'RESET_FORM':
       return initialFormValues;
     case 'INIT_FORM':
       return { ...state, ...action.values };
+    case 'SET_INPUT_MODE':
+      if (action.mode === 'url') {
+        return {
+          ...state,
+          inputMode: action.mode,
+          productName: '',
+          ingredientsText: '',
+          hasManualIngredients: false,
+          noIngredientsAvailable: false,
+        };
+      } else {
+        return {
+          ...state,
+          inputMode: action.mode,
+          productUrl: '',
+          ingredientsText: '',
+          hasManualIngredients: true,
+          noIngredientsAvailable: false,
+        };
+      }
     default:
       return state;
   }
@@ -143,12 +160,10 @@ export const useAnalyzeForm = (initialValues?: Partial<AnalyzeFormValues>) => {
   const validateIngredientsText = (
     value: string,
     hasManual: boolean,
-    noIngredients: boolean,
   ): string | undefined => {
     if (!hasManual) return undefined; // Not required if not in manual mode
-    if (noIngredients) return undefined; // OK if user acknowledged no ingredients
     const trimmed = value.trim();
-    if (!trimmed) return 'Please enter ingredients or check "No ingredient list available"';
+    if (!trimmed) return 'Please enter the ingredients list';
     if (trimmed.length < 10) return 'Ingredients list seems too short. Please provide more detail.';
     return undefined;
   };
@@ -196,7 +211,6 @@ export const useAnalyzeForm = (initialValues?: Partial<AnalyzeFormValues>) => {
           error = validateIngredientsText(
             formValues.ingredientsText,
             formValues.hasManualIngredients,
-            formValues.noIngredientsAvailable,
           );
           break;
       }
@@ -212,11 +226,27 @@ export const useAnalyzeForm = (initialValues?: Partial<AnalyzeFormValues>) => {
   const validateForm = useCallback((): boolean => {
     const errors: AnalyzeFormErrors = {};
 
-    const productNameError = validateProductName(formValues.productName);
-    if (productNameError) errors.productName = productNameError;
+    if (formValues.inputMode === 'url') {
+      const productUrlError = validateProductUrl(formValues.productUrl);
+      if (productUrlError) errors.productUrl = productUrlError;
+      
+      if (formValues.hasManualIngredients) {
+        const ingredientsError = validateIngredientsText(
+          formValues.ingredientsText,
+          true,
+        );
+        if (ingredientsError) errors.ingredientsText = ingredientsError;
+      }
+    } else {
+      const productNameError = validateProductName(formValues.productName);
+      if (productNameError) errors.productName = productNameError;
 
-    const productUrlError = validateProductUrl(formValues.productUrl);
-    if (productUrlError) errors.productUrl = productUrlError;
+      const ingredientsError = validateIngredientsText(
+        formValues.ingredientsText,
+        true,
+      );
+      if (ingredientsError) errors.ingredientsText = ingredientsError;
+    }
 
     const speciesError = validateSpecies(formValues.species);
     if (speciesError) errors.species = speciesError;
@@ -226,13 +256,6 @@ export const useAnalyzeForm = (initialValues?: Partial<AnalyzeFormValues>) => {
 
     const ageError = validateAge(formValues.age);
     if (ageError) errors.age = ageError;
-
-    const ingredientsError = validateIngredientsText(
-      formValues.ingredientsText,
-      formValues.hasManualIngredients,
-      formValues.noIngredientsAvailable,
-    );
-    if (ingredientsError) errors.ingredientsText = ingredientsError;
 
     setFormErrors(errors);
     setShowValidationSummary(Object.keys(errors).length > 0);
@@ -260,22 +283,16 @@ export const useAnalyzeForm = (initialValues?: Partial<AnalyzeFormValues>) => {
     });
   }, []);
 
-  const toggleNoIngredients = useCallback((checked: boolean) => {
-    dispatch({ type: 'SET_NO_INGREDIENTS', value: checked });
-    if (checked) {
-      // Clear ingredients text error when user checks the box
-      setFormErrors((prev) => {
-        const updated = { ...prev };
-        delete updated.ingredientsText;
-        return updated;
-      });
-    }
+
+  const setInputMode = useCallback((mode: import('../../../types/analyze').InputMode) => {
+    dispatch({ type: 'SET_INPUT_MODE', mode });
+    setFormErrors({});
+    setShowValidationSummary(false);
   }, []);
 
   const manualIngredientsState: ManualIngredientsState = {
     isVisible: formValues.hasManualIngredients,
     value: formValues.ingredientsText,
-    noIngredientsAvailable: formValues.noIngredientsAvailable,
   };
 
   return {
@@ -290,10 +307,10 @@ export const useAnalyzeForm = (initialValues?: Partial<AnalyzeFormValues>) => {
     enableManualIngredients,
     resetManualIngredients,
     updateManualIngredients,
-    toggleNoIngredients,
     setScrapeState,
     setFormErrors,
     initializeForm,
+    setInputMode,
   };
 };
 

@@ -2,7 +2,10 @@
 
 export type SpeciesOption = "Cat" | "Dog" | "";
 
+export type InputMode = 'url' | 'manual';
+
 export type AnalyzeFormValues = {
+  inputMode: InputMode;
   productName: string;
   productUrl: string;
   species: SpeciesOption;
@@ -11,7 +14,6 @@ export type AnalyzeFormValues = {
   additionalInfo: string;
   ingredientsText: string;
   hasManualIngredients: boolean;
-  noIngredientsAvailable: boolean;
 };
 
 export type AnalyzeFormErrors = {
@@ -31,7 +33,6 @@ export type ScrapeState = "idle" | "scraping" | "awaitingManual" | "manualReady"
 export type ManualIngredientsState = {
   isVisible: boolean;
   value: string;
-  noIngredientsAvailable: boolean;
 };
 
 export type SubmitStatus = "idle" | "submitting" | "succeeded" | "failed";
@@ -45,13 +46,14 @@ export type ApiErrorShape = {
 
 // API Request/Response types matching backend DTOs
 export type CreateAnalysisRequest = {
-  productName: string;
-  productUrl: string;
-  ingredientsText?: string | null;
+  isManual: boolean;
+  productName: string | null;
+  productUrl: string | null;
+  ingredientsText: string | null;
   species: 0 | 1; // 0 = Cat, 1 = Dog (enum values)
   breed: string;
   age: number;
-  additionalInfo?: string | null;
+  additionalInfo: string | null;
 };
 
 // Helper to convert species string to enum value

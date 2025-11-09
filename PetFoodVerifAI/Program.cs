@@ -98,7 +98,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowFrontend", policy =>
     {
         var allowedOrigins = builder.Environment.IsDevelopment()
-            ? ["http://localhost:5173", "http://127.0.0.1:5173"]
+            ? ["http://localhost:5173", "http://127.0.0.1:5173", "http://localhost:5174", "http://127.0.0.1:5174"]
             : new[] { 
                 "https://www.petfoodverifai.com",
                 "https://petfoodverifai.com",

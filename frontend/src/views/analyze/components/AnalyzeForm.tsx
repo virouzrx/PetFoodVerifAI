@@ -11,6 +11,7 @@ import ScrapeStatus from './ScrapeStatus';
 import ManualIngredientsTextarea from './ManualIngredientsTextarea';
 import FormValidationSummary from './FormValidationSummary';
 import SubmitAnalysisButton from './SubmitAnalysisButton';
+import InputModeSelector from './InputModeSelector';
 
 import type { ScrapeState } from '../../../types/analyze';
 
@@ -48,8 +49,8 @@ const AnalyzeForm = ({ onSubmit, submissionStatus, scrapeStateFromParent, apiErr
     enableManualIngredients,
     resetManualIngredients,
     updateManualIngredients,
-    toggleNoIngredients,
     setScrapeState,
+    setInputMode,
   } = useAnalyzeForm(initialValues);
 
   // Use parent scrape state if provided (for API-driven state changes)
@@ -138,60 +139,111 @@ const AnalyzeForm = ({ onSubmit, submissionStatus, scrapeStateFromParent, apiErr
       {/* Product Information Section */}
       <div className="space-y-4">
         <h2 className="text-lg font-semibold text-slate-900">Product Information</h2>
-        
-        <div className="grid gap-4 sm:grid-cols-2">
-          <div className="sm:col-span-2">
-            <ProductNameInput
-              value={formValues.productName}
-              error={mergedErrors.productName}
-              onChange={(value) => updateField('productName', value)}
-              onBlur={() => handleBlur('productName')}
-              disabled={isSubmitting || lockedFields.includes('productName')}
-            />
-          </div>
 
-          <div className="sm:col-span-2">
-            <ProductUrlInput
-              value={formValues.productUrl}
-              error={mergedErrors.productUrl}
-              onChange={(value) => updateField('productUrl', value)}
-              onBlur={() => handleBlur('productUrl')}
-              disabled={isSubmitting || lockedFields.includes('productUrl')}
-            />
-          </div>
+        {/* Input Mode Selector - only show for new analyses, not reanalysis */}
+        {!lockedFields.includes('productUrl') && !lockedFields.includes('productName') && (
+          <InputModeSelector
+            value={formValues.inputMode}
+            onChange={setInputMode}
+            disabled={isSubmitting}
+            hasFormData={
+              !!formValues.productUrl ||
+              !!formValues.productName ||
+              !!formValues.ingredientsText
+            }
+          />
+        )}
+
+        <div className="grid gap-4 sm:grid-cols-2">
+          {/* Conditionally render fields based on input mode */}
+          {formValues.inputMode === 'url' ? (
+            <>
+              {/* URL Mode: Show URL input */}
+              <div className="sm:col-span-2">
+                <ProductUrlInput
+                  value={formValues.productUrl}
+                  error={mergedErrors.productUrl}
+                  onChange={(value) => updateField('productUrl', value)}
+                  onBlur={() => handleBlur('productUrl')}
+                  disabled={isSubmitting || lockedFields.includes('productUrl')}
+                />
+              </div>
+
+              {/* Show scrape status if scraping */}
+              {scrapeState !== 'idle' && (
+                <div className="sm:col-span-2">
+                  <ScrapeStatus
+                    state={scrapeState}
+                    message={
+                      scrapeState === 'scraping'
+                        ? 'Attempting to retrieve ingredients from product page...'
+                        : scrapeState === 'submitting'
+                        ? 'Submitting your analysis request...'
+                        : scrapeState === 'awaitingManual'
+                        ? 'Unable to automatically retrieve ingredients. You can enter them manually or try a different URL.'
+                        : 'Manual ingredients ready. Complete the form to continue.'
+                    }
+                    onRetry={handleRetry}
+                    onEnableManual={enableManualIngredients}
+                    isManualVisible={manualIngredientsState.isVisible}
+                  />
+                </div>
+              )}
+
+              {/* Manual ingredients fallback if scraping fails */}
+              {(scrapeState === 'failed' || manualIngredientsState.isVisible) && (
+                <div className="sm:col-span-2">
+                  <ManualIngredientsTextarea
+                    value={formValues.ingredientsText}
+                    error={mergedErrors.ingredientsText}
+                    onChange={updateManualIngredients}
+                    disabled={isSubmitting}
+                    required={manualIngredientsState.isVisible}
+                  />
+
+                  {!manualIngredientsState.isVisible && scrapeState !== 'failed' && (
+                    <button
+                      type="button"
+                      onClick={enableManualIngredients}
+                      disabled={isSubmitting}
+                      className="mt-2 text-sm text-brand-primary hover:underline focus:outline-none focus:ring-2 focus:ring-brand-primary rounded"
+                    >
+                      Enter ingredients manually
+                    </button>
+                  )}
+                </div>
+              )}
+            </>
+          ) : (
+            <>
+              {/* Manual Mode: Show product name and ingredients inputs */}
+              <div className="sm:col-span-2">
+                <ProductNameInput
+                  value={formValues.productName}
+                  error={mergedErrors.productName}
+                  onChange={(value) => updateField('productName', value)}
+                  onBlur={() => handleBlur('productName')}
+                  disabled={isSubmitting || lockedFields.includes('productName')}
+                />
+              </div>
+
+              <div className="sm:col-span-2">
+                <ManualIngredientsTextarea
+                  value={formValues.ingredientsText}
+                  error={mergedErrors.ingredientsText}
+                  onChange={(value) => updateField('ingredientsText', value)}
+                  disabled={isSubmitting}
+                  required={true}
+                />
+                <p className="mt-1 text-xs text-slate-500">
+                  Paste the full ingredients list from the product packaging or website
+                </p>
+              </div>
+            </>
+          )}
         </div>
       </div>
 
-      {/* Scrape Status */}
-      {scrapeState !== 'idle' && (
-        <ScrapeStatus
-          state={scrapeState}
-          message={
-            scrapeState === 'scraping'
-              ? 'Attempting to retrieve ingredients from product page...'
-              : scrapeState === 'submitting'
-              ? 'Submitting your analysis request...'
-              : scrapeState === 'awaitingManual'
-              ? 'Unable to automatically retrieve ingredients. You can enter them manually or try a different URL.'
-              : 'Manual ingredients ready. Complete the form to continue.'
-          }
-          onRetry={handleRetry}
-          onEnableManual={enableManualIngredients}
-          isManualVisible={manualIngredientsState.isVisible}
-        />
-      )}
-
-      {/* Manual Ingredients Section */}
-      {manualIngredientsState.isVisible && (
-        <ManualIngredientsTextarea
-          value={manualIngredientsState.value}
-          noIngredientsAvailable={manualIngredientsState.noIngredientsAvailable}
-          error={mergedErrors.ingredientsText}
-          onChange={updateManualIngredients}
-          onNoIngredientsToggle={toggleNoIngredients}
-          disabled={isSubmitting}
-        />
-      )}
 
       {/* Pet Information Section */}
       <div className="space-y-4">

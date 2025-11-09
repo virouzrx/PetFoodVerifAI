@@ -22,6 +22,72 @@ namespace PetFoodVerifAI.Controllers
             {
                 return Unauthorized();
             }
+            
+            if (request.IsManual)
+            {
+                if (string.IsNullOrWhiteSpace(request.ProductName))
+                {
+                    return BadRequest(new 
+                    { 
+                        message = "Product name is required for manual entry.",
+                        errors = new Dictionary<string, string[]>
+                        {
+                            ["ProductName"] = ["Product name is required when entering manually"]
+                        }
+                    });
+                }
+                
+                if (string.IsNullOrWhiteSpace(request.IngredientsText))
+                {
+                    return BadRequest(new 
+                    { 
+                        message = "Ingredients are required for manual entry.",
+                        errors = new Dictionary<string, string[]>
+                        {
+                            ["IngredientsText"] = ["Ingredients are required when entering manually"]
+                        }
+                    });
+                }
+                
+                if (!string.IsNullOrWhiteSpace(request.ProductUrl))
+                {
+                    return BadRequest(new 
+                    { 
+                        message = "ProductUrl should not be provided when IsManual is true.",
+                        errors = new Dictionary<string, string[]>
+                        {
+                            ["ProductUrl"] = ["Do not provide URL in manual mode"]
+                        }
+                    });
+                }
+            }
+            else
+            {
+                if (string.IsNullOrWhiteSpace(request.ProductUrl))
+                {
+                    return BadRequest(new 
+                    { 
+                        message = "Product URL is required when IsManual is false.",
+                        errors = new Dictionary<string, string[]>
+                        {
+                            ["ProductUrl"] = ["Product URL is required for scraping mode"]
+                        }
+                    });
+                }
+                
+                if (!Uri.TryCreate(request.ProductUrl, UriKind.Absolute, out var uri) ||
+                    (uri.Scheme != Uri.UriSchemeHttp && uri.Scheme != Uri.UriSchemeHttps))
+                {
+                    return BadRequest(new 
+                    { 
+                        message = "ProductUrl must be a valid HTTP or HTTPS URL.",
+                        errors = new Dictionary<string, string[]>
+                        {
+                            ["ProductUrl"] = ["Please enter a valid URL starting with http:// or https://"]
+                        }
+                    });
+                }
+            }
 
             try
             {

@@ -51,18 +51,55 @@ const ProductListItem = ({ item, onOpenVersionHistory }: ProductListItemProps) =
           <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
             {/* Left section: Product info */}
             <div className="flex-1 min-w-0">
-              {/* Product name */}
-              <Link
-                to={`/results/${item.analysisId}`}
-                className="text-lg font-semibold text-brand-dark hover:text-brand-primary focus:outline-none focus:ring-2 focus:ring-brand-primary focus:ring-offset-2 rounded"
-              >
-                {item.productName}
-              </Link>
+              {/* Product name with manual entry badge */}
+              <div className="flex items-center gap-2">
+                <Link
+                  to={`/results/${item.analysisId}`}
+                  className="text-lg font-semibold text-brand-dark hover:text-brand-primary focus:outline-none focus:ring-2 focus:ring-brand-primary focus:ring-offset-2 rounded"
+                >
+                  {item.productName}
+                </Link>
+
+                {/* Manual entry badge */}
+                {!item.productUrl && (
+                  <span
+                    className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-amber-100 text-amber-800 border border-amber-200"
+                    title="This product was entered manually"
+                  >
+                    <svg
+                      className="h-3 w-3 mr-1"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                      />
+                    </svg>
+                    Manual
+                  </span>
+                )}
+              </div>
               
               {/* Date */}
               <p className="mt-1 text-sm text-gray-600">
                 Analyzed {formattedDate}
               </p>
+
+              {/* Show URL if available */}
+              {item.productUrl && (
+                <a
+                  href={item.productUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-1 text-xs text-gray-500 hover:text-brand-primary truncate block"
+                >
+                  {item.productUrl}
+                </a>
+              )}
             </div>
 
             {/* Right section: Recommendation pill */}
