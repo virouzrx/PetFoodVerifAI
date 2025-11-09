@@ -296,14 +296,12 @@ jobs:
 
       - name: Ensure staticwebapp.config.json is in dist root
         run: |
-          echo "Ensuring config file is in dist..."
-          if [ -f "./frontend/public/staticwebapp.config.json" ]; then
-            cp ./frontend/public/staticwebapp.config.json ./frontend/dist/staticwebapp.config.json
-            echo "Copied from public/"
-          elif [ -f "./frontend/staticwebapp.config.json" ]; then
-            cp ./frontend/staticwebapp.config.json ./frontend/dist/staticwebapp.config.json
-            echo "Copied from frontend root"
-          fi
+          echo "Copying config file from frontend root to dist..."
+          cp ./frontend/staticwebapp.config.json ./frontend/dist/staticwebapp.config.json
+          # Update the header to indicate it's from dist
+          sed -i 's/FROM-FRONTEND-ROOT/FROM-DIST-FOLDER/g' ./frontend/dist/staticwebapp.config.json
+          sed -i 's|frontend/staticwebapp.config.json|frontend/dist/staticwebapp.config.json|g' ./frontend/dist/staticwebapp.config.json
+          echo "Config file copied to dist"
           echo "Verifying config file in dist:"
           cat ./frontend/dist/staticwebapp.config.json
           echo ""
