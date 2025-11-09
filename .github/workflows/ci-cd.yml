@@ -283,31 +283,6 @@ jobs:
           cache: 'npm'
           cache-dependency-path: './frontend/package-lock.json'
 
-      - name: Install dependencies
-        run: npm ci
-        working-directory: ./frontend
-
-      - name: Build frontend
-        run: npm run build
-        working-directory: ./frontend
-        env:
-          VITE_API_URL: https://petfoodverifai-api-fjftbmfmbtfpgjh2.canadacentral-01.azurewebsites.net/api
-          VITE_GOOGLE_CLIENT_ID: ${{ secrets.VITE_GOOGLE_CLIENT_ID }}
-
-      - name: Ensure staticwebapp.config.json is in dist root
-        run: |
-          echo "Copying config file from frontend root to dist..."
-          cp ./frontend/staticwebapp.config.json ./frontend/dist/staticwebapp.config.json
-          # Update the header to indicate it's from dist
-          sed -i 's/FROM-FRONTEND-ROOT/FROM-DIST-FOLDER/g' ./frontend/dist/staticwebapp.config.json
-          sed -i 's|frontend/staticwebapp.config.json|frontend/dist/staticwebapp.config.json|g' ./frontend/dist/staticwebapp.config.json
-          echo "Config file copied to dist"
-          echo "Verifying config file in dist:"
-          cat ./frontend/dist/staticwebapp.config.json
-          echo ""
-          echo "Listing dist contents:"
-          ls -la ./frontend/dist/
-
       - name: Deploy to Azure Static Web Apps
         uses: Azure/static-web-apps-deploy@v1
         with:
@@ -316,4 +291,7 @@ jobs:
           action: "upload"
           app_location: "frontend"
           output_location: "dist"
-          skip_app_build: true
+          app_build_command: "npm install && npm run build"
+        env:
+          VITE_API_URL: https://petfoodverifai-api-fjftbmfmbtfpgjh2.canadacentral-01.azurewebsites.net/api
+          VITE_GOOGLE_CLIENT_ID: ${{ secrets.VITE_GOOGLE_CLIENT_ID }}
