@@ -55,7 +55,6 @@ const formReducer = (state: AnalyzeFormValues, action: FormAction): AnalyzeFormV
           productName: '',
           ingredientsText: '',
           hasManualIngredients: false,
-          noIngredientsAvailable: false,
         };
       } else {
         return {
@@ -64,7 +63,6 @@ const formReducer = (state: AnalyzeFormValues, action: FormAction): AnalyzeFormV
           productUrl: '',
           ingredientsText: '',
           hasManualIngredients: true,
-          noIngredientsAvailable: false,
         };
       }
     default:

@@ -191,17 +191,16 @@ const AnalyzeForm = ({ onSubmit, submissionStatus, scrapeStateFromParent, apiErr
               )}
 
               {/* Manual ingredients fallback if scraping fails */}
-              {(scrapeState === 'failed' || manualIngredientsState.isVisible) && (
+              {(scrapeState === 'awaitingManual' || manualIngredientsState.isVisible) && (
                 <div className="sm:col-span-2">
                   <ManualIngredientsTextarea
                     value={formValues.ingredientsText}
                     error={mergedErrors.ingredientsText}
                     onChange={updateManualIngredients}
                     disabled={isSubmitting}
-                    required={manualIngredientsState.isVisible}
                   />
 
-                  {!manualIngredientsState.isVisible && scrapeState !== 'failed' && (
+                  {!manualIngredientsState.isVisible && scrapeState !== 'awaitingManual' && (
                     <button
                       type="button"
                       onClick={enableManualIngredients}
@@ -233,7 +232,6 @@ const AnalyzeForm = ({ onSubmit, submissionStatus, scrapeStateFromParent, apiErr
                   error={mergedErrors.ingredientsText}
                   onChange={(value) => updateField('ingredientsText', value)}
                   disabled={isSubmitting}
-                  required={true}
                 />
                 <p className="mt-1 text-xs text-slate-500">
                   Paste the full ingredients list from the product packaging or website

@@ -18,6 +18,7 @@ describe('analysisService', () => {
   const mockProductId = '456e7890-e89b-12d3-a456-426614174000';
 
   const mockCreateRequest: CreateAnalysisRequest = {
+    isManual: false,
     productName: 'Test Dog Food',
     productUrl: 'https://example.com/product',
     species: 1, // Dog = 1
