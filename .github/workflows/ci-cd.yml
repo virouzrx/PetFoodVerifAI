@@ -287,3 +287,4 @@ jobs:
           app_build_command: "npm install && npm run build"
         env:
           VITE_API_URL: https://petfoodverifai-api-fjftbmfmbtfpgjh2.canadacentral-01.azurewebsites.net/api
+          VITE_GOOGLE_CLIENT_ID: ${{ secrets.VITE_GOOGLE_CLIENT_ID }}
