@@ -52,7 +52,6 @@ namespace PetFoodVerifAI.Services
                 throw new ExternalServiceException("Failed to get analysis from the LLM service.", ex);
             }
             
-            // Serialize concerns to JSON for storage
             var concernsJson = llmResponse.Concerns.Count > 0 
                 ? JsonSerializer.Serialize(llmResponse.Concerns.Select(c => new IngredientConcernDto
                 {
@@ -109,13 +108,9 @@ namespace PetFoodVerifAI.Services
                 queryable = queryable.Where(a => a.ProductId == query.ProductId.Value);
             }
 
-            // If grouping by product, get only the latest analysis per product
             if (query.GroupByProduct && !query.ProductId.HasValue)
             {
-                // Get all analyses for the user with Product included
                 var allAnalyses = await queryable.ToListAsync();
-
-                // Group by ProductId and get the latest analysis for each product (in memory)
                 var latestAnalyses = allAnalyses
                     .GroupBy(a => a.ProductId)
                     .Select(g => g.OrderByDescending(a => a.CreatedAt).First())
@@ -123,7 +118,6 @@ namespace PetFoodVerifAI.Services
 
                 var totalCount = latestAnalyses.Count;
 
-                // Apply pagination and project to DTO (in memory)
                 var items = latestAnalyses
                     .Skip((query.Page - 1) * query.PageSize)
                     .Take(query.PageSize)
@@ -183,19 +177,17 @@ namespace PetFoodVerifAI.Services
                 return null;
             }
 
-            // Deserialize concerns from JSON
-            List<IngredientConcernDto> concerns = new List<IngredientConcernDto>();
+            List<IngredientConcernDto> concerns = [];
             if (!string.IsNullOrEmpty(analysis.ConcernsJson))
             {
                 try
                 {
                     concerns = JsonSerializer.Deserialize<List<IngredientConcernDto>>(analysis.ConcernsJson) 
-                        ?? new List<IngredientConcernDto>();
+                        ?? [];
                 }
                 catch (JsonException)
                 {
-                    // If deserialization fails, return empty list
-                    concerns = new List<IngredientConcernDto>();
+                    concerns = [];
                 }
             }
 
@@ -230,7 +222,6 @@ namespace PetFoodVerifAI.Services
 
             if (feedbackExists)
             {
-                // Or update existing feedback, depending on requirements
                 throw new InvalidOperationException("Feedback already submitted for this analysis.");
             }
 

@@ -1,5 +1,4 @@
 using PetFoodVerifAI.DTOs;
-using System.Threading.Tasks;
 
 namespace PetFoodVerifAI.Services
 {

@@ -1,8 +1,4 @@
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
 using Resend;
-using System;
-using System.Threading.Tasks;
 
 namespace PetFoodVerifAI.Services
 {
@@ -22,14 +18,14 @@ namespace PetFoodVerifAI.Services
         public async Task SendVerificationEmailAsync(string email, string verificationToken, string verificationLink)
         {
             var subject = "Verify Your Email - PetFoodVerifAI";
-            var htmlBody = GenerateVerificationEmailHtml(email, verificationToken, verificationLink);
+            var htmlBody = GenerateVerificationEmailHtml(verificationToken, verificationLink);
             await SendEmailAsync(email, subject, htmlBody);
         }
 
         public async Task SendPasswordResetEmailAsync(string email, string resetToken, string resetLink)
         {
             var subject = "Password Reset Request - PetFoodVerifAI";
-            var htmlBody = GeneratePasswordResetEmailHtml(email, resetToken, resetLink);
+            var htmlBody = GeneratePasswordResetEmailHtml(resetLink);
             await SendEmailAsync(email, subject, htmlBody);
         }
 
@@ -47,16 +43,16 @@ namespace PetFoodVerifAI.Services
                     HtmlBody = body,
                 });
 
-                _logger.LogInformation($"Email sent successfully to {to} via Resend");
+                _logger.LogInformation("Email sent successfully to {to} via Resend", to);
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Failed to send email to {to}: {ex.Message}");
+                _logger.LogError("Failed to send email to {to}: {ex.Message}", to, ex.Message);
                 throw;
             }
         }
 
-        private string GenerateVerificationEmailHtml(string email, string verificationToken, string verificationLink)
+        private static string GenerateVerificationEmailHtml(string verificationToken, string verificationLink)
         {
             return $@"
 <!DOCTYPE html>
@@ -99,7 +95,7 @@ namespace PetFoodVerifAI.Services
 </html>";
         }
 
-        private string GeneratePasswordResetEmailHtml(string email, string resetToken, string resetLink)
+        private static string GeneratePasswordResetEmailHtml(string resetLink)
         {
             return $@"
 <!DOCTYPE html>

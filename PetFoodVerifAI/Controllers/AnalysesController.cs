@@ -10,14 +10,9 @@ namespace PetFoodVerifAI.Controllers
     [Authorize]
     [ApiController]
     [Route("api/[controller]")]
-    public class AnalysesController : ControllerBase
+    public class AnalysesController(IAnalysisService analysisService) : ControllerBase
     {
-        private readonly IAnalysisService _analysisService;
-
-        public AnalysesController(IAnalysisService analysisService)
-        {
-            _analysisService = analysisService;
-        }
+        private readonly IAnalysisService _analysisService = analysisService;
 
         [HttpPost]
         public async Task<IActionResult> CreateAnalysis([FromBody] CreateAnalysisRequest request)
@@ -35,12 +30,10 @@ namespace PetFoodVerifAI.Controllers
             }
             catch (ExternalServiceException ex)
             {
-                // Log the exception ex
                 return StatusCode(503, new { message = "An external service is unavailable. Please try again later.", details = ex.Message });
             }
             catch (Exception ex)
             {
-                // Log the exception ex
                 return StatusCode(500, new { message = "An unexpected error occurred.", details = ex.Message });
             }
         }
@@ -101,7 +94,6 @@ namespace PetFoodVerifAI.Controllers
             }
             catch (Exception ex)
             {
-                // Log the exception ex
                 return StatusCode(500, new { message = "An unexpected error occurred.", details = ex.Message });
             }
         }

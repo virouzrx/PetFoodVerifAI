@@ -3,9 +3,6 @@ using System.ComponentModel.DataAnnotations;
 
 namespace PetFoodVerifAI.DTOs;
 
-/// <summary>
-/// Command model for creating a new analysis.
-/// </summary>
 public class CreateAnalysisRequest
 {
     [Required]
@@ -29,9 +26,6 @@ public class CreateAnalysisRequest
     public string? AdditionalInfo { get; set; }
 }
 
-/// <summary>
-/// DTO for the response after creating an analysis.
-/// </summary>
 public class AnalysisCreatedResponse
 {
     public Guid AnalysisId { get; set; }
@@ -42,9 +36,6 @@ public class AnalysisCreatedResponse
     public DateTime CreatedAt { get; set; }
 }
 
-/// <summary>
-/// DTO for ingredient concerns in the analysis response.
-/// </summary>
 public class IngredientConcernDto
 {
     public string Type { get; set; } = string.Empty; // "questionable" or "unacceptable"
@@ -52,9 +43,6 @@ public class IngredientConcernDto
     public string Reason { get; set; } = string.Empty;
 }
 
-/// <summary>
-/// DTO for a paginated list of analysis summaries.
-/// </summary>
 public class PaginatedAnalysesResponse
 {
     public int Page { get; set; }
@@ -64,9 +52,6 @@ public class PaginatedAnalysesResponse
 }
 
 
-/// <summary>
-/// DTO for a summary of an analysis, used in lists.
-/// </summary>
 public class AnalysisSummaryDto
 {
     public Guid AnalysisId { get; set; }
@@ -76,9 +61,6 @@ public class AnalysisSummaryDto
     public DateTime CreatedAt { get; set; }
 }
 
-/// <summary>
-/// DTO for the detailed view of a single analysis.
-/// </summary>
 public class AnalysisDetailDto
 {
     public Guid AnalysisId { get; set; }

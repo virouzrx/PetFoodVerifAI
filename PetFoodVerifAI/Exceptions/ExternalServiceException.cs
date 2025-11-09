@@ -1,5 +1,3 @@
-using System;
-
 namespace PetFoodVerifAI.Exceptions
 {
     public class ExternalServiceException : Exception

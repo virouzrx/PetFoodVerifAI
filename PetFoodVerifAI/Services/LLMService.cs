@@ -170,20 +170,16 @@ namespace PetFoodVerifAI.Services
 
         private static string CleanMarkdownJson(string content)
         {
-            // Remove markdown code block markers (```json ... ``` or ``` ... ```)
             var trimmed = content.Trim();
             
             if (trimmed.StartsWith("```"))
             {
-                // Find the end of the first line (which contains ```json or just ```)
                 var firstNewLine = trimmed.IndexOf('\n');
                 if (firstNewLine > 0)
                 {
-                    // Remove the first line
                     trimmed = trimmed.Substring(firstNewLine + 1);
                 }
                 
-                // Remove trailing ```
                 if (trimmed.EndsWith("```"))
                 {
                     trimmed = trimmed.Substring(0, trimmed.Length - 3);
@@ -252,7 +248,6 @@ Analyze these ingredients and determine if this food is recommended for this spe
 Provide your analysis now as valid JSON only, with no additional text:";
         }
 
-        // Anthropic API Response Models
         private class AnthropicResponse
         {
             [JsonPropertyName("content")]
@@ -265,7 +260,6 @@ Provide your analysis now as valid JSON only, with no additional text:";
             public string Text { get; set; } = string.Empty;
         }
 
-        // OpenAI API Response Models
         private class OpenAIResponse
         {
             [JsonPropertyName("choices")]

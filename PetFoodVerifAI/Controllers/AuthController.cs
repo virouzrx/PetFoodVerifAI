@@ -1,20 +1,14 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using PetFoodVerifAI.DTOs;
 using PetFoodVerifAI.Services;
-using System.Threading.Tasks;
 
 namespace PetFoodVerifAI.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class AuthController : ControllerBase
+    public class AuthController(IAuthService authService) : ControllerBase
     {
-        private readonly IAuthService _authService;
-
-        public AuthController(IAuthService authService)
-        {
-            _authService = authService;
-        }
+        private readonly IAuthService _authService = authService;
 
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterDto registerDto)
@@ -109,7 +103,6 @@ namespace PetFoodVerifAI.Controllers
         [HttpPost("forgot-password")]
         public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordRequestDto request)
         {
-            // Validate model state
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
@@ -117,18 +110,12 @@ namespace PetFoodVerifAI.Controllers
 
             try
             {
-                // Call service to initiate password reset
                 await _authService.ForgotPasswordAsync(request);
-                
-                // Always return 200 OK (even if email doesn't exist - prevents enumeration)
                 return Ok();
             }
             catch (Exception ex)
             {
-                // Log critical error
                 System.Diagnostics.Debug.WriteLine($"Critical error in ForgotPassword endpoint: {ex.Message}");
-                
-                // Return generic error (don't expose details)
                 return StatusCode(500, new { message = "An error occurred processing your request" });
             }
         }
@@ -136,22 +123,18 @@ namespace PetFoodVerifAI.Controllers
         [HttpPost("reset-password")]
         public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequestDto request)
         {
-            // Model validation is handled automatically by [ApiController] attribute
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            // Call service to reset password
             var result = await _authService.ResetPasswordAsync(request);
 
             if (!result.Succeeded)
             {
-                // Return 400 Bad Request with error details
                 return BadRequest(new { Errors = result.Errors });
             }
 
-            // Return 200 OK with empty body on success
             return Ok();
         }
     }

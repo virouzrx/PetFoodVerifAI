@@ -3,9 +3,6 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PetFoodVerifAI.Models;
 
-/// <summary>
-/// Represents a unique pet food product identified by name and URL
-/// </summary>
 [Table("Products")]
 public class Product
 {
@@ -23,7 +20,6 @@ public class Product
     public DateTime CreatedAt { get; set; }
 
 
-    // Navigation property
     public virtual ICollection<Analysis> Analyses { get; set; } = new List<Analysis>();
 }
 

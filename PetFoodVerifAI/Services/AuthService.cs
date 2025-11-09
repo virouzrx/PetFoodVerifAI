@@ -23,20 +23,20 @@ namespace PetFoodVerifAI.Services
             var user = await _userManager.FindByEmailAsync(loginRequest.Email);
             if (user == null)
             {
-                return new AuthResultDto { Succeeded = false, Errors = new[] { new IdentityError { Description = "Invalid credentials" } } };
+                return new AuthResultDto { Succeeded = false, Errors = [new IdentityError { Description = "Invalid credentials" }] };
             }
 
             // Check if email is confirmed
             if (!user.EmailConfirmed)
             {
-                return new AuthResultDto { Succeeded = false, Errors = new[] { new IdentityError { Description = "Email not confirmed. Please verify your email first." } } };
+                return new AuthResultDto { Succeeded = false, Errors = [new IdentityError { Description = "Email not confirmed. Please verify your email first." }] };
             }
 
             var result = await _signInManager.CheckPasswordSignInAsync(user, loginRequest.Password, lockoutOnFailure: true);
 
             if (!result.Succeeded)
             {
-                return new AuthResultDto { Succeeded = false, Errors = new[] { new IdentityError { Description = "Invalid credentials" } } };
+                return new AuthResultDto { Succeeded = false, Errors = [new IdentityError { Description = "Invalid credentials" }] };
             }
 
             var token = GenerateJwtToken(user);
@@ -74,27 +74,20 @@ namespace PetFoodVerifAI.Services
                 };
             }
 
-            // Generate verification token
             var verificationToken = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-            
-            // Set token expiration time (24 hours)
             var expiresAt = DateTime.UtcNow.AddHours(24);
 
-            // Build verification link (frontend will construct this)
             var verificationLink = $"{_configuration["AppUrl"]}/verify-email?userId={user.Id}&token={Uri.EscapeDataString(verificationToken)}";
 
-            // Send verification email
             try
             {
                 await _emailService.SendVerificationEmailAsync(user.Email, verificationToken, verificationLink);
             }
             catch (Exception ex)
             {
-                // Log error but don't fail registration
                 System.Diagnostics.Debug.WriteLine($"Email sending failed: {ex.Message}");
             }
 
-            // Return response WITHOUT JWT token - user must verify email first
             return new AuthResultDto
             {
                 Succeeded = true,
@@ -102,7 +95,7 @@ namespace PetFoodVerifAI.Services
                 {
                     UserId = user.Id,
                     Email = user.Email,
-                    Token = string.Empty, // No token until verified
+                    Token = string.Empty,
                     EmailConfirmed = false
                 }
             };
@@ -116,24 +109,17 @@ namespace PetFoodVerifAI.Services
                 return new AuthResultDto { Succeeded = false, Errors = new[] { new IdentityError { Description = "User not found" } } };
             }
 
-            // URL-decode the token in case it arrives URL-encoded
             var decodedToken = Uri.UnescapeDataString(verifyRequest.VerificationToken);
-            
-            // Check if SecurityStamp looks like a token (corruption from old code)
-            // This handles users created with the old buggy code that stored the token as SecurityStamp
             bool securityStampIsCorrupted = user.SecurityStamp == decodedToken || user.SecurityStamp == verifyRequest.VerificationToken;
             if (securityStampIsCorrupted)
             {
-                // Regenerate a proper security stamp
                 await _userManager.UpdateSecurityStampAsync(user);
             }
 
-            // Verify the token
             var result = await _userManager.ConfirmEmailAsync(user, decodedToken);
 
             if (!result.Succeeded)
             {
-                // Try with the raw token if decode didn't help
                 if (decodedToken != verifyRequest.VerificationToken)
                 {
                     result = await _userManager.ConfirmEmailAsync(user, verifyRequest.VerificationToken);
@@ -149,7 +135,6 @@ namespace PetFoodVerifAI.Services
                 }
             }
 
-            // Generate JWT token
             var token = GenerateJwtToken(user);
 
             return new AuthResultDto
@@ -170,7 +155,6 @@ namespace PetFoodVerifAI.Services
             var user = await _userManager.FindByEmailAsync(resendRequest.Email);
             if (user == null)
             {
-                // Don't reveal if email exists
                 return new AuthResultDto
                 {
                     Succeeded = true,
@@ -178,7 +162,6 @@ namespace PetFoodVerifAI.Services
                 };
             }
 
-            // If already confirmed, return success
             if (user.EmailConfirmed)
             {
                 return new AuthResultDto
@@ -188,13 +171,10 @@ namespace PetFoodVerifAI.Services
                 };
             }
 
-            // Generate new verification token
             var verificationToken = await _userManager.GenerateEmailConfirmationTokenAsync(user);
             
-            // Build verification link
             var verificationLink = $"{_configuration["AppUrl"]}/verify-email?userId={user.Id}&token={Uri.EscapeDataString(verificationToken)}";
 
-            // Send verification email
             try
             {
                 await _emailService.SendVerificationEmailAsync(user.Email ?? "", verificationToken, verificationLink);
@@ -204,7 +184,7 @@ namespace PetFoodVerifAI.Services
                 return new AuthResultDto
                 {
                     Succeeded = false,
-                    Errors = new[] { new IdentityError { Description = $"Failed to send email: {ex.Message}" } }
+                    Errors = [new IdentityError { Description = $"Failed to send email: {ex.Message}" }]
                 };
             }
 
@@ -228,9 +208,9 @@ namespace PetFoodVerifAI.Services
 
             var claims = new List<Claim>
             {
-                new Claim(JwtRegisteredClaimNames.Sub, user.Id),
-                new Claim(JwtRegisteredClaimNames.Email, user.Email!),
-                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+                new(JwtRegisteredClaimNames.Sub, user.Id),
+                new(JwtRegisteredClaimNames.Email, user.Email!),
+                new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
             };
 
             var token = new JwtSecurityToken(
@@ -248,139 +228,125 @@ namespace PetFoodVerifAI.Services
         {
             try
             {
-                // Use Google's tokeninfo endpoint to validate the access token
                 var googleClientId = _configuration["Google:ClientId"];
-                
-                using (var httpClient = new HttpClient())
+
+                using var httpClient = new HttpClient();
+                var tokenInfoUrl = $"https://www.googleapis.com/oauth2/v1/tokeninfo?access_token={Uri.EscapeDataString(googleRequest.GoogleToken)}";
+
+                try
                 {
-                    var tokenInfoUrl = $"https://www.googleapis.com/oauth2/v1/tokeninfo?access_token={Uri.EscapeDataString(googleRequest.GoogleToken)}";
-                    
-                    try
+                    var response = await httpClient.GetAsync(tokenInfoUrl);
+
+                    if (!response.IsSuccessStatusCode)
                     {
-                        var response = await httpClient.GetAsync(tokenInfoUrl);
-                        
-                        if (!response.IsSuccessStatusCode)
+                        return new AuthResultDto
                         {
-                            return new AuthResultDto 
-                            { 
-                                Succeeded = false, 
-                                Errors = new[] { new IdentityError { Description = "Invalid or expired Google token" } } 
-                            };
-                        }
-
-                        var jsonContent = await response.Content.ReadAsStringAsync();
-                        using (var document = System.Text.Json.JsonDocument.Parse(jsonContent))
-                        {
-                            var root = document.RootElement;
-                            
-                            // Validate that the token is for our app
-                            if (root.TryGetProperty("issued_to", out var issuedTo))
-                            {
-                                if (issuedTo.GetString() != googleClientId)
-                                {
-                                    return new AuthResultDto 
-                                    { 
-                                        Succeeded = false, 
-                                        Errors = new[] { new IdentityError { Description = "Google token is not for this application" } } 
-                                    };
-                                }
-                            }
-
-                            // Get the user's email from their profile
-                            // Note: Access tokens don't contain claims; we need a separate call or use ID token
-                            // For now, we'll need to get the user info from Google's userinfo endpoint
-                            var userInfoUrl = "https://www.googleapis.com/oauth2/v1/userinfo";
-                            var userInfoRequest = new HttpRequestMessage(HttpMethod.Get, userInfoUrl);
-                            userInfoRequest.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", googleRequest.GoogleToken);
-                            
-                            var userInfoResponse = await httpClient.SendAsync(userInfoRequest);
-                            if (!userInfoResponse.IsSuccessStatusCode)
-                            {
-                                return new AuthResultDto 
-                                { 
-                                    Succeeded = false, 
-                                    Errors = new[] { new IdentityError { Description = "Failed to retrieve user information from Google" } } 
-                                };
-                            }
-
-                            var userInfoContent = await userInfoResponse.Content.ReadAsStringAsync();
-                            using (var userInfoDoc = System.Text.Json.JsonDocument.Parse(userInfoContent))
-                            {
-                                var userRoot = userInfoDoc.RootElement;
-                                
-                                if (!userRoot.TryGetProperty("email", out var emailElement))
-                                {
-                                    return new AuthResultDto 
-                                    { 
-                                        Succeeded = false, 
-                                        Errors = new[] { new IdentityError { Description = "Could not retrieve email from Google profile" } } 
-                                    };
-                                }
-
-                                var email = emailElement.GetString();
-                                if (string.IsNullOrEmpty(email))
-                                {
-                                    return new AuthResultDto 
-                                    { 
-                                        Succeeded = false, 
-                                        Errors = new[] { new IdentityError { Description = "Email is empty in Google profile" } } 
-                                    };
-                                }
-
-                                // Find or create user
-                                var user = await _userManager.FindByEmailAsync(email);
-                                if (user == null)
-                                {
-                                    // Create new user with verified email
-                                    user = new IdentityUser
-                                    {
-                                        UserName = email,
-                                        Email = email,
-                                        EmailConfirmed = true // Email is verified through Google
-                                    };
-
-                                    var result = await _userManager.CreateAsync(user);
-                                    if (!result.Succeeded)
-                                    {
-                                        return new AuthResultDto 
-                                        { 
-                                            Succeeded = false, 
-                                            Errors = result.Errors 
-                                        };
-                                    }
-                                }
-                                else if (!user.EmailConfirmed)
-                                {
-                                    // Auto-confirm email if user exists but email wasn't confirmed
-                                    user.EmailConfirmed = true;
-                                    await _userManager.UpdateAsync(user);
-                                }
-
-                                // Generate JWT token
-                                var jwtToken = GenerateJwtToken(user);
-
-                                return new AuthResultDto
-                                {
-                                    Succeeded = true,
-                                    Response = new AuthResponseDto
-                                    {
-                                        UserId = user.Id,
-                                        Email = user.Email!,
-                                        Token = jwtToken,
-                                        EmailConfirmed = user.EmailConfirmed
-                                    }
-                                };
-                            }
-                        }
-                    }
-                    catch (HttpRequestException)
-                    {
-                        return new AuthResultDto 
-                        { 
-                            Succeeded = false, 
-                            Errors = new[] { new IdentityError { Description = "Failed to validate Google token. Please check your connection and try again." } } 
+                            Succeeded = false,
+                            Errors = new[] { new IdentityError { Description = "Invalid or expired Google token" } }
                         };
                     }
+
+                    var jsonContent = await response.Content.ReadAsStringAsync();
+                    using var document = System.Text.Json.JsonDocument.Parse(jsonContent);
+                    var root = document.RootElement;
+
+                    if (root.TryGetProperty("issued_to", out var issuedTo))
+                    {
+                        if (issuedTo.GetString() != googleClientId)
+                        {
+                            return new AuthResultDto
+                            {
+                                Succeeded = false,
+                                Errors = [new IdentityError { Description = "Google token is not for this application" }]
+                            };
+                        }
+                    }
+
+                    var userInfoUrl = "https://www.googleapis.com/oauth2/v1/userinfo";
+                    var userInfoRequest = new HttpRequestMessage(HttpMethod.Get, userInfoUrl);
+                    userInfoRequest.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", googleRequest.GoogleToken);
+
+                    var userInfoResponse = await httpClient.SendAsync(userInfoRequest);
+                    if (!userInfoResponse.IsSuccessStatusCode)
+                    {
+                        return new AuthResultDto
+                        {
+                            Succeeded = false,
+                            Errors = [new IdentityError { Description = "Failed to retrieve user information from Google" }]
+                        };
+                    }
+
+                    var userInfoContent = await userInfoResponse.Content.ReadAsStringAsync();
+                    using var userInfoDoc = System.Text.Json.JsonDocument.Parse(userInfoContent);
+                    var userRoot = userInfoDoc.RootElement;
+
+                    if (!userRoot.TryGetProperty("email", out var emailElement))
+                    {
+                        return new AuthResultDto
+                        {
+                            Succeeded = false,
+                            Errors = [new IdentityError { Description = "Could not retrieve email from Google profile" }]
+                        };
+                    }
+
+                    var email = emailElement.GetString();
+                    if (string.IsNullOrEmpty(email))
+                    {
+                        return new AuthResultDto
+                        {
+                            Succeeded = false,
+                            Errors = [new IdentityError { Description = "Email is empty in Google profile" }]
+                        };
+                    }
+
+                    var user = await _userManager.FindByEmailAsync(email);
+                    if (user == null)
+                    {
+                        user = new IdentityUser
+                        {
+                            UserName = email,
+                            Email = email,
+                            EmailConfirmed = true
+                        };
+
+                        var result = await _userManager.CreateAsync(user);
+                        if (!result.Succeeded)
+                        {
+                            return new AuthResultDto
+                            {
+                                Succeeded = false,
+                                Errors = result.Errors
+                            };
+                        }
+                    }
+                    else if (!user.EmailConfirmed)
+                    {
+                        user.EmailConfirmed = true;
+                        await _userManager.UpdateAsync(user);
+                    }
+
+                    var jwtToken = GenerateJwtToken(user);
+
+                    return new AuthResultDto
+                    {
+                        Succeeded = true,
+                        Response = new AuthResponseDto
+                        {
+                            UserId = user.Id,
+                            Email = user.Email!,
+                            Token = jwtToken,
+                            EmailConfirmed = user.EmailConfirmed
+                        }
+                    };
+                }
+                catch (HttpRequestException)
+                {
+                    return new AuthResultDto
+                    {
+                        Succeeded = false,
+                        Errors = [new IdentityError { Description = "Failed to validate Google token. Please check your connection and try again." }]
+                    };
+
                 }
             }
             catch (Exception ex)
@@ -388,7 +354,7 @@ namespace PetFoodVerifAI.Services
                 return new AuthResultDto 
                 { 
                     Succeeded = false, 
-                    Errors = new[] { new IdentityError { Description = $"Google login failed: {ex.Message}" } } 
+                    Errors = [new IdentityError { Description = $"Google login failed: {ex.Message}" }] 
                 };
             }
         }
@@ -397,29 +363,21 @@ namespace PetFoodVerifAI.Services
         {
             try
             {
-                // Normalize email for lookup
                 var normalizedEmail = request.Email.ToLowerInvariant().Trim();
-                
-                // Find user by email
                 var user = await _userManager.FindByEmailAsync(normalizedEmail);
                 
-                // If user doesn't exist, log and return success (prevent enumeration)
                 if (user == null)
                 {
-                    // Log at Information level - not an error
                     System.Diagnostics.Debug.WriteLine($"Password reset requested for non-existent email: {normalizedEmail}");
                     return true;
                 }
                 
-                // Generate password reset token
                 var resetToken = await _userManager.GeneratePasswordResetTokenAsync(user);
                 
-                // Build password reset link
                 var encodedToken = Uri.EscapeDataString(resetToken);
                 var encodedEmail = Uri.EscapeDataString(user.Email ?? "");
                 var resetLink = $"{_configuration["AppUrl"]}/reset-password?email={encodedEmail}&token={encodedToken}";
                 
-                // Send password reset email
                 try
                 {
                     await _emailService.SendPasswordResetEmailAsync(user.Email ?? "", resetToken, resetLink);
@@ -427,7 +385,6 @@ namespace PetFoodVerifAI.Services
                 }
                 catch (Exception ex)
                 {
-                    // Log error but still return success to prevent enumeration
                     System.Diagnostics.Debug.WriteLine($"Failed to send password reset email: {ex.Message}");
                 }
                 
@@ -435,9 +392,7 @@ namespace PetFoodVerifAI.Services
             }
             catch (Exception ex)
             {
-                // Log critical error
                 System.Diagnostics.Debug.WriteLine($"Critical error in ForgotPasswordAsync: {ex.Message}");
-                // Rethrow to let controller handle as 500 error
                 throw;
             }
         }
@@ -446,37 +401,24 @@ namespace PetFoodVerifAI.Services
         {
             try
             {
-                // Normalize email for lookup
                 var normalizedEmail = request.Email.ToLowerInvariant().Trim();
-                
-                // Find user by email
                 var user = await _userManager.FindByEmailAsync(normalizedEmail);
-                
-                // Return generic error if user not found (security best practice - don't reveal if email exists)
                 if (user == null)
                 {
                     System.Diagnostics.Debug.WriteLine($"Password reset attempt for non-existent email: {normalizedEmail}");
                     return new AuthResultDto
                     {
                         Succeeded = false,
-                        Errors = new[] { new IdentityError { Description = "Invalid or expired password reset token." } }
+                        Errors = [new IdentityError { Description = "Invalid or expired password reset token." }]
                     };
                 }
 
-                // URL-decode the token in case it arrives URL-encoded
                 var decodedToken = Uri.UnescapeDataString(request.Token);
                 
-                // Attempt to reset password using UserManager
-                // This validates:
-                // - Token format and signature
-                // - Token expiration
-                // - Token association with user
-                // - Password strength requirements
                 var result = await _userManager.ResetPasswordAsync(user, decodedToken, request.NewPassword);
                 
                 if (!result.Succeeded)
                 {
-                    // Try with the raw token if decode didn't help
                     if (decodedToken != request.Token)
                     {
                         result = await _userManager.ResetPasswordAsync(user, request.Token, request.NewPassword);
@@ -490,12 +432,11 @@ namespace PetFoodVerifAI.Services
                             Succeeded = false,
                             Errors = result.Errors.Any()
                                 ? result.Errors
-                                : new[] { new IdentityError { Description = "Invalid or expired password reset token." } }
+                                : [new IdentityError { Description = "Invalid or expired password reset token." }]
                         };
                     }
                 }
 
-                // Log successful reset (without sensitive data)
                 System.Diagnostics.Debug.WriteLine($"Password reset successful for user {normalizedEmail}");
                 
                 return new AuthResultDto
@@ -506,13 +447,11 @@ namespace PetFoodVerifAI.Services
             }
             catch (Exception ex)
             {
-                // Log critical error
                 System.Diagnostics.Debug.WriteLine($"Critical error in ResetPasswordAsync: {ex.Message}");
-                // Return generic error (don't expose internal details)
                 return new AuthResultDto
                 {
                     Succeeded = false,
-                    Errors = new[] { new IdentityError { Description = "An unexpected error occurred." } }
+                    Errors = [new IdentityError { Description = "An unexpected error occurred." }]
                 };
             }
         }

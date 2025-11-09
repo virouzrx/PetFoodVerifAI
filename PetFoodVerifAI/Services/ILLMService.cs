@@ -1,5 +1,4 @@
 using PetFoodVerifAI.DTOs;
-using System.Threading.Tasks;
 
 namespace PetFoodVerifAI.Services
 {
@@ -14,7 +13,7 @@ namespace PetFoodVerifAI.Services
     {
         public bool IsRecommended { get; set; }
         public string Justification { get; set; } = string.Empty;
-        public List<IngredientConcern> Concerns { get; set; } = new List<IngredientConcern>();
+        public List<IngredientConcern> Concerns { get; set; } = [];
     }
 
     public interface ILLMService

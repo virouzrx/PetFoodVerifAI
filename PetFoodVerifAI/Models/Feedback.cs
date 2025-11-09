@@ -4,9 +4,6 @@ using Microsoft.AspNetCore.Identity;
 
 namespace PetFoodVerifAI.Models;
 
-/// <summary>
-/// Represents user feedback (thumbs up/down) on an analysis
-/// </summary>
 [Table("Feedback")]
 public class Feedback
 {
@@ -28,7 +25,6 @@ public class Feedback
     public DateTime CreatedAt { get; set; }
 
 
-    // Navigation properties
     public virtual Analysis Analysis { get; set; } = null!;
 
     [ForeignKey(nameof(UserId))]

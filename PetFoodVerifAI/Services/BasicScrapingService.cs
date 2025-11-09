@@ -12,17 +12,13 @@ namespace PetFoodVerifAI.Services
         {
             try
             {
-                // Get the response as string
                 var response = await _httpClient.GetStringAsync(productUrl);
 
-                // First, extract the entire ingredients section (div with id="ingredients")
-                // This ensures we're looking in the right place
                 var ingredientsSectionPattern = @"<div[^>]*id=""ingredients""[^>]*>(.*?)</div>\s*</div>\s*</div>";
                 var sectionMatch = Regex.Match(response, ingredientsSectionPattern, RegexOptions.Singleline | RegexOptions.IgnoreCase);
                 
                 string searchArea = sectionMatch.Success ? sectionMatch.Groups[1].Value : response;
 
-                // Now find the anchors_anchorsHTML___2lrv div within the ingredients section
                 var regexPattern = @"<div[^>]*class=""[^""]*anchors_anchorsHTML___2lrv[^""]*""[^>]*>(.*?)</div>";
                 var match = Regex.Match(searchArea, regexPattern, RegexOptions.Singleline | RegexOptions.IgnoreCase);
                 
@@ -30,13 +26,10 @@ namespace PetFoodVerifAI.Services
                 {
                     var htmlContent = match.Groups[1].Value;
                     
-                    // Remove HTML tags
                     var textOnly = Regex.Replace(htmlContent, @"<[^>]+>", "\n");
                     
-                    // Decode HTML entities
                     var decodedText = System.Net.WebUtility.HtmlDecode(textOnly);
                     
-                    // Normalize whitespace but preserve line breaks for readability
                     var normalizedText = Regex.Replace(decodedText, @"[ \t]+", " ");
                     normalizedText = Regex.Replace(normalizedText, @"\n\s*\n", "\n");
                     normalizedText = normalizedText.Trim();
@@ -44,37 +37,32 @@ namespace PetFoodVerifAI.Services
                     return normalizedText;
                 }
 
-                // Fallback to HtmlAgilityPack if regex fails
                 try
                 {
-                    var htmlDoc = new HtmlDocument();
-                    
-                    // Configure HtmlAgilityPack to be very lenient
-                    htmlDoc.OptionCheckSyntax = false;
-                    htmlDoc.OptionFixNestedTags = true;
-                    htmlDoc.OptionAutoCloseOnEnd = true;
-                    htmlDoc.OptionDefaultStreamEncoding = Encoding.UTF8;
-                    htmlDoc.OptionReadEncoding = true;
-                    
-                    // Set a maximum depth to prevent infinite recursion
-                    htmlDoc.OptionMaxNestedChildNodes = 5000;
-                    
+                    var htmlDoc = new HtmlDocument
+                    {
+                        OptionCheckSyntax = false,
+                        OptionFixNestedTags = true,
+                        OptionAutoCloseOnEnd = true,
+                        OptionDefaultStreamEncoding = Encoding.UTF8,
+                        OptionReadEncoding = true,
+
+                        OptionMaxNestedChildNodes = 5000
+                    };
+
                     htmlDoc.LoadHtml(response);
 
-                    // Try the specific div with class anchors_anchorsHTML___2lrv
                     var ingredientsNode = htmlDoc.DocumentNode.SelectSingleNode("//div[@id='ingredients']//div[contains(@class, 'anchors_anchorsHTML___2lrv')]");
 
                     if (ingredientsNode != null)
                     {
                         var ingredientsText = ingredientsNode.InnerText;
                         
-                        // Decode HTML entities and normalize whitespace
                         var decodedText = System.Net.WebUtility.HtmlDecode(ingredientsText);
                         var normalizedText = Regex.Replace(decodedText, @"\s+", " ").Trim();
                         return normalizedText;
                     }
 
-                    // Fallback: try to find just the div with the specific class
                     ingredientsNode = htmlDoc.DocumentNode.SelectSingleNode("//div[contains(@class, 'anchors_anchorsHTML___2lrv')]");
                     if (ingredientsNode != null)
                     {
@@ -86,7 +74,6 @@ namespace PetFoodVerifAI.Services
                 }
                 catch (Exception htmlParseEx)
                 {
-                    // Log the parsing error but continue
                     Console.WriteLine($"HtmlAgilityPack parsing failed: {htmlParseEx.Message}");
                 }
 

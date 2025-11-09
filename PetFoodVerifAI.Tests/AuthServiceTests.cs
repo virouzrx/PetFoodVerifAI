@@ -3,9 +3,6 @@ using Microsoft.Extensions.Configuration;
 using Moq;
 using PetFoodVerifAI.DTOs;
 using PetFoodVerifAI.Services;
-using System;
-using System.Threading.Tasks;
-using Xunit;
 
 namespace PetFoodVerifAI.Tests
 {
@@ -19,16 +16,13 @@ namespace PetFoodVerifAI.Tests
 
         public AuthServiceTests()
         {
-            // Setup UserManager mock
             var userStoreMock = new Mock<IUserStore<IdentityUser>>();
             _mockUserManager = new Mock<UserManager<IdentityUser>>(
                 userStoreMock.Object, null, null, null, null, null, null, null, null);
 
-            // Setup Configuration mock
             _mockConfiguration = new Mock<IConfiguration>();
             _mockConfiguration.Setup(c => c["AppUrl"]).Returns("http://localhost:5173");
 
-            // Setup SignInManager mock
             var contextAccessorMock = new Mock<Microsoft.AspNetCore.Http.IHttpContextAccessor>();
             var claimsFactoryMock = new Mock<IUserClaimsPrincipalFactory<IdentityUser>>();
             _mockSignInManager = new Mock<SignInManager<IdentityUser>>(
@@ -37,10 +31,8 @@ namespace PetFoodVerifAI.Tests
                 claimsFactoryMock.Object,
                 null, null, null, null);
 
-            // Setup EmailService mock
             _mockEmailService = new Mock<IEmailService>();
 
-            // Create AuthService instance
             _authService = new AuthService(
                 _mockUserManager.Object,
                 _mockConfiguration.Object,
@@ -51,7 +43,6 @@ namespace PetFoodVerifAI.Tests
         [Fact]
         public async Task ForgotPasswordAsync_WithExistingUser_GeneratesTokenAndSendsEmail()
         {
-            // Arrange
             var email = "test@example.com";
             var request = new ForgotPasswordRequestDto { Email = email };
             var user = new IdentityUser { Email = email, UserName = email };
@@ -72,10 +63,8 @@ namespace PetFoodVerifAI.Tests
                     It.IsAny<string>()))
                 .Returns(Task.CompletedTask);
 
-            // Act
             var result = await _authService.ForgotPasswordAsync(request);
 
-            // Assert
             Assert.True(result);
             _mockUserManager.Verify(um => um.FindByEmailAsync(email), Times.Once);
             _mockUserManager.Verify(um => um.GeneratePasswordResetTokenAsync(user), Times.Once);
@@ -89,7 +78,6 @@ namespace PetFoodVerifAI.Tests
         [Fact]
         public async Task ForgotPasswordAsync_WithNonExistentUser_ReturnsSuccessWithoutSendingEmail()
         {
-            // Arrange
             var email = "nonexistent@example.com";
             var request = new ForgotPasswordRequestDto { Email = email };
 
@@ -97,10 +85,8 @@ namespace PetFoodVerifAI.Tests
                 .Setup(um => um.FindByEmailAsync(email))
                 .ReturnsAsync((IdentityUser?)null);
 
-            // Act
             var result = await _authService.ForgotPasswordAsync(request);
 
-            // Assert
             Assert.True(result);
             _mockUserManager.Verify(um => um.FindByEmailAsync(email), Times.Once);
             _mockUserManager.Verify(um => um.GeneratePasswordResetTokenAsync(It.IsAny<IdentityUser>()), Times.Never);
@@ -114,7 +100,6 @@ namespace PetFoodVerifAI.Tests
         [Fact]
         public async Task ForgotPasswordAsync_WithEmailServiceFailure_ReturnsSuccessAnyway()
         {
-            // Arrange
             var email = "test@example.com";
             var request = new ForgotPasswordRequestDto { Email = email };
             var user = new IdentityUser { Email = email, UserName = email };
@@ -135,10 +120,8 @@ namespace PetFoodVerifAI.Tests
                     It.IsAny<string>()))
                 .ThrowsAsync(new Exception("Email service unavailable"));
 
-            // Act
             var result = await _authService.ForgotPasswordAsync(request);
 
-            // Assert
             Assert.True(result);
             _mockUserManager.Verify(um => um.FindByEmailAsync(email), Times.Once);
             _mockUserManager.Verify(um => um.GeneratePasswordResetTokenAsync(user), Times.Once);
@@ -152,7 +135,6 @@ namespace PetFoodVerifAI.Tests
         [Fact]
         public async Task ForgotPasswordAsync_NormalizesEmail_BeforeLookup()
         {
-            // Arrange
             var email = "  TEST@EXAMPLE.COM  ";
             var normalizedEmail = "test@example.com";
             var request = new ForgotPasswordRequestDto { Email = email };
@@ -174,10 +156,8 @@ namespace PetFoodVerifAI.Tests
                     It.IsAny<string>()))
                 .Returns(Task.CompletedTask);
 
-            // Act
             var result = await _authService.ForgotPasswordAsync(request);
 
-            // Assert
             Assert.True(result);
             _mockUserManager.Verify(um => um.FindByEmailAsync(normalizedEmail), Times.Once);
         }
@@ -185,7 +165,6 @@ namespace PetFoodVerifAI.Tests
         [Fact]
         public async Task ForgotPasswordAsync_GeneratesCorrectResetLink_WithUrlEncodedParameters()
         {
-            // Arrange
             var email = "test@example.com";
             var request = new ForgotPasswordRequestDto { Email = email };
             var user = new IdentityUser { Email = email, UserName = email };
@@ -222,7 +201,6 @@ namespace PetFoodVerifAI.Tests
         [Fact]
         public async Task ForgotPasswordAsync_WithUserManagerException_RethrowsException()
         {
-            // Arrange
             var email = "test@example.com";
             var request = new ForgotPasswordRequestDto { Email = email };
 
@@ -230,18 +208,12 @@ namespace PetFoodVerifAI.Tests
                 .Setup(um => um.FindByEmailAsync(email))
                 .ThrowsAsync(new Exception("Database connection failed"));
 
-            // Act & Assert
             await Assert.ThrowsAsync<Exception>(() => _authService.ForgotPasswordAsync(request));
         }
-
-        // ============================================
-        // ResetPassword Tests
-        // ============================================
 
         [Fact]
         public async Task ResetPasswordAsync_WithValidToken_ShouldSucceed()
         {
-            // Arrange
             var email = "test@example.com";
             var token = "valid-reset-token";
             var newPassword = "NewSecurePassword123!";
@@ -261,10 +233,8 @@ namespace PetFoodVerifAI.Tests
                 .Setup(um => um.ResetPasswordAsync(user, token, newPassword))
                 .ReturnsAsync(IdentityResult.Success);
 
-            // Act
             var result = await _authService.ResetPasswordAsync(request);
 
-            // Assert
             Assert.True(result.Succeeded);
             Assert.NotNull(result.Response);
             _mockUserManager.Verify(um => um.FindByEmailAsync(email), Times.Once);
@@ -274,7 +244,6 @@ namespace PetFoodVerifAI.Tests
         [Fact]
         public async Task ResetPasswordAsync_WithInvalidToken_ShouldFail()
         {
-            // Arrange
             var email = "test@example.com";
             var token = "invalid-token";
             var newPassword = "NewSecurePassword123!";
@@ -295,10 +264,8 @@ namespace PetFoodVerifAI.Tests
                 .Setup(um => um.ResetPasswordAsync(user, It.IsAny<string>(), newPassword))
                 .ReturnsAsync(IdentityResult.Failed(error));
 
-            // Act
             var result = await _authService.ResetPasswordAsync(request);
 
-            // Assert
             Assert.False(result.Succeeded);
             Assert.Contains(result.Errors, e => e.Code == "InvalidToken");
             _mockUserManager.Verify(um => um.FindByEmailAsync(email), Times.Once);
@@ -307,7 +274,6 @@ namespace PetFoodVerifAI.Tests
         [Fact]
         public async Task ResetPasswordAsync_WithNonExistentEmail_ShouldFailWithGenericError()
         {
-            // Arrange
             var email = "nonexistent@example.com";
             var request = new ResetPasswordRequestDto
             {
@@ -320,10 +286,8 @@ namespace PetFoodVerifAI.Tests
                 .Setup(um => um.FindByEmailAsync(email))
                 .ReturnsAsync((IdentityUser?)null);
 
-            // Act
             var result = await _authService.ResetPasswordAsync(request);
 
-            // Assert
             Assert.False(result.Succeeded);
             Assert.Contains(result.Errors, e => e.Description.Contains("Invalid or expired password reset token"));
             _mockUserManager.Verify(um => um.FindByEmailAsync(email), Times.Once);
@@ -333,7 +297,6 @@ namespace PetFoodVerifAI.Tests
         [Fact]
         public async Task ResetPasswordAsync_WithWeakPassword_ShouldFail()
         {
-            // Arrange
             var email = "test@example.com";
             var token = "valid-token";
             var weakPassword = "weak";
@@ -354,10 +317,8 @@ namespace PetFoodVerifAI.Tests
                 .Setup(um => um.ResetPasswordAsync(user, It.IsAny<string>(), weakPassword))
                 .ReturnsAsync(IdentityResult.Failed(error));
 
-            // Act
             var result = await _authService.ResetPasswordAsync(request);
 
-            // Assert
             Assert.False(result.Succeeded);
             Assert.Contains(result.Errors, e => e.Code == "PasswordTooShort");
         }
@@ -365,7 +326,6 @@ namespace PetFoodVerifAI.Tests
         [Fact]
         public async Task ResetPasswordAsync_NormalizesEmail_BeforeLookup()
         {
-            // Arrange
             var email = "  TEST@EXAMPLE.COM  ";
             var normalizedEmail = "test@example.com";
             var token = "valid-token";
@@ -386,10 +346,8 @@ namespace PetFoodVerifAI.Tests
                 .Setup(um => um.ResetPasswordAsync(user, token, newPassword))
                 .ReturnsAsync(IdentityResult.Success);
 
-            // Act
             var result = await _authService.ResetPasswordAsync(request);
 
-            // Assert
             Assert.True(result.Succeeded);
             _mockUserManager.Verify(um => um.FindByEmailAsync(normalizedEmail), Times.Once);
         }
@@ -397,7 +355,6 @@ namespace PetFoodVerifAI.Tests
         [Fact]
         public async Task ResetPasswordAsync_WithUrlEncodedToken_ShouldDecodeAndTryBothVersions()
         {
-            // Arrange
             var email = "test@example.com";
             var encodedToken = "test%2Ftoken%2Bspecial";
             var decodedToken = "test/token+special";
@@ -414,20 +371,16 @@ namespace PetFoodVerifAI.Tests
                 .Setup(um => um.FindByEmailAsync(email))
                 .ReturnsAsync(user);
 
-            // First attempt with decoded token fails
             _mockUserManager
                 .Setup(um => um.ResetPasswordAsync(user, decodedToken, newPassword))
                 .ReturnsAsync(IdentityResult.Failed(new IdentityError { Description = "Invalid token" }));
 
-            // Second attempt with original token succeeds
             _mockUserManager
                 .Setup(um => um.ResetPasswordAsync(user, encodedToken, newPassword))
                 .ReturnsAsync(IdentityResult.Success);
 
-            // Act
             var result = await _authService.ResetPasswordAsync(request);
 
-            // Assert
             Assert.True(result.Succeeded);
             _mockUserManager.Verify(um => um.ResetPasswordAsync(user, decodedToken, newPassword), Times.Once);
             _mockUserManager.Verify(um => um.ResetPasswordAsync(user, encodedToken, newPassword), Times.Once);
@@ -436,7 +389,6 @@ namespace PetFoodVerifAI.Tests
         [Fact]
         public async Task ResetPasswordAsync_WithException_ShouldReturnGenericError()
         {
-            // Arrange
             var email = "test@example.com";
             var token = "valid-token";
             var newPassword = "NewSecurePassword123!";
@@ -451,10 +403,8 @@ namespace PetFoodVerifAI.Tests
                 .Setup(um => um.FindByEmailAsync(email))
                 .ThrowsAsync(new Exception("Database connection failed"));
 
-            // Act
             var result = await _authService.ResetPasswordAsync(request);
 
-            // Assert
             Assert.False(result.Succeeded);
             Assert.Contains(result.Errors, e => e.Description.Contains("An unexpected error occurred"));
         }
@@ -462,7 +412,6 @@ namespace PetFoodVerifAI.Tests
         [Fact]
         public async Task ResetPasswordAsync_AfterSuccessfulReset_SecurityStampShouldInvalidateOldTokens()
         {
-            // Arrange
             var email = "test@example.com";
             var token = "valid-token";
             var newPassword = "NewSecurePassword123!";
@@ -482,13 +431,9 @@ namespace PetFoodVerifAI.Tests
                 .Setup(um => um.ResetPasswordAsync(user, token, newPassword))
                 .ReturnsAsync(IdentityResult.Success);
 
-            // Act
             var result = await _authService.ResetPasswordAsync(request);
 
-            // Assert
             Assert.True(result.Succeeded);
-            // Note: ASP.NET Identity automatically updates SecurityStamp on password reset
-            // This test documents the expected behavior
             _mockUserManager.Verify(um => um.ResetPasswordAsync(user, token, newPassword), Times.Once);
         }
     }

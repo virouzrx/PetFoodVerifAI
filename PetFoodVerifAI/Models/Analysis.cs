@@ -1,13 +1,9 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.AspNetCore.Identity;
-using System.Text.Json;
 
 namespace PetFoodVerifAI.Models;
 
-/// <summary>
-/// Represents an analysis of pet food product with recommendation and justification
-/// </summary>
 [Table("Analyses")]
 public class Analysis
 {
@@ -40,16 +36,12 @@ public class Analysis
 
     public string? AdditionalInfo { get; set; }
 
-    /// <summary>
-    /// JSON-serialized list of ingredient concerns (questionable or unacceptable)
-    /// </summary>
     public string? ConcernsJson { get; set; }
 
     [Required]
     public DateTime CreatedAt { get; set; }
 
 
-    // Navigation properties
     public virtual Product Product { get; set; } = null!;
 
     [ForeignKey(nameof(UserId))]
