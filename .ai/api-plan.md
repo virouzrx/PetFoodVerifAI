@@ -48,16 +48,17 @@ Authentication will be handled by the built-in endpoints provided by ASP.NET Ide
 ### 2.2. Analyses
 
 - **POST `/api/analyses`**
-  - **Description**: Creates a new analysis for a product. This is the core endpoint that orchestrates scraping, LLM analysis, and database persistence. If the product (by name and URL) doesn't exist, it's created implicitly.
+  - **Description**: Creates a new analysis for a product. This is the core endpoint that orchestrates scraping, LLM analysis, and database persistence. Supports two input modes: URL mode (scrapes product name and ingredients) and Manual mode (uses provided product name and ingredients). If the product (by name and URL) doesn't exist, it's created implicitly.
   - **Request Payload**:
     ```json
     {
-      "productName": "Example Pet Food",
-      "productUrl": "http://example.com/petfood",
-      "ingredientsText": "Chicken, rice, ...", // Optional: only if scraping fails client-side
-      "species": "Dog", // "Cat" or "Dog"
-      "breed": "Golden Retriever",
-      "age": 5,
+      "isManual": false, // Required: true for manual entry, false for URL scraping
+      "productName": null, // Optional: required if isManual=true, ignored if isManual=false (scraped from URL)
+      "productUrl": "http://example.com/petfood", // Optional: required if isManual=false, must be null if isManual=true
+      "ingredientsText": null, // Optional: required if isManual=true, optional if isManual=false (scraped from URL if not provided)
+      "species": "Dog", // Required: "Cat" or "Dog"
+      "breed": "Golden Retriever", // Required
+      "age": 5, // Required
       "additionalInfo": "My dog has a sensitive stomach." // Optional
     }
     ```
@@ -150,8 +151,15 @@ Authentication will be handled by the built-in endpoints provided by ASP.NET Ide
 Input validation will be performed at the API layer for all incoming requests based on the database schema constraints.
 
 - **Analyses (`POST /api/analyses`)**:
-  - `productName`: Required, non-empty string.
-  - `productUrl`: Required, valid URL format.
+  - `isManual`: Required, boolean flag indicating input mode.
+  - If `isManual = true`:
+    - `productName`: Required, non-empty string.
+    - `ingredientsText`: Required, non-empty string.
+    - `productUrl`: Must be null or empty (not allowed in manual mode).
+  - If `isManual = false`:
+    - `productUrl`: Required, valid HTTP/HTTPS URL format.
+    - `productName`: Optional, ignored (automatically scraped from URL).
+    - `ingredientsText`: Optional, only used if scraping fails (fallback).
   - `species`: Required, must be either 'Cat' or 'Dog'.
   - `age`: Required, must be a positive integer.
   - `breed`: Required, non-empty string.
@@ -165,10 +173,13 @@ Input validation will be performed at the API layer for all incoming requests ba
 
 - **Product Analysis (`POST /api/analyses`)**:
   - This endpoint will contain the core business logic.
-  1.  **Find or Create Product**: It first queries for a `Product` with the provided `productName` and `productUrl`. If it doesn't exist, a new one is created.
-  2.  **Scrape/Receive Ingredients**: If `ingredientsText` is not in the payload, it triggers a web scraping service.
-  3.  **LLM Call**: It sends the ingredients and pet details to the LLM service for analysis.
-  4.  **Persist Analysis**: It saves the LLM's response (`recommendation`, `justification`) as a new `Analysis` record, linked to the product and the authenticated user.
+  1.  **Determine Input Mode**: Based on the `isManual` flag, the endpoint follows different paths:
+     - **Manual Mode** (`isManual = true`): Uses provided `productName` and `ingredientsText` directly.
+     - **URL Mode** (`isManual = false`): Triggers web scraping to extract both `productName` and `ingredients` from the provided `productUrl`.
+  2.  **Find or Create Product**: It queries for a `Product` with the `productName` and `productUrl` combination. If it doesn't exist, a new one is created with the appropriate `IsManualEntry` flag.
+  3.  **Scrape Product Data** (URL mode only): The scraping service extracts both the product name and ingredients from the URL. If scraping fails and `ingredientsText` is provided, it uses the provided ingredients as a fallback.
+  4.  **LLM Call**: It sends the ingredients and pet details to the LLM service for analysis.
+  5.  **Persist Analysis**: It saves the LLM's response (`recommendation`, `justification`) as a new `Analysis` record, linked to the product and the authenticated user.
 - **Analysis History & Versioning (`GET /api/analyses`)**:
   - To get a user's history, the endpoint queries the `Analyses` table filtered by the authenticated user's ID.
   - To get a product's version history, the client will pass the `productId` in the query string, which adds a filter to the database query. Both scenarios leverage the respective database indexes for performance.

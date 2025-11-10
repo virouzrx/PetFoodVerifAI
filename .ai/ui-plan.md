@@ -20,8 +20,9 @@ The application is a secure, accessible SPA with a pre-auth landing experience, 
 
 - **Requirements coverage** (high level):
   - FR-01 Auth: Register/Login views with gated routes; no guest access.
-  - FR-02 Form: Analyze Product view with vertical form.
-  - FR-03/FR-04 Scraping + fallback: Inline manual ingredient textarea revealed on failure.
+  - FR-02 Form: Analyze Product view with dual input modes (URL mode and Manual mode).
+  - FR-03 Product Data Scraping: Automatic extraction of product name and ingredients from URL in URL mode.
+  - FR-04 Manual Entry: Primary manual entry mode plus fallback manual ingredient entry when scraping fails.
   - FR-05 LLM Analysis: Analysis request from Analyze Product view.
   - FR-06/FR-07 Results: Badge, justification, visible disclaimer.
   - FR-08/FR-09 History + Versioning: My Products list + Product Version History drawer.
@@ -86,15 +87,17 @@ The application is a secure, accessible SPA with a pre-auth landing experience, 
 
 6) **Analyze Product**
 - **Path**: `/analyze` (default authenticated landing)
-- **Main purpose**: Collect product and pet details; orchestrate scraping fallback and submit for analysis.
-- **Key information**: Product Name, Product URL, Species (Cat/Dog), Breed, Age, Additional Info, Ingredients (manual fallback); notices about scraping and privacy; submission status.
+- **Main purpose**: Collect product and pet details via dual input modes; orchestrate scraping or manual entry and submit for analysis.
+- **Key information**: Input mode selector (URL/Manual), Product Name (manual mode only), Product URL (URL mode only), Species (Cat/Dog), Breed, Age, Additional Info, Ingredients (manual mode or fallback); notices about scraping and privacy; submission status.
 - **Key view components**: 
-  - `AnalyzeForm` (vertical): `ProductNameInput`, `ProductUrlInput`, `SpeciesRadioGroup`, `BreedTextInput`, `AgeNumberInput`, `AdditionalInfoTextarea`.
-  - `ScrapeStatus` with `aria-live` (attempts scrape if ingredients missing), `ManualIngredientsTextarea` displayed if scraping fails or user opts in.
+  - `AnalyzeForm` (vertical): `InputModeSelector` (URL/Manual toggle), `ProductNameInput` (visible in manual mode), `ProductUrlInput` (visible in URL mode), `SpeciesRadioGroup`, `BreedTextInput`, `AgeNumberInput`, `AdditionalInfoTextarea`.
+  - `ScrapeStatus` with `aria-live` (in URL mode, shows scraping progress for product name and ingredients), `ManualIngredientsTextarea` displayed in manual mode or as fallback when scraping fails.
   - `SubmitAnalysisButton` with loading state; `FormValidationSummary`.
   - `InlineHelp` for acceptable URLs and data usage.
 - **UX/Accessibility/Security**:
   - Client-side validation mirrors API; prevent duplicate submissions; persist draft in memory.
+  - In URL mode: Product name is automatically extracted from URL (not user input). User only provides URL.
+  - In Manual mode: User provides both product name and ingredients manually.
   - Loading indicators for scraping and analysis; progress is announced to screen readers.
   - On 503 from scraper/LLM, propose manual ingredients retry or later retry; preserve inputs.
 
@@ -153,14 +156,22 @@ The application is a secure, accessible SPA with a pre-auth landing experience, 
 
 ## 3. User Journey Map
 
-- **Primary use case**
+- **Primary use case (URL Mode)**
   1. User lands on `/` → learns about app → proceeds to `/login` or `/register`.
   2. Auth success → routed to `/analyze` (default authenticated landing).
-  3. User fills form (name, URL, species, breed, age, optional info). On submit, if `ingredientsText` missing, scraping attempts in background.
-  4. If scraping fails, `ManualIngredientsTextarea` appears inline with a message; user pastes ingredients and resubmits.
-  5. Analysis request is sent → show “Thinking…” with progress (aria-live). On success, route to `/results/:analysisId`.
+  3. User selects URL mode and fills form (URL, species, breed, age, optional info). Product name is not required as it will be extracted automatically.
+  4. On submit, system scrapes product name and ingredients from URL. If scraping fails, `ManualIngredientsTextarea` appears inline with a message; user pastes ingredients and resubmits.
+  5. Analysis request is sent → show "Thinking…" with progress (aria-live). On success, route to `/results/:analysisId`.
   6. Results view shows badge, justification, AI disclaimer. User optionally gives feedback (thumb up/down) → instant confirmation.
   7. User navigates to `My Products` to see history; opens Version History drawer for a product → can open prior results, or click Re-analyze to go back to `/analyze` with pre-filled fields.
+
+- **Primary use case (Manual Mode)**
+  1. User lands on `/` → learns about app → proceeds to `/login` or `/register`.
+  2. Auth success → routed to `/analyze` (default authenticated landing).
+  3. User selects Manual mode and fills form (product name, ingredients, species, breed, age, optional info). No URL required.
+  4. On submit, analysis request is sent → show "Thinking…" with progress (aria-live). On success, route to `/results/:analysisId`.
+  5. Results view shows badge, justification, AI disclaimer. User optionally gives feedback (thumb up/down) → instant confirmation.
+  6. Product is saved in history marked as manual entry (no URL, cannot be re-analyzed via URL).
 
 - **Re-analyze flow**
   - From `/products`, click Re-analyze → `/analyze` with product fields pre-filled (URL, name). Submit → new result saved; Version History updates.
@@ -200,8 +211,9 @@ The application is a secure, accessible SPA with a pre-auth landing experience, 
 - **GlobalAlertArea/Toast**: Surface API errors (400 mapped to forms, 401 session, 503 retry) and confirmations.
 - **ForgotPasswordForm**: Single email input form; always shows success message (prevents user enumeration); handles email validation errors.
 - **ResetPasswordForm**: New password and confirm password inputs; extracts token/email from URL; validates password strength; shows success with countdown redirect or error with recovery link.
-- **AnalyzeForm**: Structured form with validation and inline scraping fallback. Emits a normalized payload for POST `/api/analyses`.
-- **ScrapeStatus**: `aria-live` region reflecting scraping attempts and failures; toggles manual entry.
+- **AnalyzeForm**: Structured form with dual input mode support (URL/Manual), validation, and inline scraping fallback. Emits a normalized payload for POST `/api/analyses` with `isManual` flag.
+- **InputModeSelector**: Toggle/radio group to switch between URL mode and Manual mode.
+- **ScrapeStatus**: `aria-live` region reflecting scraping attempts and failures; shows progress for product name and ingredient extraction in URL mode; toggles manual entry fallback.
 - **AnalysisBadge**: Accessible status badge with text and icon states for Recommended/Not Recommended.
 - **JustificationCard**: Shows concise LLM reason; truncates with expandable details if lengthy.
 - **AIDisclaimer**: Required legal notice visible on Results.
@@ -219,13 +231,15 @@ The application is a secure, accessible SPA with a pre-auth landing experience, 
 - Register/Login: POST `/api/auth/register` / POST `/api/auth/login`; handle 400/401/409.
 - Forgot Password: POST `/api/auth/forgot-password`; always returns 200 OK (handles 400 for validation only); no user enumeration.
 - Reset Password: POST `/api/auth/reset-password` with email, token, newPassword; handle 400 (invalid token, weak password).
-- Analyze Product: POST `/api/analyses`; client triggers scraping or includes `ingredientsText` fallback; handle 400/503.
+- Analyze Product: POST `/api/analyses`; client sends `isManual` flag, in URL mode product name is automatically scraped (not provided by user), client triggers scraping or includes `ingredientsText` fallback; handle 400/503.
 - Results: GET `/api/analyses/{id}`; POST feedback `/api/analyses/{analysisId}/feedback` (201/409).
 - My Products: GET `/api/analyses` (paginated); filters by `productId` when opened in Version History drawer.
 - Version History Drawer: GET `/api/analyses?productId=...` (paginated).
 
 ### Edge cases and error states
-- Scraping unavailable or fails: Show manual ingredients path inline; preserve user input.
+- Scraping unavailable or fails (URL mode): Show manual ingredients path inline; preserve user input; product name still extracted from URL.
+- Manual mode selected: Product name and ingredients fields required; URL field hidden/disabled.
+- URL mode selected: URL field required; product name field hidden/disabled (extracted automatically).
 - No ingredient list available: Results explicitly mark Not Recommended with reason (per PRD).
 - Service unavailable (503): Retry affordance and guidance; non-destructive UI state.
 - Unauthorized (401): Session expired banner; safe redirect to `/login` with return path.
@@ -239,13 +253,14 @@ The application is a secure, accessible SPA with a pre-auth landing experience, 
 
 ### Requirements and user stories mapping (UI → PRD)
 - US-001/US-002 (Register/Login): Register/Login views with redirects and errors.
-- US-003 (Analyze with scraping success): Analyze Product → Results with loading indicator.
-- US-004 (Analyze with scraping failure): Inline manual ingredient entry → Results.
-- US-005 (No ingredient list): Results shows Not Recommended with explicit justification text.
-- US-006 (View result): Results page with badge, justification, disclaimer.
-- US-007 (Feedback): Feedback controls on Results with confirmation.
-- US-008 (History): My Products list with name and last analyzed date.
-- US-009 (Re-analyze): From history, Re-analyze pre-fills Analyze Product form; new version saved.
+- US-005 (Analyze with URL scraping success): Analyze Product (URL mode) → Results with loading indicator; product name automatically extracted.
+- US-006 (Analyze with scraping failure): Inline manual ingredient entry fallback → Results.
+- US-007 (Analyze with manual entry): Analyze Product (Manual mode) → Results with loading indicator; product saved as manual entry.
+- US-007a (No ingredient list): Results shows Not Recommended with explicit justification text.
+- US-008 (View result): Results page with badge, justification, disclaimer.
+- US-009 (Feedback): Feedback controls on Results with confirmation.
+- US-010 (History): My Products list with name and last analyzed date.
+- US-011 (Re-analyze): From history, Re-analyze pre-fills Analyze Product form; new version saved (only for URL-based products).
 
 ### Anticipated user pain points and mitigations
 - Waiting for analysis: Prominent progress indicators; concise copy about expected duration; non-blocking UI where safe.

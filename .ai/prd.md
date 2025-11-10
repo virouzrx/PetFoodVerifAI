@@ -1,15 +1,15 @@
 # Product Requirements Document (PRD) - Pet Food Analyzer
 ## 1. Product Overview
-The Pet Food Analyzer is a web application designed to provide pet owners with a quick and objective analysis of pet food ingredients. The initial Proof of Concept (PoC) will focus on analyzing cat and dog food from a single, predefined online store. Users will submit a product link along with their pet's details (species, breed, age). The application will scrape the ingredients, send them to a Large Language Model (LLM) for analysis against a set of predefined rules, and return a simple "Recommended" or "Not Recommended" verdict with a concise justification. All analyses are saved to a user's private history for future reference.
+The Pet Food Analyzer is a web application designed to provide pet owners with a quick and objective analysis of pet food ingredients. The initial Proof of Concept (PoC) will focus on analyzing cat and dog food from a single, predefined online store. Users can submit product information in two ways: (1) by providing a product URL from which the system automatically extracts the product name and ingredients, or (2) by manually entering the product name and ingredients. The application will send the ingredients to a Large Language Model (LLM) for analysis against a set of predefined rules, and return a simple "Recommended" or "Not Recommended" verdict with a concise justification. All analyses are saved to a user's private history for future reference.
 
 ## 2. User Problem
 Pet owners are often skeptical about the quality of commercial pet food and find it difficult to decipher complex ingredient lists. They lack a simple, accessible, and objective tool to help them quickly determine if a particular food product is suitable for their pet's specific needs, leading to uncertainty and a time-consuming research process. This application aims to solve this by providing an immediate, AI-driven analysis from a simple product link.
 
 ## 3. Functional Requirements
 - FR-01: User Authentication: The system shall require users to register and log in to use the application. There will be no guest access.
-- FR-02: Data Input Form: The application shall provide a single, vertical form for users to input the Product URL, Product Name, Species (Cat/Dog), Breed (free text), Age, and optional "Additional Info".
-- FR-03: Ingredient Scraping: The system shall attempt to automatically scrape the ingredient list from the provided product URL.
-- FR-04: Manual Ingredient Input: If ingredient scraping fails, the system shall prompt the user to manually copy and paste the ingredients.
+- FR-02: Data Input Form: The application shall provide a form with two input modes: (1) URL Mode: users provide a Product URL, and the system automatically extracts the product name and ingredients from the URL; (2) Manual Mode: users manually enter the Product Name and ingredients. Both modes require Species (Cat/Dog), Breed (free text), Age, and optional "Additional Info".
+- FR-03: Product Data Scraping: When a product URL is provided, the system shall automatically scrape both the product name and ingredient list from the provided product URL.
+- FR-04: Manual Ingredient Input: The system supports manual entry as a primary input mode. Users can choose to manually enter product name and ingredients without providing a URL. Additionally, if ingredient scraping fails in URL mode, the system shall prompt the user to manually copy and paste the ingredients as a fallback.
 - FR-05: LLM Analysis: The application will use an LLM with a guided meta-prompt containing predefined rules (e.g., "grain is bad for cats") to analyze the ingredients.
 - FR-06: Results Display: The analysis result shall be displayed on a dedicated page featuring a prominent "Recommended" or "Not Recommended" badge and a short, LLM-generated justification.
 - FR-07: AI Disclaimer: A disclaimer stating that the analysis is AI-generated and not a substitute for professional veterinary advice must be visible on the results page.
@@ -93,26 +93,37 @@ Pet owners are often skeptical about the quality of commercial pet food and find
 
 ### Product Analysis
 - ID: US-005
-- Title: Analyze a product with successful ingredient scraping
-- Description: As a logged-in user, I want to submit a product URL and my pet's details to get an analysis of the food.
+- Title: Analyze a product with successful URL scraping
+- Description: As a logged-in user, I want to submit a product URL and my pet's details to get an analysis of the food, with the system automatically extracting the product name and ingredients.
 - Acceptance Criteria:
   - Given I am logged in and on the analysis form page,
-  - When I fill in all required fields (URL, Product Name, Species, Age, Breed) and click "Analyze",
-  - And the system successfully scrapes the ingredients from the URL,
+  - When I select URL mode and fill in the required fields (URL, Species, Age, Breed) and click "Analyze",
+  - And the system successfully scrapes the product name and ingredients from the URL,
   - Then a loading indicator is displayed while the analysis is processing.
   - Then I am redirected to the results page, which shows a "Recommended" or "Not Recommended" badge and a justification.
+  - The product name displayed on the results page matches the name extracted from the URL.
 
 - ID: US-006
-- Title: Analyze a product with failed ingredient scraping
-- Description: As a logged-in user, if the app cannot find the ingredients, I want to be prompted to enter them manually so I can still get an analysis.
+- Title: Analyze a product with failed ingredient scraping (fallback to manual)
+- Description: As a logged-in user, if the app cannot find the ingredients when scraping from a URL, I want to be prompted to enter them manually so I can still get an analysis.
 - Acceptance Criteria:
-  - Given I have submitted the analysis form,
+  - Given I have submitted the analysis form in URL mode,
   - And the system fails to scrape the ingredients from the URL,
-  - Then a message is displayed informing me of the failure and providing a text box.
+  - Then a message is displayed informing me of the failure and providing a text box for manual ingredient entry.
   - When I paste the ingredients into the text box and resubmit,
   - Then the analysis proceeds, and I am shown the results page.
 
 - ID: US-007
+- Title: Analyze a product using manual entry mode
+- Description: As a logged-in user, I want to manually enter a product name and ingredients without providing a URL, so I can analyze products that are not available online or products I have in physical form.
+- Acceptance Criteria:
+  - Given I am logged in and on the analysis form page,
+  - When I select Manual mode and fill in the required fields (Product Name, Ingredients, Species, Age, Breed) and click "Analyze",
+  - Then a loading indicator is displayed while the analysis is processing.
+  - Then I am redirected to the results page, which shows a "Recommended" or "Not Recommended" badge and a justification.
+  - The product is saved in my history with the manually entered name and marked as a manual entry.
+
+- ID: US-007a
 - Title: Handle a product with no ingredient list
 - Description: As a user, if I submit a product that has no ingredient list available for scraping or manual entry, I want the system to flag it as not recommended.
 - Acceptance Criteria:
