@@ -62,6 +62,7 @@ describe('analysisService', () => {
         analysisId: mockAnalysisId,
         productId: mockProductId,
         productName: 'Test Product 1',
+        isManualEntry: false,
         recommendation: 'Recommended' as const,
         createdAt: '2024-01-01T12:00:00Z',
       },
