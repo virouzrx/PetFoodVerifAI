@@ -42,7 +42,7 @@ const ProductUrlInput = ({
             ? 'border-red-600 focus:border-red-700 focus:ring-red-700'
             : 'border-gray-300 focus:border-brand-primary focus:ring-brand-primary/30'
         } disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-500`}
-        placeholder="https://www.chewy.com/product-name/..."
+        placeholder="https://www.zooplus.com/product-name/..."
       />
       {error ? (
         <p id={errorId} className="mt-1 text-sm text-red-700" role="alert">
@@ -50,7 +50,7 @@ const ProductUrlInput = ({
         </p>
       ) : (
         <p id={helperId} className="mt-1 text-xs text-gray-600">
-          Link to the specific product page on a supported retailer
+          Link to the specific product page on zooplus.com
         </p>
       )}
     </div>

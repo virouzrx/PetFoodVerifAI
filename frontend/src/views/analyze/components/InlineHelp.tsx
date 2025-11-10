@@ -47,7 +47,7 @@ const InlineHelp = ({ className = "" }: InlineHelpProps) => {
             <h4 className="font-medium mb-2">Tips for best results:</h4>
             <ul className="list-disc pl-5 space-y-1">
               <li>
-                Use product URLs from supported retailers (e.g., Chewy.com, Amazon)
+                Use product URLs from zooplus.com
               </li>
               <li>
                 Ensure the URL points to a specific product page, not a category listing

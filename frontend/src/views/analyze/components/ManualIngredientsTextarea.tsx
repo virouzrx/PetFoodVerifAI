@@ -27,9 +27,6 @@ const ManualIngredientsTextarea = ({
         <h3 className="text-sm font-semibold text-amber-900">
           Manual Ingredient Entry
         </h3>
-        <p className="mt-1 text-xs text-amber-800">
-          Since automatic scraping wasn't successful, please provide the ingredient list manually.
-        </p>
       </div>
 
       {/* Textarea */}
@@ -58,7 +55,7 @@ const ManualIngredientsTextarea = ({
           </p>
         ) : (
           <p id={helperId} className="mt-1 text-xs text-slate-600">
-            Copy ingredients exactly as they appear on the package. Include all ingredients in order.
+            Copy ingredients exactly as they appear on the package. Include all ingredients in order. If possible, also include vitamins, minerals, and supplements (such as taurine).
           </p>
         )}
       </div>

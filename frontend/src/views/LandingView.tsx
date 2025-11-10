@@ -3,7 +3,6 @@ import MarketingHero from './components/MarketingHero'
 import HowItWorks from './components/HowItWorks'
 import PoCScopeNotice from './components/PoCScopeNotice'
 import PrimaryCTAButtons from './components/PrimaryCTAButtons'
-import FooterLinks from './components/FooterLinks'
 import type { HowStep, LandingViewProps } from '../types/landing'
 
 const mockSteps: HowStep[] = [
@@ -43,18 +42,14 @@ const LandingView = () => {
           'Requires an authenticated account to run analyses.',
         ],
         disclaimer:
-          'AI Disclaimer: This tool provides automated recommendations. Always consult a veterinarian for personalized guidance.',
+          'This tool provides automated recommendations. Always consult a veterinarian for personalized guidance.',
         privacyNote:
-          'Privacy Notice: Ingredient data you submit is used solely to generate insights and is not shared externally.',
+          'Ingredient data you submit is used solely to generate insights and is not shared externally.',
       },
       authRoutes: {
         login: '/login',
         register: '/register',
       },
-      footerLinks: [
-        { label: 'Privacy', href: '/privacy' },
-        { label: 'Terms', href: '/terms' },
-      ],
     }),
     [],
   )
@@ -70,7 +65,6 @@ const LandingView = () => {
           registerPath={viewModel.authRoutes.register}
         />
       </main>
-      <FooterLinks links={viewModel.footerLinks} />
     </div>
   )
 }

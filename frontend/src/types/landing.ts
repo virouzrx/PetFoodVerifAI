@@ -52,6 +52,6 @@ export interface LandingViewProps {
   steps: HowStep[]
   scope: PoCScopeNoticeProps
   authRoutes: AuthRoutesConfig
-  footerLinks: FooterLink[]
+  footerLinks?: FooterLink[]
 }
 

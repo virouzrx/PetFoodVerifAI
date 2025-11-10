@@ -54,7 +54,9 @@ const AppHeader = ({ currentPath, onLogout }: AppHeaderProps) => {
             className="flex items-center gap-2 text-xl font-bold text-brand-primary hover:text-brand-accent focus:outline-none focus:ring-2 focus:ring-brand-primary focus:ring-offset-2 rounded-md"
           >
             <span className="text-2xl">🐾</span>
-            <span>PetFoodVerifAI</span>
+            <span>
+              PetFoodVerif<span className="text-brand-tertiary font-semibold">AI</span>
+            </span>
           </a>
           
           {/* Navigation */}
