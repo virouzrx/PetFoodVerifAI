@@ -209,8 +209,8 @@ Analyze these ingredients and determine if this food is recommended for this spe
 
 ### For Cats (if applicable):
 - **Essential nutrients that MUST be present:** Taurine (critical), Arachidonic acid, Vitamin A (preformed), Arginine, high-quality animal protein
-- **Toxic/Unacceptable ingredients:** Onions, garlic, chives, grapes, raisins, chocolate, caffeine, xylitol, alcohol, macadamia nuts
-- **Questionable ingredients:** Excessive carbs/grains, low-quality protein fillers, artificial preservatives (BHA, BHT, ethoxyquin), unspecified by-products
+- **Toxic/Unacceptable ingredients:** Onions, garlic, chives, grapes, raisins, chocolate, caffeine, xylitol, alcohol, macadamia nuts, excessive carbs/grains
+- **Questionable ingredients:** Low-quality protein fillers, artificial preservatives (BHA, BHT, ethoxyquin), unspecified by-products
 
 ### For Dogs (if applicable):
 - **Essential nutrients:** Complete protein sources, essential fatty acids, vitamins, minerals with proper calcium/phosphorus ratio

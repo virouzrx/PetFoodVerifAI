@@ -6,7 +6,7 @@ type InlineHelpProps = {
  * InlineHelp Component
  * 
  * Purpose: Provide static guidance on acceptable product URLs, privacy notice, 
- * and explain scraping fallback.
+ * and explain the two input modes (URL and manual entry).
  * 
  * Elements: Heading, short paragraphs, list of tips, info icon styled with Tailwind
  * Accessibility: role="note", screen-reader friendly with ordered focus placement
@@ -39,15 +39,16 @@ const InlineHelp = ({ className = "" }: InlineHelpProps) => {
           </h3>
           <div className="mt-2 text-sm text-gray-800">
             <p className="mb-3">
-              We'll attempt to automatically retrieve ingredient information from the 
-              product URL you provide. If automatic scraping isn't possible, you'll 
-              have the option to enter ingredients manually.
+              You can provide product information in two ways: by entering a product URL 
+              and we'll automatically retrieve the ingredient information, or you can choose 
+              to enter the product name and ingredients manually. Manual entry is always 
+              available as an option, whether the automatic retrieval works or not.
             </p>
             
             <h4 className="font-medium mb-2">Tips for best results:</h4>
             <ul className="list-disc pl-5 space-y-1">
               <li>
-                Use product URLs from zooplus.com
+                Use product URLs from zooplus.pl
               </li>
               <li>
                 Ensure the URL points to a specific product page, not a category listing
@@ -63,7 +64,7 @@ const InlineHelp = ({ className = "" }: InlineHelpProps) => {
             <p className="mt-3 text-xs">
               <strong>Privacy Notice:</strong> We collect product and pet details only 
               to provide analysis recommendations. Your data is stored securely and not 
-              shared with third parties. See our privacy policy for more information.
+              shared with third parties.
             </p>
           </div>
         </div>

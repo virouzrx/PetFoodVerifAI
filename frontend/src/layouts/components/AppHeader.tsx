@@ -16,7 +16,7 @@ type AppHeaderProps = {
   onLogout: () => void
 }
 
-const navItems: NavLinkItem[] = [
+export const navItems: NavLinkItem[] = [
   {
     id: 'analyze',
     label: 'Analyze',
@@ -45,10 +45,10 @@ const AppHeader = ({ currentPath, onLogout }: AppHeaderProps) => {
   }
 
   return (
-    <header className="sticky top-0 z-40 border-b-2 border-brand-primary bg-brand-secondary shadow-md">
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
+    <header className="sticky top-0 z-40 w-full border-b-2 border-brand-primary bg-brand-secondary shadow-md">
+      <div className="mx-auto flex w-full items-center justify-between px-4 py-4 sm:px-6 lg:max-w-7xl lg:px-8">
         {/* Logo */}
-        <div className="flex items-center gap-8">
+        <div className="flex items-center gap-4 sm:gap-8">
           <a
             href="/analyze"
             className="flex items-center gap-2 text-xl font-bold text-brand-primary hover:text-brand-accent focus:outline-none focus:ring-2 focus:ring-brand-primary focus:ring-offset-2 rounded-md"
@@ -59,8 +59,13 @@ const AppHeader = ({ currentPath, onLogout }: AppHeaderProps) => {
             </span>
           </a>
           
-          {/* Navigation */}
-          <NavLinks items={navItems} currentPath={currentPath} />
+          {/* Navigation - show only "Analyze" on mobile, all items on tablet+ */}
+          <div className="hidden md:block">
+            <NavLinks items={navItems} currentPath={currentPath} />
+          </div>
+          <div className="md:hidden">
+            <NavLinks items={navItems.filter(item => item.id === 'analyze')} currentPath={currentPath} />
+          </div>
         </div>
         
         {/* Account Menu */}
@@ -68,6 +73,8 @@ const AppHeader = ({ currentPath, onLogout }: AppHeaderProps) => {
           email={state.user?.email || 'User'}
           onLogout={handleLogout}
           isProcessing={isProcessing}
+          currentPath={currentPath}
+          mobileNavItems={navItems.filter(item => item.id === 'products')}
         />
       </div>
     </header>

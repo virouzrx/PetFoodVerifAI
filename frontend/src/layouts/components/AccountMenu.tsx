@@ -1,12 +1,16 @@
 import { useState, useEffect, useRef } from 'react'
+import { NavLink } from 'react-router-dom'
+import type { NavLinkItem } from './AppHeader'
 
 export type AccountMenuProps = {
   email: string
   onLogout: () => void
   isProcessing: boolean
+  currentPath?: string
+  mobileNavItems?: NavLinkItem[]
 }
 
-const AccountMenu = ({ email, onLogout, isProcessing }: AccountMenuProps) => {
+const AccountMenu = ({ email, onLogout, isProcessing, currentPath = '', mobileNavItems = [] }: AccountMenuProps) => {
   const [isOpen, setIsOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
 
@@ -40,6 +44,17 @@ const AccountMenu = ({ email, onLogout, isProcessing }: AccountMenuProps) => {
     onLogout()
   }
 
+  const handleNavClick = () => {
+    setIsOpen(false)
+  }
+
+  const isActive = (item: NavLinkItem) => {
+    if (item.exact) {
+      return currentPath === item.path
+    }
+    return currentPath.startsWith(item.path)
+  }
+
   return (
     <div className="relative" ref={menuRef}>
       <button
@@ -47,7 +62,7 @@ const AccountMenu = ({ email, onLogout, isProcessing }: AccountMenuProps) => {
         onClick={() => setIsOpen(!isOpen)}
         aria-expanded={isOpen}
         aria-haspopup="true"
-        className="flex items-center gap-2 rounded-md bg-white px-4 py-2 text-sm font-medium text-brand-dark hover:bg-brand-primary hover:text-white transition-colors shadow-sm focus:outline-none focus:ring-2 focus:ring-brand-primary focus:ring-offset-2"
+        className="flex items-center gap-2 rounded-md bg-brand-primary px-4 py-2 text-sm font-medium text-white hover:bg-brand-primary/90 transition-colors shadow-sm focus:outline-none focus:ring-2 focus:ring-brand-primary focus:ring-offset-2"
       >
         <span className="hidden sm:inline">{email}</span>
         <svg
@@ -74,6 +89,30 @@ const AccountMenu = ({ email, onLogout, isProcessing }: AccountMenuProps) => {
             Signed in as
             <div className="mt-1 truncate font-medium text-brand-dark">{email}</div>
           </div>
+          
+          {/* Mobile Navigation Items - only show on mobile */}
+          {mobileNavItems.length > 0 && (
+            <>
+              {mobileNavItems.map((item) => {
+                const active = isActive(item)
+                return (
+                  <NavLink
+                    key={item.id}
+                    to={item.path}
+                    onClick={handleNavClick}
+                    role="menuitem"
+                    aria-current={active ? 'page' : undefined}
+                    className={`md:hidden block px-4 py-2 text-sm text-brand-dark hover:bg-white focus:bg-white focus:outline-none ${
+                      active ? 'bg-white font-medium' : ''
+                    }`}
+                  >
+                    {item.label}
+                  </NavLink>
+                )
+              })}
+              <div className="md:hidden border-t-2 border-brand-accent my-1" />
+            </>
+          )}
           
           <button
             type="button"

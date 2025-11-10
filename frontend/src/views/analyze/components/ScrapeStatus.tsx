@@ -44,7 +44,7 @@ const ScrapeStatus = ({
   const getStatusLabel = () => {
     switch (state) {
       case 'scraping':
-        return 'Scraping';
+        return 'Loading';
       case 'submitting':
         return 'Analyzing';
       case 'awaitingManual':
@@ -148,7 +148,7 @@ const ScrapeStatus = ({
                   onClick={onRetry}
                   className="rounded-md border border-amber-600 bg-white px-3 py-1.5 text-sm font-medium text-amber-900 hover:bg-amber-50 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2"
                 >
-                  Retry Scraping
+                  Try Again
                 </button>
               )}
             </div>

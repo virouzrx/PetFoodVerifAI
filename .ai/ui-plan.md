@@ -197,6 +197,9 @@ The application is a secure, accessible SPA with a pre-auth landing experience, 
 
 - **Navigation**
   - Persistent header with links: Analyze, My Products; account menu with Logout.
+  - On mobile (< 768px): "Analyze" remains visible in header; "My Products" moved to account dropdown menu.
+  - On tablet+ (≥ 768px): Both "Analyze" and "My Products" visible in header navigation.
+  - Header covers full width on all screen sizes; responsive padding and max-width constraints.
   - Deep links from results to product history and vice versa.
   - Route guards redirect unauthenticated users to `/login` with a return path.
 
@@ -207,7 +210,7 @@ The application is a secure, accessible SPA with a pre-auth landing experience, 
 ## 5. Key Components
 
 - **AuthGuard/ProtectedRoute**: Wraps authenticated routes; intercepts 401 to show session-expired UI and redirect.
-- **AppHeader**: Branding, primary nav (Analyze, My Products), account menu (Logout), responsive menu for tablet.
+- **AppHeader**: Branding, primary nav (Analyze, My Products on tablet+; Analyze only on mobile), account menu (Logout, includes "My Products" on mobile), full-width responsive layout.
 - **GlobalAlertArea/Toast**: Surface API errors (400 mapped to forms, 401 session, 503 retry) and confirmations.
 - **ForgotPasswordForm**: Single email input form; always shows success message (prevents user enumeration); handles email validation errors.
 - **ResetPasswordForm**: New password and confirm password inputs; extracts token/email from URL; validates password strength; shows success with countdown redirect or error with recovery link.
