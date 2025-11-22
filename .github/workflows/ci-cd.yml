@@ -131,7 +131,7 @@ jobs:
         run: npx playwright install chromium --with-deps
 
       - name: Install dotnet-ef tool
-        run: dotnet tool install --global dotnet-ef
+        run: dotnet tool install --global dotnet-ef --version 8.0.10
 
       - name: Restore backend dependencies
         run: dotnet restore
@@ -211,7 +211,7 @@ jobs:
         working-directory: ./frontend
 
   # ============================================
-  # Deploy Backend API to Azure
+  # Deploy API to Azure
   # ============================================
   deploy-backend:
     name: Deploy Backend to Azure
